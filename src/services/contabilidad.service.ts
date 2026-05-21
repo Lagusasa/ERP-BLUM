@@ -6,6 +6,11 @@ import type {
   PeriodoContable,
   ComprobanteForm,
 } from '@/types/contabilidad.types'
+import type {
+  BalanceComprobacionLinea,
+  EstadoResultados,
+  BalanceGeneral,
+} from '@/types/reportes.types'
 
 // ============================================================
 // PLAN DE CUENTAS
@@ -322,4 +327,152 @@ export async function getResumenMes(
   const gastos = data.filter((c) => c.tipo === 'diario').reduce((s, c) => s + c.total_debe, 0)
 
   return { ventas, compras, gastos }
+}
+
+// ============================================================
+// REPORTES FINANCIEROS
+// ============================================================
+
+async function getLineasAprobadas(empresa_id: string, desde?: string, hasta?: string) {
+  const supabase = await createClient()
+
+  let q = supabase
+    .from('comprobantes')
+    .select('id')
+    .eq('empresa_id', empresa_id)
+    .eq('estado', 'aprobado')
+
+  if (desde) q = q.gte('fecha', desde)
+  if (hasta) q = q.lte('fecha', hasta)
+
+  const { data: comprobantes } = await q
+  if (!comprobantes?.length) return []
+
+  const ids = comprobantes.map((c) => c.id)
+
+  const { data: lineas } = await supabase
+    .from('comprobante_lineas')
+    .select('debe, haber, cuenta:plan_cuentas!cuenta_id(id, codigo, nombre, clase, saldo_normal)')
+    .in('comprobante_id', ids)
+
+  return lineas ?? []
+}
+
+export async function getBalanceComprobacion(
+  empresa_id: string,
+  desde: string,
+  hasta: string
+): Promise<BalanceComprobacionLinea[]> {
+  const lineas = await getLineasAprobadas(empresa_id, desde, hasta)
+  if (!lineas.length) return []
+
+  const map = new Map<string, BalanceComprobacionLinea>()
+
+  for (const l of lineas) {
+    const c = l.cuenta as unknown as { id: string; codigo: string; nombre: string; clase: string; saldo_normal: string } | null
+    if (!c) continue
+    if (!map.has(c.id)) {
+      map.set(c.id, { codigo: c.codigo, nombre: c.nombre, clase: c.clase, saldo_normal: c.saldo_normal, total_debe: 0, total_haber: 0, saldo_deudor: 0, saldo_acreedor: 0 })
+    }
+    const e = map.get(c.id)!
+    e.total_debe += l.debe
+    e.total_haber += l.haber
+  }
+
+  for (const e of map.values()) {
+    const saldo = e.total_debe - e.total_haber
+    e.saldo_deudor = saldo > 0 ? saldo : 0
+    e.saldo_acreedor = saldo < 0 ? -saldo : 0
+  }
+
+  return Array.from(map.values()).sort((a, b) => a.codigo.localeCompare(b.codigo))
+}
+
+export async function getEstadoResultados(
+  empresa_id: string,
+  desde: string,
+  hasta: string
+): Promise<EstadoResultados> {
+  const lineas = await getLineasAprobadas(empresa_id, desde, hasta)
+  const RESULT_CLASES = new Set(['ingreso', 'costo', 'gasto'])
+
+  const map = new Map<string, { codigo: string; nombre: string; clase: string; saldo_normal: string; debe: number; haber: number }>()
+
+  for (const l of lineas) {
+    const c = l.cuenta as unknown as { id: string; codigo: string; nombre: string; clase: string; saldo_normal: string } | null
+    if (!c || !RESULT_CLASES.has(c.clase)) continue
+    if (!map.has(c.id)) {
+      map.set(c.id, { codigo: c.codigo, nombre: c.nombre, clase: c.clase, saldo_normal: c.saldo_normal, debe: 0, haber: 0 })
+    }
+    const e = map.get(c.id)!
+    e.debe += l.debe
+    e.haber += l.haber
+  }
+
+  const ingresos: EstadoResultados['ingresos'] = []
+  const costos: EstadoResultados['costos'] = []
+  const gastos: EstadoResultados['gastos'] = []
+
+  for (const e of Array.from(map.values()).sort((a, b) => a.codigo.localeCompare(b.codigo))) {
+    const monto = e.saldo_normal === 'acreedor' ? e.haber - e.debe : e.debe - e.haber
+    const item = { codigo: e.codigo, nombre: e.nombre, monto }
+    if (e.clase === 'ingreso') ingresos.push(item)
+    else if (e.clase === 'costo') costos.push(item)
+    else gastos.push(item)
+  }
+
+  const total_ingresos = ingresos.reduce((s, i) => s + i.monto, 0)
+  const total_costos = costos.reduce((s, i) => s + i.monto, 0)
+  const total_gastos = gastos.reduce((s, i) => s + i.monto, 0)
+
+  return {
+    ingresos, costos, gastos,
+    total_ingresos, total_costos, total_gastos,
+    resultado_bruto: total_ingresos - total_costos,
+    resultado_neto: total_ingresos - total_costos - total_gastos,
+  }
+}
+
+export async function getBalanceGeneral(
+  empresa_id: string,
+  hasta: string
+): Promise<BalanceGeneral> {
+  const lineas = await getLineasAprobadas(empresa_id, undefined, hasta)
+  const BALANCE_CLASES = new Set(['activo', 'pasivo', 'patrimonio'])
+
+  const map = new Map<string, { codigo: string; nombre: string; clase: string; saldo_normal: string; debe: number; haber: number }>()
+
+  for (const l of lineas) {
+    const c = l.cuenta as unknown as { id: string; codigo: string; nombre: string; clase: string; saldo_normal: string } | null
+    if (!c || !BALANCE_CLASES.has(c.clase)) continue
+    if (!map.has(c.id)) {
+      map.set(c.id, { codigo: c.codigo, nombre: c.nombre, clase: c.clase, saldo_normal: c.saldo_normal, debe: 0, haber: 0 })
+    }
+    const e = map.get(c.id)!
+    e.debe += l.debe
+    e.haber += l.haber
+  }
+
+  const activos: BalanceGeneral['activos'] = []
+  const pasivos: BalanceGeneral['pasivos'] = []
+  const patrimonio: BalanceGeneral['patrimonio'] = []
+
+  for (const e of Array.from(map.values()).sort((a, b) => a.codigo.localeCompare(b.codigo))) {
+    const saldo = e.saldo_normal === 'deudor' ? e.debe - e.haber : e.haber - e.debe
+    if (saldo === 0) continue
+    const item = { codigo: e.codigo, nombre: e.nombre, saldo }
+    if (e.clase === 'activo') activos.push(item)
+    else if (e.clase === 'pasivo') pasivos.push(item)
+    else patrimonio.push(item)
+  }
+
+  const total_activo = activos.reduce((s, i) => s + i.saldo, 0)
+  const total_pasivo = pasivos.reduce((s, i) => s + i.saldo, 0)
+  const total_patrimonio = patrimonio.reduce((s, i) => s + i.saldo, 0)
+
+  return {
+    activos, pasivos, patrimonio,
+    total_activo, total_pasivo, total_patrimonio,
+    diferencia: total_activo - (total_pasivo + total_patrimonio),
+  }
 }

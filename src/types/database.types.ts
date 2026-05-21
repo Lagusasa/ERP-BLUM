@@ -451,6 +451,22 @@ export type Database = {
         Update: Partial<Omit<Database['public']['Tables']['liquidaciones']['Row'], 'id' | 'created_at'>>
         Relationships: []
       }
+      config_contable: {
+        Row: {
+          empresa_id: string
+          cuenta_iva_cf_id: string | null
+          cuenta_iva_df_id: string | null
+          cuenta_cxc_id: string | null
+          cuenta_cxp_id: string | null
+          cuenta_ingreso_id: string | null
+          cuenta_gasto_id: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['config_contable']['Row'], 'updated_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['config_contable']['Row'], never>>
+        Relationships: []
+      }
       declaraciones_f29: {
         Row: {
           id: string

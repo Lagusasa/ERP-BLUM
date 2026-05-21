@@ -28,10 +28,12 @@ const NAV_MODULOS: NavItem[] = [
     href: '/contabilidad',
     disponible: true,
     children: [
-      { label: 'Resumen',         href: '/contabilidad',              icon: null, disponible: true },
-      { label: 'Plan de Cuentas', href: '/contabilidad/plan-cuentas', icon: null, disponible: true },
-      { label: 'Libro Diario',    href: '/contabilidad/libro-diario', icon: null, disponible: true },
-      { label: 'Libro Mayor',     href: '/contabilidad/libro-mayor',  icon: null, disponible: true },
+      { label: 'Resumen',              href: '/contabilidad',                                    icon: null, disponible: true },
+      { label: 'Plan de Cuentas',     href: '/contabilidad/plan-cuentas',                        icon: null, disponible: true },
+      { label: 'Libro Diario',        href: '/contabilidad/libro-diario',                        icon: null, disponible: true },
+      { label: 'Libro Mayor',         href: '/contabilidad/libro-mayor',                         icon: null, disponible: true },
+      { label: 'Reportes',            href: '/contabilidad/reportes',                            icon: null, disponible: true },
+      { label: 'Configuración',       href: '/contabilidad/config',                              icon: null, disponible: true },
     ],
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
