@@ -30,7 +30,7 @@ export default async function ContabilidadPage() {
         <div>
           <h1 className="text-xl font-bold text-slate-900">Contabilidad</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            {periodo ? `Período activo: ${periodo.nombre} ${periodo.anio}` : 'Sin período activo configurado'}
+            {periodo ? `Período activo: ${periodo.mes}/${periodo.anio}` : 'Sin período activo configurado'}
           </p>
         </div>
         <div className="flex gap-2">
@@ -86,7 +86,7 @@ export default async function ContabilidadPage() {
         </div>
         <div className="bg-white border border-slate-200 rounded-xl p-4">
           <p className="text-xs text-slate-500 uppercase tracking-wide">Período actual</p>
-          <p className="text-lg font-bold text-blue-600 mt-1">{periodo?.nombre ?? '—'}</p>
+          <p className="text-lg font-bold text-blue-600 mt-1">{periodo ? `${periodo.mes}/${periodo.anio}` : '—'}</p>
           <p className="text-xs text-slate-400 mt-0.5">{periodo?.anio ?? 'No configurado'}</p>
         </div>
       </div>

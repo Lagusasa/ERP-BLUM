@@ -52,9 +52,10 @@ export async function updateProveedor(
   data: Partial<Proveedor>
 ): Promise<Proveedor> {
   const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: result, error } = await supabase
     .from('proveedores')
-    .update(data)
+    .update(data as any)
     .eq('id', id)
     .eq('empresa_id', empresa_id)
     .select()
@@ -122,17 +123,14 @@ export async function createDocumentoCompra(
 // TIPOS DE DOCUMENTO
 // ============================================================
 
-export async function getTiposDocumento(esCompra?: boolean, esVenta?: boolean): Promise<TipoDocumento[]> {
+export async function getTiposDocumento(): Promise<TipoDocumento[]> {
   const supabase = await createClient()
-  let query = supabase
+  const { data, error } = await supabase
     .from('tipos_documento')
     .select('*')
-    .order('orden', { ascending: true })
+    .eq('is_active', true)
+    .order('codigo', { ascending: true })
 
-  if (esCompra !== undefined) query = query.eq('es_compra', esCompra)
-  if (esVenta !== undefined) query = query.eq('es_venta', esVenta)
-
-  const { data, error } = await query
   if (error) throw new Error(error.message)
   return (data ?? []) as TipoDocumento[]
 }

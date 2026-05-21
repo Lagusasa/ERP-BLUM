@@ -11,7 +11,7 @@ export default async function NuevoDocumentoCompraPage() {
 
   const [proveedores, tiposDoc] = await Promise.allSettled([
     getProveedores(empresa.id),
-    getTiposDocumento(true, undefined),
+    getTiposDocumento(),
   ])
 
   const listaProveedores = proveedores.status === 'fulfilled' ? proveedores.value.filter((p) => p.is_active) : []

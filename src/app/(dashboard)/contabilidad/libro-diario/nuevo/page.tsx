@@ -23,7 +23,7 @@ export default async function NuevoComprobantePage() {
         <h1 className="text-xl font-bold text-slate-900">Nuevo Comprobante</h1>
         <p className="text-sm text-slate-500 mt-0.5">
           {periodoActual
-            ? `Período: ${periodoActual.nombre} ${periodoActual.anio}`
+            ? `Período: ${periodoActual.mes}/${periodoActual.anio}`
             : 'Sin período activo — el comprobante se guardará como borrador'
           }
         </p>

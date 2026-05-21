@@ -26,7 +26,7 @@ export async function getEmpresaActiva(): Promise<EmpresaBasica | null> {
   if (!asignaciones || asignaciones.length === 0) return null
 
   const todasLasEmpresas = asignaciones
-    .map((a) => a.empresas as EmpresaBasica | null)
+    .map((a) => a.empresas as unknown as EmpresaBasica | null)
     .filter((e): e is EmpresaBasica => e !== null && e.is_active)
 
   if (todasLasEmpresas.length === 0) return null
@@ -58,6 +58,6 @@ export async function getEmpresasUsuario(): Promise<EmpresaBasica[]> {
   if (!asignaciones) return []
 
   return asignaciones
-    .map((a) => a.empresas as EmpresaBasica | null)
+    .map((a) => a.empresas as unknown as EmpresaBasica | null)
     .filter((e): e is EmpresaBasica => e !== null && e.is_active)
 }

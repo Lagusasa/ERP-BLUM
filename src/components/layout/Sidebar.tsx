@@ -72,7 +72,13 @@ const NAV_MODULOS: NavItem[] = [
   {
     label: 'Tributación',
     href: '/tributacion',
-    disponible: false,
+    disponible: true,
+    children: [
+      { label: 'Resumen',          href: '/tributacion',                icon: null, disponible: true },
+      { label: 'Libro Compras',    href: '/tributacion/libro-compras',  icon: null, disponible: true },
+      { label: 'Libro Ventas',     href: '/tributacion/libro-ventas',   icon: null, disponible: true },
+      { label: 'Declaración F29',  href: '/tributacion/f29',            icon: null, disponible: true },
+    ],
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
@@ -82,7 +88,12 @@ const NAV_MODULOS: NavItem[] = [
   {
     label: 'Remuneraciones',
     href: '/remuneraciones',
-    disponible: false,
+    disponible: true,
+    children: [
+      { label: 'Resumen',       href: '/remuneraciones',                       icon: null, disponible: true },
+      { label: 'Trabajadores',  href: '/remuneraciones/trabajadores',           icon: null, disponible: true },
+      { label: 'Liquidaciones', href: '/remuneraciones/liquidaciones',          icon: null, disponible: true },
+    ],
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -135,7 +146,11 @@ const NAV_CONFIG: NavItem[] = [
   {
     label: 'Administración',
     href: '/admin',
-    disponible: false,
+    disponible: true,
+    children: [
+      { label: 'Empresas', href: '/admin/empresas', icon: null, disponible: true },
+      { label: 'Usuarios', href: '/admin/usuarios', icon: null, disponible: true },
+    ],
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />

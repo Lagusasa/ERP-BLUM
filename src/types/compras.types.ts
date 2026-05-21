@@ -5,12 +5,14 @@ export interface TipoDocumento {
   id: string
   codigo: string
   nombre: string
-  abreviatura: string
+  abreviatura: string | null
   afecto_iva: boolean
-  es_compra: boolean
-  es_venta: boolean
-  es_electronico: boolean
-  orden: number
+  afecta_iva_debito: boolean
+  afecta_iva_credito: boolean
+  es_nota_credito: boolean
+  es_nota_debito: boolean
+  is_active: boolean
+  created_at: string
 }
 
 export interface Proveedor {
@@ -23,17 +25,13 @@ export interface Proveedor {
   direccion: string | null
   comuna: string | null
   ciudad: string | null
-  region: string | null
   telefono: string | null
   email: string | null
-  contacto_nombre: string | null
-  contacto_email: string | null
-  condicion_pago: number
-  cuenta_contable_id: string | null
-  notas: string | null
+  condicion_pago: string | null
   is_active: boolean
   created_at: string
   updated_at: string
+  deleted_at: string | null
 }
 
 export interface Cliente {
@@ -46,18 +44,14 @@ export interface Cliente {
   direccion: string | null
   comuna: string | null
   ciudad: string | null
-  region: string | null
   telefono: string | null
   email: string | null
-  contacto_nombre: string | null
-  contacto_email: string | null
-  condicion_pago: number
   limite_credito: number | null
-  cuenta_contable_id: string | null
-  notas: string | null
+  condicion_pago: string | null
   is_active: boolean
   created_at: string
   updated_at: string
+  deleted_at: string | null
 }
 
 export interface DocumentoCompra {
@@ -68,8 +62,6 @@ export interface DocumentoCompra {
   numero_documento: string
   fecha_emision: string
   fecha_vencimiento: string | null
-  fecha_recepcion: string | null
-  periodo_id: string | null
   neto: number
   iva: number
   exento: number
@@ -77,12 +69,11 @@ export interface DocumentoCompra {
   tasa_iva: number
   es_afecto: boolean
   estado: EstadoDocumentoCompra
-  comprobante_id: string | null
   referencia: string | null
   glosa: string | null
-  is_active: boolean
   created_at: string
   updated_at: string
+  deleted_at: string | null
   proveedor?: Proveedor
   tipo_documento?: TipoDocumento
 }
@@ -95,7 +86,6 @@ export interface DocumentoVenta {
   numero_documento: string
   fecha_emision: string
   fecha_vencimiento: string | null
-  periodo_id: string | null
   neto: number
   iva: number
   exento: number
@@ -103,12 +93,11 @@ export interface DocumentoVenta {
   tasa_iva: number
   es_afecto: boolean
   estado: EstadoDocumentoVenta
-  comprobante_id: string | null
   referencia: string | null
   glosa: string | null
-  is_active: boolean
   created_at: string
   updated_at: string
+  deleted_at: string | null
   cliente?: Cliente
   tipo_documento?: TipoDocumento
 }

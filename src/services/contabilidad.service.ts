@@ -17,8 +17,6 @@ export async function getCuentas(empresa_id: string): Promise<PlanCuenta[]> {
     .from('plan_cuentas')
     .select('*')
     .eq('empresa_id', empresa_id)
-    .is('deleted_at', null)
-    .order('orden', { ascending: true })
     .order('codigo', { ascending: true })
 
   if (error) throw new Error(error.message)
@@ -32,8 +30,7 @@ export async function getCuentasImputables(empresa_id: string): Promise<PlanCuen
     .select('id, codigo, nombre, clase, saldo_normal')
     .eq('empresa_id', empresa_id)
     .eq('es_imputable', true)
-    .eq('is_active', true)
-    .is('deleted_at', null)
+    .eq('es_activo', true)
     .order('codigo', { ascending: true })
 
   if (error) throw new Error(error.message)
@@ -45,14 +42,15 @@ export async function createCuenta(
   data: Partial<PlanCuenta>
 ): Promise<PlanCuenta> {
   const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: result, error } = await supabase
     .from('plan_cuentas')
-    .insert({ ...data, empresa_id })
+    .insert({ ...data, empresa_id } as any)
     .select()
     .single()
 
   if (error) throw new Error(error.message)
-  return result as PlanCuenta
+  return result as unknown as PlanCuenta
 }
 
 export async function updateCuenta(
@@ -61,16 +59,17 @@ export async function updateCuenta(
   data: Partial<PlanCuenta>
 ): Promise<PlanCuenta> {
   const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: result, error } = await supabase
     .from('plan_cuentas')
-    .update(data)
+    .update(data as any)
     .eq('id', id)
     .eq('empresa_id', empresa_id)
     .select()
     .single()
 
   if (error) throw new Error(error.message)
-  return result as PlanCuenta
+  return result as unknown as PlanCuenta
 }
 
 export async function tieneMigracionTemplate(empresa_id: string): Promise<boolean> {
@@ -140,7 +139,7 @@ export async function getComprobantes(filtros: FiltrosComprobante): Promise<Comp
       periodo:periodos_contables(*)
     `)
     .eq('empresa_id', filtros.empresa_id)
-    .is('deleted_at', null)
+    .neq('estado', 'anulado')
     .order('numero', { ascending: false })
 
   if (filtros.tipo) query = query.eq('tipo', filtros.tipo)
@@ -168,7 +167,6 @@ export async function getComprobante(id: string, empresa_id: string): Promise<Co
     `)
     .eq('id', id)
     .eq('empresa_id', empresa_id)
-    .is('deleted_at', null)
     .maybeSingle()
 
   return data as unknown as Comprobante | null

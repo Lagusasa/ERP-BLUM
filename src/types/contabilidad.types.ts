@@ -11,20 +11,15 @@ export interface PlanCuenta {
   cuenta_padre_id: string | null
   codigo: string
   nombre: string
-  nombre_corto: string | null
   clase: ClaseCuenta
   tipo: TipoCuenta
   nivel: number
   saldo_normal: SaldoNormal
   es_imputable: boolean
-  es_ajuste: boolean
-  es_tributaria: boolean
-  codigo_sii: string | null
-  orden: number
-  is_active: boolean
+  es_activo: boolean
+  permite_ajuste: boolean
   created_at: string
   updated_at: string
-  deleted_at: string | null
   hijos?: PlanCuenta[]
 }
 
@@ -44,10 +39,9 @@ export interface PeriodoContable {
   empresa_id: string
   anio: number
   mes: number
-  nombre: string
   estado: EstadoPeriodo
-  fecha_inicio: string | null
-  fecha_fin: string | null
+  fecha_apertura: string | null
+  fecha_cierre: string | null
   created_at: string
   updated_at: string
 }
@@ -61,7 +55,6 @@ export interface ComprobanteLinia {
   debe: number
   haber: number
   glosa: string | null
-  documento_ref: string | null
   orden: number
   created_at: string
   cuenta?: PlanCuenta
@@ -75,14 +68,11 @@ export interface Comprobante {
   numero: number
   tipo: TipoComprobante
   fecha: string
-  glosa: string
+  glosa: string | null
+  referencia: string | null
   estado: EstadoComprobante
   total_debe: number
   total_haber: number
-  origen: string | null
-  origen_id: string | null
-  documento_ref: string | null
-  is_active: boolean
   created_at: string
   updated_at: string
   created_by: string | null

@@ -26,9 +26,8 @@ export default function LibroDiarioClient({ comprobantes, empresa_id }: Props) {
       const terminoBusq = busqueda.toLowerCase()
       const coincide =
         !busqueda ||
-        c.glosa.toLowerCase().includes(terminoBusq) ||
-        String(c.numero).includes(terminoBusq) ||
-        (c.documento_ref ?? '').toLowerCase().includes(terminoBusq)
+        (c.glosa ?? '').toLowerCase().includes(terminoBusq) ||
+        String(c.numero).includes(terminoBusq)
 
       const estadoOk = filtroEstado === 'todos' || c.estado === filtroEstado
       const tipoOk = filtroTipo === 'todos' || c.tipo === filtroTipo
@@ -141,10 +140,7 @@ export default function LibroDiarioClient({ comprobantes, empresa_id }: Props) {
                   <td className="px-4 py-2.5 font-medium text-slate-700">{c.numero}</td>
                   <td className="px-4 py-2.5 text-slate-600">{formatDate(c.fecha)}</td>
                   <td className="px-4 py-2.5 text-slate-700 max-w-xs">
-                    <p className="truncate">{c.glosa}</p>
-                    {c.documento_ref && (
-                      <p className="text-xs text-slate-400 truncate">{c.documento_ref}</p>
-                    )}
+                    <p className="truncate">{c.glosa ?? '—'}</p>
                   </td>
                   <td className="px-4 py-2.5 text-slate-500 text-xs">
                     {TIPO_COMPROBANTE_LABELS[c.tipo]}

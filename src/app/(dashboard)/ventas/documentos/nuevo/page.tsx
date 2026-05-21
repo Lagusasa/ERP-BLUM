@@ -12,7 +12,7 @@ export default async function NuevoDocumentoVentaPage() {
 
   const [clientes, tiposDoc] = await Promise.allSettled([
     getClientes(empresa.id),
-    getTiposDocumento(undefined, true),
+    getTiposDocumento(),
   ])
 
   const listaClientes = clientes.status === 'fulfilled' ? clientes.value.filter((c) => c.is_active) : []

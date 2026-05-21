@@ -98,17 +98,18 @@ export default function NuevoComprobanteClient({ empresa_id, periodo_id, cuentas
       const supabase = createClient()
 
       const anio = new Date(fecha).getFullYear()
-      const { data: numero } = await supabase.rpc('siguiente_numero_comprobante', {
+      const { data: numeroRpc } = await supabase.rpc('siguiente_numero_comprobante', {
         p_empresa_id: empresa_id,
         p_anio: anio,
       })
+      if (!numeroRpc) throw new Error('No se pudo obtener número de comprobante')
 
       const { data: comprobante, error: compErr } = await supabase
         .from('comprobantes')
         .insert({
           empresa_id,
           periodo_id: periodo_id ?? null,
-          numero,
+          numero: numeroRpc,
           tipo,
           fecha,
           glosa: glosa.trim(),

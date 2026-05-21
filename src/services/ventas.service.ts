@@ -52,9 +52,10 @@ export async function updateCliente(
   data: Partial<Cliente>
 ): Promise<Cliente> {
   const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: result, error } = await supabase
     .from('clientes')
-    .update(data)
+    .update(data as any)
     .eq('id', id)
     .eq('empresa_id', empresa_id)
     .select()
