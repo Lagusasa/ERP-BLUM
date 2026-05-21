@@ -29,7 +29,7 @@ export default function LoginForm() {
         } else if (authError.message.includes('Email not confirmed')) {
           setError('Debes confirmar tu email antes de iniciar sesión.')
         } else {
-          setError(authError.message)
+          setError('Error al iniciar sesión. Intenta nuevamente.')
         }
         return
       }
@@ -37,7 +37,8 @@ export default function LoginForm() {
       router.push('/dashboard')
       router.refresh()
     } catch (err) {
-      setError('Error: ' + (err instanceof Error ? err.message : String(err)))
+      console.error('Login error:', err)
+      setError('Error inesperado. Intenta nuevamente.')
     } finally {
       setLoading(false)
     }
