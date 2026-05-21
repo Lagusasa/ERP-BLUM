@@ -27,7 +27,7 @@ export default async function FinanzasPage() {
             + Cuenta
           </Link>
           <Link href="/finanzas/movimientos/nuevo"
-            className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg">
+            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
@@ -89,7 +89,7 @@ export default async function FinanzasPage() {
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center">
           <p className="text-sm text-slate-500">No hay cuentas bancarias configuradas.</p>
           <Link href="/finanzas/cuentas/nueva"
-            className="mt-2 inline-block text-sm text-blue-600 hover:underline">
+            className="mt-2 inline-block text-sm text-emerald-700 hover:underline">
             Agregar primera cuenta →
           </Link>
         </div>
@@ -99,7 +99,7 @@ export default async function FinanzasPage() {
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <h2 className="text-sm font-semibold text-slate-700">Últimos movimientos</h2>
-          <Link href="/finanzas/movimientos" className="text-xs text-blue-600 hover:underline">Ver todos →</Link>
+          <Link href="/finanzas/movimientos" className="text-xs text-emerald-700 hover:underline">Ver todos →</Link>
         </div>
         {movimientos.length === 0 ? (
           <p className="text-center py-8 text-slate-400 text-sm">Sin movimientos registrados.</p>

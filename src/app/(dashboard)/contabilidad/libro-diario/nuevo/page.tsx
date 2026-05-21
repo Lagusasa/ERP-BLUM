@@ -35,7 +35,7 @@ export default async function NuevoComprobantePage() {
           <p className="text-amber-600 text-sm mt-1">
             Debes importar el plan de cuentas antes de crear comprobantes.
           </p>
-          <a href="/contabilidad/plan-cuentas" className="mt-3 inline-block text-sm text-blue-600 hover:underline">
+          <a href="/contabilidad/plan-cuentas" className="mt-3 inline-block text-sm text-emerald-700 hover:underline">
             Ir a Plan de Cuentas →
           </a>
         </div>

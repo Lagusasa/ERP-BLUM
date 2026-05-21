@@ -34,7 +34,7 @@ export default async function ContabilidadLayout({
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <div className="flex items-center px-4 border-b border-slate-100">
           <div className="flex items-center gap-2 py-3 pr-6 border-r border-slate-200 mr-2">
-            <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-4 h-4 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
             <span className="text-sm font-semibold text-slate-700">Contabilidad</span>

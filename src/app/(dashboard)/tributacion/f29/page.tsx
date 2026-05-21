@@ -82,9 +82,9 @@ export default async function F29Page({ searchParams }: PageProps) {
         </div>
 
         {/* Info */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <p className="text-xs text-blue-700 font-medium mb-1">Información F29 — {MESES[mes - 1]} {anio}</p>
-          <p className="text-xs text-blue-600">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+          <p className="text-xs text-emerald-800 font-medium mb-1">Información F29 — {MESES[mes - 1]} {anio}</p>
+          <p className="text-xs text-emerald-700">
             Esta es una pre-liquidación calculada automáticamente desde los documentos registrados.
             El vencimiento para la declaración y pago es el día 12 del mes siguiente.
             Para presentar la declaración oficial, accede al portal del SII.

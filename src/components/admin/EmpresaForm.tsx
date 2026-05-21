@@ -104,31 +104,31 @@ export default function EmpresaForm({ empresa }: Props) {
             <label className="block text-xs font-medium text-slate-600 mb-1">Razón Social <span className="text-red-500">*</span></label>
             <input type="text" value={razonSocial} onChange={(e) => setRazonSocial(e.target.value)} required
               placeholder="Empresa Ejemplo SpA"
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">RUT <span className="text-red-500">*</span></label>
             <input type="text" value={rut} onChange={(e) => setRut(e.target.value)} required
               placeholder="76.123.456-7"
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Giro Comercial</label>
             <input type="text" value={giro} onChange={(e) => setGiro(e.target.value)}
               placeholder="Servicios de consultoría"
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Email</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
               placeholder="contacto@empresa.cl"
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Teléfono</label>
             <input type="text" value={telefono} onChange={(e) => setTelefono(e.target.value)}
               placeholder="+56 2 2345 6789"
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
         </div>
       </div>
@@ -140,19 +140,19 @@ export default function EmpresaForm({ empresa }: Props) {
             <label className="block text-xs font-medium text-slate-600 mb-1">Dirección</label>
             <input type="text" value={direccion} onChange={(e) => setDireccion(e.target.value)}
               placeholder="Av. Ejemplo 1234, Oficina 5"
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Comuna</label>
             <input type="text" value={comuna} onChange={(e) => setComuna(e.target.value)}
               placeholder="Providencia"
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Ciudad</label>
             <input type="text" value={ciudad} onChange={(e) => setCiudad(e.target.value)}
               placeholder="Santiago"
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
         </div>
       </div>
@@ -165,7 +165,7 @@ export default function EmpresaForm({ empresa }: Props) {
           Cancelar
         </button>
         <button type="submit" disabled={guardando}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50">
+          className="px-4 py-2 text-sm font-medium text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-colors disabled:opacity-50">
           {guardando ? 'Guardando...' : isEditing ? 'Actualizar empresa' : 'Crear empresa'}
         </button>
       </div>

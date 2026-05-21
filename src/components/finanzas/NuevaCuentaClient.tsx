@@ -43,14 +43,14 @@ export default function NuevaCuentaClient({ empresa_id }: Props) {
         <label className="block text-sm font-medium text-slate-700 mb-1">Banco / Institución</label>
         <input required value={form.banco} onChange={set('banco')}
           placeholder="Ej: Banco Chile, BCI, Santander…"
-          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Tipo de cuenta</label>
           <select value={form.tipo_cuenta} onChange={set('tipo_cuenta')}
-            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
             {(Object.keys(TIPO_CUENTA_LABELS) as TipoCuenta[]).map((t) => (
               <option key={t} value={t}>{TIPO_CUENTA_LABELS[t]}</option>
             ))}
@@ -59,7 +59,7 @@ export default function NuevaCuentaClient({ empresa_id }: Props) {
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Moneda</label>
           <select value={form.moneda} onChange={set('moneda')}
-            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
             <option value="USD">USD</option>
             <option value="CLP">CLP</option>
             <option value="EUR">EUR</option>
@@ -72,14 +72,14 @@ export default function NuevaCuentaClient({ empresa_id }: Props) {
         <label className="block text-sm font-medium text-slate-700 mb-1">Número de cuenta</label>
         <input required value={form.numero_cuenta} onChange={set('numero_cuenta')}
           placeholder="Ej: 1234-5678-90"
-          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">Saldo inicial</label>
         <input required type="number" step="0.01" value={form.saldo_inicial} onChange={set('saldo_inicial')}
           placeholder="0.00"
-          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
@@ -90,7 +90,7 @@ export default function NuevaCuentaClient({ empresa_id }: Props) {
           Cancelar
         </button>
         <button type="submit" disabled={loading}
-          className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg disabled:opacity-50">
+          className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg disabled:opacity-50">
           {loading ? 'Guardando…' : 'Crear cuenta'}
         </button>
       </div>

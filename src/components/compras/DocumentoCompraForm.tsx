@@ -89,7 +89,7 @@ export default function DocumentoCompraForm({ empresa_id, proveedores, tiposDocu
               Proveedor <span className="text-red-500">*</span>
             </label>
             <select value={proveedorId} onChange={(e) => setProveedorId(e.target.value)} required
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
               <option value="">— Seleccionar proveedor —</option>
               {proveedores.map((p) => (
                 <option key={p.id} value={p.id}>{p.rut} — {p.razon_social}</option>
@@ -107,7 +107,7 @@ export default function DocumentoCompraForm({ empresa_id, proveedores, tiposDocu
               const tipo = tiposDocumento.find((t) => t.id === e.target.value)
               if (tipo) setEsAfecto(tipo.afecto_iva)
             }} required
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
               <option value="">— Seleccionar —</option>
               {tiposDocumento.map((t) => (
                 <option key={t.id} value={t.id}>{t.codigo} — {t.nombre}</option>
@@ -122,21 +122,21 @@ export default function DocumentoCompraForm({ empresa_id, proveedores, tiposDocu
             </label>
             <input type="text" value={numeroDoc} onChange={(e) => setNumeroDoc(e.target.value)}
               placeholder="123456" required
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
 
           {/* Fecha emisión */}
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Fecha de Emisión <span className="text-red-500">*</span></label>
             <input type="date" value={fechaEmision} onChange={(e) => setFechaEmision(e.target.value)} required
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
 
           {/* Fecha vencimiento */}
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Fecha de Vencimiento</label>
             <input type="date" value={fechaVencimiento} onChange={(e) => setFechaVencimiento(e.target.value)}
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
         </div>
       </div>
@@ -149,18 +149,18 @@ export default function DocumentoCompraForm({ empresa_id, proveedores, tiposDocu
             <label className="block text-xs font-medium text-slate-600 mb-1">Monto Neto (CLP)</label>
             <input type="number" min="0" step="1" value={neto} onChange={(e) => setNeto(e.target.value)}
               placeholder="0"
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Monto Exento (CLP)</label>
             <input type="number" min="0" step="1" value={exento} onChange={(e) => setExento(e.target.value)}
               placeholder="0"
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Tasa IVA (%)</label>
             <select value={tasaIva} onChange={(e) => setTasaIva(e.target.value)} disabled={!esAfecto}
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50 disabled:text-slate-400">
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-slate-50 disabled:text-slate-400">
               <option value="19">19% (General)</option>
               <option value="0">0% (Exento)</option>
             </select>
@@ -198,13 +198,13 @@ export default function DocumentoCompraForm({ empresa_id, proveedores, tiposDocu
             <label className="block text-xs font-medium text-slate-600 mb-1">Referencia / OC / N° Orden</label>
             <input type="text" value={referencia} onChange={(e) => setReferencia(e.target.value)}
               placeholder="OC-001 / N° Orden de compra..."
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Glosa / Descripción</label>
             <input type="text" value={glosa} onChange={(e) => setGlosa(e.target.value)}
               placeholder="Descripción del documento..."
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
         </div>
       </div>

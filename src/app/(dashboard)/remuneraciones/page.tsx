@@ -61,7 +61,7 @@ export default async function RemuneracionesPage() {
           <p className="text-sm font-medium text-slate-600 mb-1">No hay trabajadores registrados</p>
           <p className="text-xs text-slate-400 mb-4">Comienza registrando los trabajadores de la empresa</p>
           <a href="/remuneraciones/trabajadores/nuevo"
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-colors">
             Registrar primer trabajador
           </a>
         </div>
@@ -69,7 +69,7 @@ export default async function RemuneracionesPage() {
         <div className="bg-white border border-slate-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-slate-700">Trabajadores con contrato activo</h3>
-            <a href="/remuneraciones/trabajadores" className="text-xs text-blue-600 hover:underline">Ver todos →</a>
+            <a href="/remuneraciones/trabajadores" className="text-xs text-emerald-700 hover:underline">Ver todos →</a>
           </div>
           <div className="space-y-2">
             {listaT.slice(0, 5).map((t) => (

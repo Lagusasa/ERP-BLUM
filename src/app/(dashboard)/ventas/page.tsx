@@ -47,7 +47,7 @@ export default async function VentasPage() {
         </div>
         <div className="bg-white border border-slate-200 rounded-xl p-4">
           <p className="text-xs text-slate-500 uppercase tracking-wide">IVA Débito Fiscal</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">{formatCurrency(iva.total_iva)}</p>
+          <p className="text-2xl font-bold text-emerald-700 mt-1">{formatCurrency(iva.total_iva)}</p>
           <p className="text-xs text-slate-400 mt-0.5">{iva.cantidad} documentos</p>
         </div>
         <div className="bg-white border border-slate-200 rounded-xl p-4">
@@ -65,12 +65,12 @@ export default async function VentasPage() {
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <h2 className="text-sm font-semibold text-slate-700">Últimos Documentos de Venta</h2>
-          <Link href="/ventas/documentos" className="text-xs text-blue-600 hover:underline">Ver todos →</Link>
+          <Link href="/ventas/documentos" className="text-xs text-emerald-700 hover:underline">Ver todos →</Link>
         </div>
         {listaDoc.length === 0 ? (
           <div className="py-12 text-center">
             <p className="text-slate-400 text-sm">No hay documentos registrados.</p>
-            <Link href="/ventas/documentos/nuevo" className="mt-2 inline-block text-sm text-blue-600 hover:underline">
+            <Link href="/ventas/documentos/nuevo" className="mt-2 inline-block text-sm text-emerald-700 hover:underline">
               Registrar primer documento →
             </Link>
           </div>
@@ -103,7 +103,7 @@ export default async function VentasPage() {
                   <td className="px-4 py-2.5 text-right text-xs font-medium tabular-nums">{formatCurrency(d.total)}</td>
                   <td className="px-4 py-2.5 text-center">
                     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
-                      d.estado === 'emitido' ? 'bg-blue-100 text-blue-700' :
+                      d.estado === 'emitido' ? 'bg-emerald-100 text-emerald-800' :
                       d.estado === 'contabilizado' ? 'bg-purple-100 text-purple-700' :
                       d.estado === 'cobrado' ? 'bg-green-100 text-green-700' :
                       'bg-red-100 text-red-700'

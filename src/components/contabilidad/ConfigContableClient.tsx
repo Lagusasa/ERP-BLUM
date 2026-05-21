@@ -73,7 +73,7 @@ export default function ConfigContableClient({ empresa_id, cuentas, config }: Pr
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
+      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-sm text-emerald-900">
         Configure las cuentas contables que se usarán al centralizar documentos de compra y venta automáticamente.
         Solo aparecen cuentas imputables del plan de cuentas.
       </div>
@@ -93,7 +93,7 @@ export default function ConfigContableClient({ empresa_id, cuentas, config }: Pr
                 <select
                   value={valores[campo.key]}
                   onChange={(e) => setValores((prev) => ({ ...prev, [campo.key]: e.target.value }))}
-                  className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
                 >
                   <option value="">— Sin asignar —</option>
                   {cuentasImputables.map((c) => (
@@ -119,7 +119,7 @@ export default function ConfigContableClient({ empresa_id, cuentas, config }: Pr
         <button
           type="submit"
           disabled={guardando}
-          className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors"
+          className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors"
         >
           {guardando ? 'Guardando...' : 'Guardar configuración'}
         </button>

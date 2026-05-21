@@ -15,7 +15,7 @@ interface Props {
 function EstadoBadge({ estado }: { estado: EstadoInstancia }) {
   const map: Record<EstadoInstancia, string> = {
     pendiente:   'bg-slate-100 text-slate-600',
-    en_proceso:  'bg-blue-100 text-blue-700',
+    en_proceso:  'bg-emerald-100 text-emerald-800',
     aprobado:    'bg-green-100 text-green-700',
     rechazado:   'bg-red-100 text-red-700',
     cancelado:   'bg-slate-100 text-slate-400',
@@ -50,7 +50,7 @@ export default async function WorkflowsPage({ searchParams }: Props) {
         </div>
         <Link
           href="/workflows/nuevo"
-          className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -67,7 +67,7 @@ export default async function WorkflowsPage({ searchParams }: Props) {
         </div>
         <div className="bg-white border border-slate-200 rounded-xl p-4">
           <p className="text-xs text-slate-500 uppercase tracking-wide">En proceso</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">{pendientes}</p>
+          <p className="text-2xl font-bold text-emerald-700 mt-1">{pendientes}</p>
         </div>
         <div className="bg-white border border-slate-200 rounded-xl p-4">
           <p className="text-xs text-slate-500 uppercase tracking-wide">Aprobados</p>
@@ -113,7 +113,7 @@ export default async function WorkflowsPage({ searchParams }: Props) {
                 className={cn(
                   'text-xs px-2.5 py-1 rounded-md font-medium transition-colors',
                   params.estado === e || (!params.estado && !e)
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-emerald-700 text-white'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 )}
               >

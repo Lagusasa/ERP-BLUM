@@ -76,12 +76,12 @@ export default function NuevoProductoClient({ empresa_id, categorias, unidades }
             <div>
               <label className="block text-xs text-slate-500 mb-1">SKU *</label>
               <input type="text" value={form.sku} onChange={(e) => set('sku', e.target.value)} required
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
             <div>
               <label className="block text-xs text-slate-500 mb-1">Tipo</label>
               <select value={form.tipo} onChange={(e) => set('tipo', e.target.value)}
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                 {Object.entries(TIPO_PRODUCTO_LABELS).map(([v, l]) => (
                   <option key={v} value={v}>{l}</option>
                 ))}
@@ -91,13 +91,13 @@ export default function NuevoProductoClient({ empresa_id, categorias, unidades }
           <div>
             <label className="block text-xs text-slate-500 mb-1">Nombre *</label>
             <input type="text" value={form.nombre} onChange={(e) => set('nombre', e.target.value)} required
-              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-slate-500 mb-1">Categoría</label>
               <select value={form.categoria_id} onChange={(e) => set('categoria_id', e.target.value)}
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                 <option value="">Sin categoría</option>
                 {categorias.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
               </select>
@@ -105,7 +105,7 @@ export default function NuevoProductoClient({ empresa_id, categorias, unidades }
             <div>
               <label className="block text-xs text-slate-500 mb-1">Unidad de medida</label>
               <select value={form.unidad_id} onChange={(e) => set('unidad_id', e.target.value)}
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                 <option value="">Sin unidad</option>
                 {unidades.map((u) => <option key={u.id} value={u.id}>{u.codigo} — {u.nombre}</option>)}
               </select>
@@ -124,19 +124,19 @@ export default function NuevoProductoClient({ empresa_id, categorias, unidades }
               <label className="block text-xs text-slate-500 mb-1">Precio compra (USD)</label>
               <input type="number" value={form.precio_compra} onChange={(e) => set('precio_compra', e.target.value)}
                 min="0" step="0.01"
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
             <div>
               <label className="block text-xs text-slate-500 mb-1">Precio venta (USD)</label>
               <input type="number" value={form.precio_venta} onChange={(e) => set('precio_venta', e.target.value)}
                 min="0" step="0.01"
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
             <div>
               <label className="block text-xs text-slate-500 mb-1">Stock mínimo</label>
               <input type="number" value={form.stock_minimo} onChange={(e) => set('stock_minimo', e.target.value)}
                 min="0" step="0.01"
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
           </div>
           <label className="flex items-center gap-2 cursor-pointer">
@@ -153,7 +153,7 @@ export default function NuevoProductoClient({ empresa_id, categorias, unidades }
           Cancelar
         </button>
         <button type="submit" disabled={guardando}
-          className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors">
+          className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors">
           {guardando ? 'Guardando...' : 'Crear producto'}
         </button>
       </div>

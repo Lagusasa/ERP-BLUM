@@ -32,7 +32,7 @@ export default async function GestionDocumentalPage({ searchParams }: Props) {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
         {[
           { label: 'Total', count: documentos.length, color: 'text-slate-800' },
-          { label: 'DTE', count: documentos.filter((d) => d.tipo === 'dte').length, color: 'text-blue-700' },
+          { label: 'DTE', count: documentos.filter((d) => d.tipo === 'dte').length, color: 'text-emerald-800' },
           { label: 'Contratos', count: documentos.filter((d) => d.tipo === 'contrato').length, color: 'text-purple-700' },
           { label: 'Liquidaciones', count: documentos.filter((d) => d.tipo === 'liquidacion').length, color: 'text-green-700' },
           { label: 'Otros', count: documentos.filter((d) => d.tipo === 'otro' || d.tipo === 'certificado' || d.tipo === 'nomina').length, color: 'text-slate-600' },

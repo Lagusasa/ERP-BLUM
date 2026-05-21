@@ -52,7 +52,7 @@ export default function EmpresaSwitcher({ empresas, empresaActiva }: Props) {
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
       >
-        <div className="w-6 h-6 rounded bg-blue-600 flex items-center justify-center shrink-0">
+        <div className="w-6 h-6 rounded bg-emerald-700 flex items-center justify-center shrink-0">
           <span className="text-white text-xs font-bold">{iniciales(nombreActiva)}</span>
         </div>
         <div className="text-left hidden sm:block">
@@ -77,10 +77,10 @@ export default function EmpresaSwitcher({ empresas, empresaActiva }: Props) {
                 disabled={cambiando}
                 className={cn(
                   'w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-slate-50 transition-colors text-left',
-                  e.id === empresaActiva?.id && 'bg-blue-50'
+                  e.id === empresaActiva?.id && 'bg-emerald-50'
                 )}
               >
-                <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 rounded-lg bg-emerald-700 flex items-center justify-center shrink-0">
                   <span className="text-white text-xs font-bold">{iniciales(e.razon_social)}</span>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -88,7 +88,7 @@ export default function EmpresaSwitcher({ empresas, empresaActiva }: Props) {
                   <p className="text-xs text-slate-400">{e.rut}</p>
                 </div>
                 {e.id === empresaActiva?.id && (
-                  <svg className="w-4 h-4 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <svg className="w-4 h-4 text-emerald-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 )}
@@ -99,7 +99,7 @@ export default function EmpresaSwitcher({ empresas, empresaActiva }: Props) {
             <a
               href="/admin/empresas/nueva"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />

@@ -47,12 +47,12 @@ export default function KardexClient({ movimientos, productos, bodegas, empresa_
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100">
           <select value={filtroProducto} onChange={(e) => setFiltroProducto(e.target.value)}
-            className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
             <option value="">Todos los productos</option>
             {productos.map((p) => <option key={p.id} value={p.id}>{p.sku} — {p.nombre}</option>)}
           </select>
           <button onClick={() => setShowForm((s) => !s)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg whitespace-nowrap">
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg whitespace-nowrap">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
@@ -161,7 +161,7 @@ function MovimientoForm({ empresa_id, productos, bodegas, onSuccess, onCancel, o
         <div>
           <label className="block text-xs text-slate-500 mb-1">Tipo</label>
           <select value={tipo} onChange={(e) => setTipo(e.target.value as 'entrada' | 'salida' | 'ajuste')}
-            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
             <option value="entrada">Entrada</option>
             <option value="salida">Salida</option>
             <option value="ajuste">Ajuste</option>
@@ -170,7 +170,7 @@ function MovimientoForm({ empresa_id, productos, bodegas, onSuccess, onCancel, o
         <div className="col-span-2">
           <label className="block text-xs text-slate-500 mb-1">Producto *</label>
           <select value={producto_id} onChange={(e) => setProductoId(e.target.value)} required
-            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
             <option value="">Seleccionar...</option>
             {productos.map((p) => <option key={p.id} value={p.id}>{p.sku} — {p.nombre}</option>)}
           </select>
@@ -178,30 +178,30 @@ function MovimientoForm({ empresa_id, productos, bodegas, onSuccess, onCancel, o
         <div>
           <label className="block text-xs text-slate-500 mb-1">Bodega *</label>
           <select value={bodega_id} onChange={(e) => setBodegaId(e.target.value)} required
-            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
             {bodegas.map((b) => <option key={b.id} value={b.id}>{b.nombre}</option>)}
           </select>
         </div>
         <div>
           <label className="block text-xs text-slate-500 mb-1">Cantidad *</label>
           <input type="number" value={cantidad} onChange={(e) => setCantidad(e.target.value)} required min="0.001" step="0.001"
-            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
         </div>
         <div>
           <label className="block text-xs text-slate-500 mb-1">Costo unit. (USD)</label>
           <input type="number" value={costo} onChange={(e) => setCosto(e.target.value)} min="0" step="0.0001"
-            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
         </div>
         <div className="col-span-2 md:col-span-3">
           <label className="block text-xs text-slate-500 mb-1">Glosa</label>
           <input type="text" value={glosa} onChange={(e) => setGlosa(e.target.value)} placeholder="Descripción del movimiento"
-            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
         </div>
         <div className="col-span-2 md:col-span-3 flex justify-end gap-2">
           <button type="button" onClick={onCancel}
             className="px-4 py-1.5 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50">Cancelar</button>
           <button type="submit" disabled={saving}
-            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg">
+            className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg">
             {saving ? 'Guardando...' : 'Registrar'}
           </button>
         </div>

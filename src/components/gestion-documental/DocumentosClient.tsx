@@ -83,15 +83,15 @@ export default function DocumentosClient({ documentos, empresa_id }: Props) {
             </svg>
             <input type="text" placeholder="Buscar documentos..."
               value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}
-            className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
             {TIPOS.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
           <button
             onClick={() => setShowForm((s) => !s)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -132,7 +132,7 @@ export default function DocumentosClient({ documentos, empresa_id }: Props) {
                       href={doc.url_externo ?? '#'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs px-2.5 py-1 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium transition-colors"
+                      className="text-xs px-2.5 py-1 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-medium transition-colors"
                     >
                       Ver
                     </a>
@@ -156,7 +156,7 @@ export default function DocumentosClient({ documentos, empresa_id }: Props) {
 
 function tipoBadge(tipo: string): string {
   const map: Record<string, string> = {
-    dte: 'bg-blue-100 text-blue-700',
+    dte: 'bg-emerald-100 text-emerald-800',
     contrato: 'bg-purple-100 text-purple-700',
     liquidacion: 'bg-green-100 text-green-700',
     nomina: 'bg-teal-100 text-teal-700',
@@ -264,7 +264,7 @@ function SubirDocumentoForm({ empresa_id, onSuccess, onCancel, onError }: FormPr
           <div>
             <label className="block text-xs text-slate-500 mb-1">Tipo</label>
             <select value={tipo} onChange={(e) => setTipo(e.target.value as TipoDocumento)}
-              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
               {Object.entries(TIPO_DOC_LABELS).map(([v, l]) => (
                 <option key={v} value={v}>{l}</option>
               ))}
@@ -274,7 +274,7 @@ function SubirDocumentoForm({ empresa_id, onSuccess, onCancel, onError }: FormPr
             <label className="block text-xs text-slate-500 mb-1">Nombre</label>
             <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)}
               required placeholder="Nombre del documento"
-              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
         </div>
 
@@ -282,7 +282,7 @@ function SubirDocumentoForm({ empresa_id, onSuccess, onCancel, onError }: FormPr
           <label className="block text-xs text-slate-500 mb-1">Descripción (opcional)</label>
           <input type="text" value={descripcion} onChange={(e) => setDescripcion(e.target.value)}
             placeholder="Descripción breve"
-            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
         </div>
 
         <div>
@@ -301,12 +301,12 @@ function SubirDocumentoForm({ empresa_id, onSuccess, onCancel, onError }: FormPr
           {modo === 'url' ? (
             <input type="url" value={urlExterno} onChange={(e) => setUrlExterno(e.target.value)}
               placeholder="https://..."
-              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           ) : (
             <input type="file"
               accept=".pdf,.xml,.xlsx,.xls,.docx,.jpg,.png"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="w-full text-sm text-slate-600 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+              className="w-full text-sm text-slate-600 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-emerald-50 file:text-emerald-800 hover:file:bg-emerald-100" />
           )}
         </div>
 
@@ -316,7 +316,7 @@ function SubirDocumentoForm({ empresa_id, onSuccess, onCancel, onError }: FormPr
             Cancelar
           </button>
           <button type="submit" disabled={uploading}
-            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors">
+            className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors">
             {uploading ? 'Subiendo...' : 'Guardar'}
           </button>
         </div>

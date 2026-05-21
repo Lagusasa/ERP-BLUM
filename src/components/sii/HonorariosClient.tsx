@@ -26,7 +26,7 @@ export default function HonorariosClient({ empresa_id, boletas }: Props) {
         {(['todos', 'emitida', 'recibida'] as const).map((f) => (
           <button key={f} onClick={() => setFiltro(f)}
             className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
-              filtro === f ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+              filtro === f ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
             }`}>
             {f === 'todos' ? 'Todos' : f === 'emitida' ? 'Emitidas' : 'Recibidas'}
           </button>
@@ -36,7 +36,7 @@ export default function HonorariosClient({ empresa_id, boletas }: Props) {
           <span>Retención 10%: <strong className="text-orange-600">{formatCurrency(totalRetencion)}</strong></span>
         </div>
         <button onClick={() => setShowForm(true)}
-          className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg">
+          className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg">
           + Boleta
         </button>
       </div>
@@ -64,7 +64,7 @@ export default function HonorariosClient({ empresa_id, boletas }: Props) {
                 <tr key={b.id} className="hover:bg-slate-50">
                   <td className="px-5 py-2.5">
                     <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${
-                      b.tipo === 'emitida' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+                      b.tipo === 'emitida' ? 'bg-emerald-100 text-emerald-800' : 'bg-green-100 text-green-700'
                     }`}>{b.tipo === 'emitida' ? 'Emitida' : 'Recibida'}</span>
                   </td>
                   <td className="px-4 py-2.5 text-slate-600">#{b.numero}</td>
@@ -136,7 +136,7 @@ function NuevoHonorarioForm({ empresa_id, onCancel, onSave }: { empresa_id: stri
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Tipo</label>
             <select value={form.tipo} onChange={set('tipo')}
-              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
               <option value="recibida">Recibida</option>
               <option value="emitida">Emitida</option>
             </select>
@@ -144,12 +144,12 @@ function NuevoHonorarioForm({ empresa_id, onCancel, onSave }: { empresa_id: stri
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Número</label>
             <input required type="number" min="1" value={form.numero} onChange={set('numero')}
-              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Fecha</label>
             <input required type="date" value={form.fecha} onChange={set('fecha')}
-              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
           </div>
         </div>
 
@@ -158,12 +158,12 @@ function NuevoHonorarioForm({ empresa_id, onCancel, onSave }: { empresa_id: stri
             <label className="block text-xs font-medium text-slate-600 mb-1">RUT Prestador</label>
             <input required value={form.rut_prestador} onChange={set('rut_prestador')}
               placeholder="12.345.678-9"
-              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Nombre Prestador</label>
             <input required value={form.nombre_prestador} onChange={set('nombre_prestador')}
-              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
           </div>
         </div>
 
@@ -172,12 +172,12 @@ function NuevoHonorarioForm({ empresa_id, onCancel, onSave }: { empresa_id: stri
             <label className="block text-xs font-medium text-slate-600 mb-1">RUT Pagador</label>
             <input required value={form.rut_pagador} onChange={set('rut_pagador')}
               placeholder="76.000.000-0"
-              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Monto Bruto</label>
             <input required type="number" min="1" value={form.monto_bruto} onChange={set('monto_bruto')}
-              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
           </div>
         </div>
 
@@ -196,7 +196,7 @@ function NuevoHonorarioForm({ empresa_id, onCancel, onSave }: { empresa_id: stri
             Cancelar
           </button>
           <button type="submit" disabled={loading}
-            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg disabled:opacity-50">
+            className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg disabled:opacity-50">
             {loading ? 'Guardando…' : 'Registrar'}
           </button>
         </div>

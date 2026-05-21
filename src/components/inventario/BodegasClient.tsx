@@ -51,7 +51,7 @@ export default function BodegasClient({ bodegas, empresa_id }: Props) {
 
       <div className="flex justify-end">
         <button onClick={() => setShowForm((s) => !s)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg">
+          className="flex items-center gap-1.5 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
@@ -65,24 +65,24 @@ export default function BodegasClient({ bodegas, empresa_id }: Props) {
             <div>
               <label className="block text-xs text-slate-500 mb-1">Código *</label>
               <input type="text" value={codigo} onChange={(e) => setCodigo(e.target.value)} required
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
             <div>
               <label className="block text-xs text-slate-500 mb-1">Nombre *</label>
               <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
             <div>
               <label className="block text-xs text-slate-500 mb-1">Ubicación</label>
               <input type="text" value={ubicacion} onChange={(e) => setUbicacion(e.target.value)}
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-4">
             <button type="button" onClick={() => setShowForm(false)}
               className="px-4 py-1.5 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50">Cancelar</button>
             <button type="submit" disabled={saving}
-              className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg">
+              className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg">
               {saving ? '...' : 'Guardar'}
             </button>
           </div>

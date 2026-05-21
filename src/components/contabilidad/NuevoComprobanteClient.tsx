@@ -156,7 +156,7 @@ export default function NuevoComprobanteClient({ empresa_id, periodo_id, cuentas
             <select
               value={tipo}
               onChange={(e) => setTipo(e.target.value as TipoComprobante)}
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
               {Object.entries(TIPO_COMPROBANTE_LABELS).map(([v, l]) => (
                 <option key={v} value={v}>{l}</option>
@@ -169,7 +169,7 @@ export default function NuevoComprobanteClient({ empresa_id, periodo_id, cuentas
               type="date"
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
           <div className="md:col-span-1">
@@ -181,7 +181,7 @@ export default function NuevoComprobanteClient({ empresa_id, periodo_id, cuentas
               value={glosa}
               onChange={(e) => setGlosa(e.target.value)}
               placeholder="Descripción del comprobante..."
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
         </div>
@@ -193,7 +193,7 @@ export default function NuevoComprobanteClient({ empresa_id, periodo_id, cuentas
           <h2 className="text-sm font-semibold text-slate-700">Líneas contables</h2>
           <button
             onClick={agregarLinea}
-            className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
+            className="flex items-center gap-1 text-xs text-emerald-700 hover:text-emerald-900"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -222,7 +222,7 @@ export default function NuevoComprobanteClient({ empresa_id, periodo_id, cuentas
                       <select
                         value={linea.cuenta_id}
                         onChange={(e) => actualizarLinea(linea.id, 'cuenta_id', e.target.value)}
-                        className="w-full text-sm border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full text-sm border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
                       >
                         <option value="">— Seleccionar cuenta —</option>
                         {cuentas.map((c) => (
@@ -245,7 +245,7 @@ export default function NuevoComprobanteClient({ empresa_id, periodo_id, cuentas
                         value={linea.debe}
                         onChange={(e) => actualizarLinea(linea.id, 'debe', e.target.value)}
                         placeholder="0"
-                        className="w-full text-sm border border-slate-200 rounded-lg px-2 py-1.5 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full text-sm border border-slate-200 rounded-lg px-2 py-1.5 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       />
                     </td>
                     <td className="px-4 py-2">
@@ -256,7 +256,7 @@ export default function NuevoComprobanteClient({ empresa_id, periodo_id, cuentas
                         value={linea.haber}
                         onChange={(e) => actualizarLinea(linea.id, 'haber', e.target.value)}
                         placeholder="0"
-                        className="w-full text-sm border border-slate-200 rounded-lg px-2 py-1.5 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full text-sm border border-slate-200 rounded-lg px-2 py-1.5 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       />
                     </td>
                     <td className="px-4 py-2">
@@ -265,7 +265,7 @@ export default function NuevoComprobanteClient({ empresa_id, periodo_id, cuentas
                         value={linea.glosa}
                         onChange={(e) => actualizarLinea(linea.id, 'glosa', e.target.value)}
                         placeholder="Descripción..."
-                        className="w-full text-sm border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full text-sm border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       />
                     </td>
                     <td className="px-2 py-2">
@@ -350,7 +350,7 @@ export default function NuevoComprobanteClient({ empresa_id, periodo_id, cuentas
           <button
             onClick={() => guardar('aprobado')}
             disabled={guardando || !balanceado}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {guardando ? 'Guardando...' : 'Aprobar y contabilizar'}
           </button>

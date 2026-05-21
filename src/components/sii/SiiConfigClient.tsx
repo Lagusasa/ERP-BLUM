@@ -45,7 +45,7 @@ export default function SiiConfigClient({ empresa_id, config }: Props) {
         <label className="block text-sm font-medium text-slate-700 mb-1">RUT Empresa</label>
         <input required value={form.rut_empresa} onChange={set('rut_empresa')}
           placeholder="76.000.000-0"
-          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
         <p className="text-xs text-slate-400 mt-1">RUT con guión, sin puntos.</p>
       </div>
 
@@ -53,13 +53,13 @@ export default function SiiConfigClient({ empresa_id, config }: Props) {
         <label className="block text-sm font-medium text-slate-700 mb-1">Razón Social</label>
         <input required value={form.razon_social} onChange={set('razon_social')}
           placeholder="Mi Empresa S.A."
-          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">Ambiente SII</label>
         <select value={form.ambiente} onChange={set('ambiente')}
-          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
           <option value="certificacion">Certificación (pruebas)</option>
           <option value="produccion">Producción</option>
         </select>
@@ -68,9 +68,9 @@ export default function SiiConfigClient({ empresa_id, config }: Props) {
         )}
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
+      <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-sm text-emerald-900">
         <p className="font-medium mb-1">Integración real con SII</p>
-        <p className="text-xs text-blue-700">La emisión real de DTE requiere certificado digital y conexión a los web services del SII. Esta versión registra los documentos manualmente para control interno.</p>
+        <p className="text-xs text-emerald-800">La emisión real de DTE requiere certificado digital y conexión a los web services del SII. Esta versión registra los documentos manualmente para control interno.</p>
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
@@ -82,7 +82,7 @@ export default function SiiConfigClient({ empresa_id, config }: Props) {
           Cancelar
         </button>
         <button type="submit" disabled={loading}
-          className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg disabled:opacity-50">
+          className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg disabled:opacity-50">
           {loading ? 'Guardando…' : 'Guardar configuración'}
         </button>
       </div>

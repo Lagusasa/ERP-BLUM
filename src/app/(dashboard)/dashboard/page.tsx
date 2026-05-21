@@ -37,11 +37,11 @@ export default async function DashboardPage() {
           <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
           <p className="text-slate-500 text-sm mt-1">Bienvenido a ERP SaaS Chile</p>
         </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
-          <p className="text-sm font-medium text-blue-800 mb-2">No tienes empresas configuradas</p>
-          <p className="text-xs text-blue-600 mb-4">Crea tu primera empresa para comenzar a usar el sistema</p>
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 text-center">
+          <p className="text-sm font-medium text-emerald-900 mb-2">No tienes empresas configuradas</p>
+          <p className="text-xs text-emerald-700 mb-4">Crea tu primera empresa para comenzar a usar el sistema</p>
           <Link href="/admin/empresas/nueva"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-colors">
             Crear empresa
           </Link>
         </div>
@@ -88,9 +88,9 @@ export default async function DashboardPage() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-blue-50 border border-blue-100 rounded-xl p-5">
+        <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-5">
           <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Ventas del mes</p>
-          <p className="text-2xl font-bold mt-1 text-blue-700 tabular-nums">{formatCurrency(ventasTotal)}</p>
+          <p className="text-2xl font-bold mt-1 text-emerald-800 tabular-nums">{formatCurrency(ventasTotal)}</p>
           <p className="text-xs text-slate-400 mt-1">
             {(ventas?.cantidad ?? 0)} documentos emitidos
           </p>
@@ -163,13 +163,13 @@ export default async function DashboardPage() {
             </div>
           )}
           {diaActual >= 20 && diaActual <= 31 && (
-            <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-xl p-4">
-              <svg className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="flex items-start gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+              <svg className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div className="flex-1">
-                <p className="text-sm font-medium text-blue-800">Cierre de período próximo</p>
-                <p className="text-xs text-blue-700 mt-0.5">
+                <p className="text-sm font-medium text-emerald-900">Cierre de período próximo</p>
+                <p className="text-xs text-emerald-800 mt-0.5">
                   Estás en los últimos días de {MESES[mes - 1]}. Recuerda ingresar todos los documentos del período.
                 </p>
               </div>
@@ -205,7 +205,7 @@ function ModuloCard({ nombre, descripcion, href, disponible }: {
   const content = (
     <div className={`bg-white border rounded-xl p-4 transition-all h-full ${
       disponible
-        ? 'border-slate-200 hover:border-blue-300 hover:shadow-sm cursor-pointer'
+        ? 'border-slate-200 hover:border-emerald-300 hover:shadow-sm cursor-pointer'
         : 'border-slate-100 opacity-40 cursor-not-allowed'
     }`}>
       <p className="text-sm font-semibold text-slate-800">{nombre}</p>

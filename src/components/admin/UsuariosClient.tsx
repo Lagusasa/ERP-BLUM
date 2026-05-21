@@ -30,7 +30,7 @@ export default function UsuariosClient({ usuarios }: Props) {
           </svg>
           <input type="text" placeholder="Buscar por nombre o email..."
             value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
         </div>
       </div>
 
@@ -53,8 +53,8 @@ export default function UsuariosClient({ usuarios }: Props) {
               <tr key={u.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                      <span className="text-blue-600 text-xs font-semibold">
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                      <span className="text-emerald-700 text-xs font-semibold">
                         {(u.perfil?.email ?? '?')[0].toUpperCase()}
                       </span>
                     </div>

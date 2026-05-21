@@ -36,7 +36,7 @@ export default async function ContabilidadPage() {
         <div className="flex gap-2">
           <Link
             href="/contabilidad/libro-diario/nuevo"
-            className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -86,7 +86,7 @@ export default async function ContabilidadPage() {
         </div>
         <div className="bg-white border border-slate-200 rounded-xl p-4">
           <p className="text-xs text-slate-500 uppercase tracking-wide">Período actual</p>
-          <p className="text-lg font-bold text-blue-600 mt-1">{periodo ? `${periodo.mes}/${periodo.anio}` : '—'}</p>
+          <p className="text-lg font-bold text-emerald-700 mt-1">{periodo ? `${periodo.mes}/${periodo.anio}` : '—'}</p>
           <p className="text-xs text-slate-400 mt-0.5">{periodo?.anio ?? 'No configurado'}</p>
         </div>
       </div>
@@ -95,7 +95,7 @@ export default async function ContabilidadPage() {
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <h2 className="text-sm font-semibold text-slate-700">Últimos Comprobantes</h2>
-          <Link href="/contabilidad/libro-diario" className="text-xs text-blue-600 hover:underline">
+          <Link href="/contabilidad/libro-diario" className="text-xs text-emerald-700 hover:underline">
             Ver todos →
           </Link>
         </div>
@@ -104,7 +104,7 @@ export default async function ContabilidadPage() {
             <p className="text-slate-400 text-sm">No hay comprobantes registrados.</p>
             <Link
               href="/contabilidad/libro-diario/nuevo"
-              className="mt-3 inline-block text-sm text-blue-600 hover:underline"
+              className="mt-3 inline-block text-sm text-emerald-700 hover:underline"
             >
               Crear primer comprobante
             </Link>

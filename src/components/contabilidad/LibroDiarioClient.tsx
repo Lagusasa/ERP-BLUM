@@ -81,14 +81,14 @@ export default function LibroDiarioClient({ comprobantes, empresa_id }: Props) {
             placeholder="Buscar por N°, glosa o referencia..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
 
         <select
           value={filtroEstado}
           onChange={(e) => setFiltroEstado(e.target.value)}
-          className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
         >
           <option value="todos">Todos los estados</option>
           <option value="borrador">Borrador</option>
@@ -99,7 +99,7 @@ export default function LibroDiarioClient({ comprobantes, empresa_id }: Props) {
         <select
           value={filtroTipo}
           onChange={(e) => setFiltroTipo(e.target.value)}
-          className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
         >
           <option value="todos">Todos los tipos</option>
           {Object.entries(TIPO_COMPROBANTE_LABELS).map(([v, l]) => (
@@ -129,7 +129,7 @@ export default function LibroDiarioClient({ comprobantes, empresa_id }: Props) {
                 <td colSpan={8} className="text-center py-10 text-slate-400">
                   No hay comprobantes que coincidan con los filtros.
                   <br />
-                  <Link href="/contabilidad/libro-diario/nuevo" className="mt-2 inline-block text-sm text-blue-600 hover:underline">
+                  <Link href="/contabilidad/libro-diario/nuevo" className="mt-2 inline-block text-sm text-emerald-700 hover:underline">
                     Crear primer comprobante →
                   </Link>
                 </td>

@@ -3,13 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #0f172a;
-  --sidebar-bg: #0f172a;
-  --sidebar-text: #94a3b8;
+  --sidebar-bg: #052e16;
+  --sidebar-text: #86efac;
   --sidebar-text-active: #ffffff;
-  --sidebar-hover: #1e293b;
-  --sidebar-active: #1d4ed8;
-  --primary: #1d4ed8;
-  --primary-hover: #1e40af;
+  --sidebar-hover: #14532d;
+  --sidebar-active: #059669;
+  --primary: #059669;
+  --primary-hover: #047857;
   --border: #e2e8f0;
   --muted: #f1f5f9;
   --muted-foreground: #64748b;

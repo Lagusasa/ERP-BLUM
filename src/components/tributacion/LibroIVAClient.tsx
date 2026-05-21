@@ -49,7 +49,7 @@ export default function LibroIVAClient({ documentos, tipo, mes, anio }: Props) {
             </svg>
             <input type="text" placeholder="Buscar RUT, razón social, N° doc..."
               value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
         </div>
 
@@ -92,7 +92,7 @@ export default function LibroIVAClient({ documentos, tipo, mes, anio }: Props) {
                     <td className="px-4 py-2.5 text-right text-xs font-medium tabular-nums">{formatCurrency(d.total)}</td>
                     <td className="px-4 py-2.5 text-center">
                       <span className={cn('inline-block px-2 py-0.5 rounded-full text-xs font-medium', {
-                        'bg-blue-100 text-blue-700': d.estado === 'emitido',
+                        'bg-emerald-100 text-emerald-800': d.estado === 'emitido',
                         'bg-purple-100 text-purple-700': d.estado === 'contabilizado',
                         'bg-green-100 text-green-700': d.estado === 'cobrado' || d.estado === 'pagado',
                         'bg-red-100 text-red-700': d.estado === 'anulado',

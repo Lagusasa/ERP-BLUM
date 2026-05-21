@@ -29,7 +29,7 @@ export default function ResumenAnualTable({ resumen }: Props) {
         {resumen.meses.map((m) => (
           <div key={m.mes} className="flex flex-col items-center gap-0.5">
             <div
-              className="w-full rounded-t-sm bg-blue-500"
+              className="w-full rounded-t-sm bg-emerald-500"
               style={{ height: `${(m.ventas / maxVentas) * 64}px`, minHeight: m.ventas > 0 ? '2px' : '0' }}
               title={`${m.nombre}: ${formatCurrency(m.ventas)}`}
             />
@@ -76,7 +76,7 @@ export default function ResumenAnualTable({ resumen }: Props) {
           <tfoot className="border-t-2 border-slate-200 bg-slate-50">
             <tr>
               <td className="py-2.5 px-3 text-sm font-semibold text-slate-800">Total año</td>
-              <td className="py-2.5 px-3 text-right tabular-nums font-semibold text-blue-700">{formatCurrency(resumen.totales.ventas)}</td>
+              <td className="py-2.5 px-3 text-right tabular-nums font-semibold text-emerald-800">{formatCurrency(resumen.totales.ventas)}</td>
               <td className="py-2.5 px-3 text-right tabular-nums font-semibold text-slate-700">{formatCurrency(resumen.totales.compras)}</td>
               <td className={`py-2.5 px-3 text-right tabular-nums font-bold ${resumen.totales.resultado >= 0 ? 'text-green-700' : 'text-red-700'}`}>
                 {formatCurrency(resumen.totales.resultado)}

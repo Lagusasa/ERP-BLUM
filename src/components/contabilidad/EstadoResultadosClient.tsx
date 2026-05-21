@@ -38,9 +38,9 @@ function Grupo({ titulo, items, total, positivo }: { titulo: string; items: Resu
 
 function ResultadoLinea({ label, monto, destacado }: { label: string; monto: number; destacado?: boolean }) {
   return (
-    <div className={`flex items-center justify-between px-4 py-2.5 border-b border-slate-100 ${destacado ? 'bg-blue-50' : ''}`}>
-      <span className={`text-sm font-semibold ${destacado ? 'text-blue-800' : 'text-slate-700'}`}>{label}</span>
-      <span className={`text-sm font-bold tabular-nums ${monto >= 0 ? (destacado ? 'text-blue-800' : 'text-green-700') : 'text-red-700'}`}>
+    <div className={`flex items-center justify-between px-4 py-2.5 border-b border-slate-100 ${destacado ? 'bg-emerald-50' : ''}`}>
+      <span className={`text-sm font-semibold ${destacado ? 'text-emerald-900' : 'text-slate-700'}`}>{label}</span>
+      <span className={`text-sm font-bold tabular-nums ${monto >= 0 ? (destacado ? 'text-emerald-900' : 'text-green-700') : 'text-red-700'}`}>
         {formatCurrency(monto)}
       </span>
     </div>

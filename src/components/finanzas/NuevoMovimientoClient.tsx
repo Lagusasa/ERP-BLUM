@@ -86,7 +86,7 @@ export default function NuevoMovimientoClient({ empresa_id, cuentas }: Props) {
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">Cuenta</label>
         <select required value={form.cuenta_id} onChange={set('cuenta_id')}
-          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
           {cuentas.map((c) => (
             <option key={c.id} value={c.id}>{c.banco} — {c.numero_cuenta}</option>
           ))}
@@ -98,7 +98,7 @@ export default function NuevoMovimientoClient({ empresa_id, cuentas }: Props) {
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Categoría</label>
           <select required value={form.categoria} onChange={set('categoria')}
-            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
             {categorias.map((c) => (
               <option key={c} value={c}>{CATEGORIA_LABELS[c]}</option>
             ))}
@@ -108,7 +108,7 @@ export default function NuevoMovimientoClient({ empresa_id, cuentas }: Props) {
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Fecha</label>
           <input required type="date" value={form.fecha} onChange={set('fecha')}
-            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
         </div>
       </div>
 
@@ -117,7 +117,7 @@ export default function NuevoMovimientoClient({ empresa_id, cuentas }: Props) {
         <label className="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
         <input required value={form.descripcion} onChange={set('descripcion')}
           placeholder="Ej: Pago factura #1234"
-          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
       </div>
 
       {/* Monto */}
@@ -125,7 +125,7 @@ export default function NuevoMovimientoClient({ empresa_id, cuentas }: Props) {
         <label className="block text-sm font-medium text-slate-700 mb-1">Monto</label>
         <input required type="number" step="0.01" min="0.01" value={form.monto} onChange={set('monto')}
           placeholder="0.00"
-          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
       </div>
 
       {/* Referencia opcional */}
@@ -133,7 +133,7 @@ export default function NuevoMovimientoClient({ empresa_id, cuentas }: Props) {
         <label className="block text-sm font-medium text-slate-700 mb-1">Referencia <span className="text-slate-400 font-normal">(opcional)</span></label>
         <input value={form.referencia} onChange={set('referencia')}
           placeholder="N° documento, cheque, etc."
-          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}

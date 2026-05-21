@@ -81,7 +81,7 @@ export default function DocumentoVentaForm({ empresa_id, clientes, tiposDocument
           <div className="md:col-span-2">
             <label className="block text-xs font-medium text-slate-600 mb-1">Cliente <span className="text-red-500">*</span></label>
             <select value={clienteId} onChange={(e) => setClienteId(e.target.value)} required
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
               <option value="">— Seleccionar cliente —</option>
               {clientes.map((c) => (
                 <option key={c.id} value={c.id}>{c.rut} — {c.razon_social}</option>
@@ -95,7 +95,7 @@ export default function DocumentoVentaForm({ empresa_id, clientes, tiposDocument
               const tipo = tiposDocumento.find((t) => t.id === e.target.value)
               if (tipo) setEsAfecto(tipo.afecto_iva)
             }} required
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
               <option value="">— Seleccionar —</option>
               {tiposDocumento.map((t) => (
                 <option key={t.id} value={t.id}>{t.codigo} — {t.nombre}</option>
@@ -105,17 +105,17 @@ export default function DocumentoVentaForm({ empresa_id, clientes, tiposDocument
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">N° Documento <span className="text-red-500">*</span></label>
             <input type="text" value={numeroDoc} onChange={(e) => setNumeroDoc(e.target.value)} placeholder="123456" required
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Fecha Emisión <span className="text-red-500">*</span></label>
             <input type="date" value={fechaEmision} onChange={(e) => setFechaEmision(e.target.value)} required
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Fecha Vencimiento</label>
             <input type="date" value={fechaVencimiento} onChange={(e) => setFechaVencimiento(e.target.value)}
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
         </div>
       </div>
@@ -126,17 +126,17 @@ export default function DocumentoVentaForm({ empresa_id, clientes, tiposDocument
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Monto Neto (CLP)</label>
             <input type="number" min="0" step="1" value={neto} onChange={(e) => setNeto(e.target.value)} placeholder="0"
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Monto Exento (CLP)</label>
             <input type="number" min="0" step="1" value={exento} onChange={(e) => setExento(e.target.value)} placeholder="0"
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Tasa IVA (%)</label>
             <select value={tasaIva} onChange={(e) => setTasaIva(e.target.value)} disabled={!esAfecto}
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50">
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-slate-50">
               <option value="19">19% (General)</option>
               <option value="0">0% (Exento)</option>
             </select>
@@ -156,12 +156,12 @@ export default function DocumentoVentaForm({ empresa_id, clientes, tiposDocument
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Referencia</label>
             <input type="text" value={referencia} onChange={(e) => setReferencia(e.target.value)} placeholder="N° pedido, cotización..."
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Glosa</label>
             <input type="text" value={glosa} onChange={(e) => setGlosa(e.target.value)} placeholder="Descripción..."
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
         </div>
       </div>

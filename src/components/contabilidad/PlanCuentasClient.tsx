@@ -10,7 +10,7 @@ interface Props {
 }
 
 const CLASE_COLORS: Record<string, string> = {
-  activo:     'text-blue-700 bg-blue-50',
+  activo:     'text-emerald-800 bg-emerald-50',
   pasivo:     'text-purple-700 bg-purple-50',
   patrimonio: 'text-indigo-700 bg-indigo-50',
   ingreso:    'text-green-700 bg-green-50',
@@ -104,7 +104,7 @@ export default function PlanCuentasClient({ cuentas }: Props) {
             placeholder="Buscar por código o nombre..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
 
@@ -200,7 +200,7 @@ function CuentaRow({
       <tr
         className={cn(
           'transition-colors',
-          isEncabezado ? 'bg-slate-50/50 hover:bg-slate-50' : 'hover:bg-blue-50/30',
+          isEncabezado ? 'bg-slate-50/50 hover:bg-slate-50' : 'hover:bg-emerald-50/30',
           cuenta.nivel === 1 ? 'border-t-2 border-slate-200' : ''
         )}
       >

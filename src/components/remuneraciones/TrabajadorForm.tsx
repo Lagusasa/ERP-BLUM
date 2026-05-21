@@ -117,32 +117,32 @@ export default function TrabajadorForm({ empresa_id, afps, isapres }: Props) {
                 <label className="block text-xs font-medium text-slate-600 mb-1">RUT <span className="text-red-500">*</span></label>
                 <input type="text" value={rut} onChange={(e) => setRut(e.target.value)} required
                   placeholder="12.345.678-9"
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Nombre <span className="text-red-500">*</span></label>
                 <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Apellido Paterno <span className="text-red-500">*</span></label>
                 <input type="text" value={apellidoPaterno} onChange={(e) => setApellidoPaterno(e.target.value)} required
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Apellido Materno</label>
                 <input type="text" value={apellidoMaterno} onChange={(e) => setApellidoMaterno(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Email</label>
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Teléfono</label>
                 <input type="text" value={telefono} onChange={(e) => setTelefono(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
             </div>
           </div>
@@ -153,7 +153,7 @@ export default function TrabajadorForm({ empresa_id, afps, isapres }: Props) {
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">AFP</label>
                 <select value={afpId} onChange={(e) => setAfpId(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                   <option value="">— Sin AFP —</option>
                   {afps.map((a) => (
                     <option key={a.id} value={a.id}>{a.nombre} ({a.tasa}%)</option>
@@ -163,7 +163,7 @@ export default function TrabajadorForm({ empresa_id, afps, isapres }: Props) {
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Isapre / Fonasa</label>
                 <select value={isapredId} onChange={(e) => setIsapreId(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                   <option value="">— Sin cotización salud —</option>
                   {isapres.map((i) => (
                     <option key={i.id} value={i.id}>{i.nombre}</option>
@@ -179,7 +179,7 @@ export default function TrabajadorForm({ empresa_id, afps, isapres }: Props) {
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Tipo de Contrato</label>
                 <select value={tipoContrato} onChange={(e) => setTipoContrato(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                   {Object.entries(TIPO_CONTRATO_LABELS).map(([v, l]) => (
                     <option key={v} value={v}>{l}</option>
                   ))}
@@ -189,22 +189,22 @@ export default function TrabajadorForm({ empresa_id, afps, isapres }: Props) {
                 <label className="block text-xs font-medium text-slate-600 mb-1">Cargo</label>
                 <input type="text" value={cargo} onChange={(e) => setCargo(e.target.value)}
                   placeholder="Ej: Contador, Vendedor..."
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Fecha Inicio <span className="text-red-500">*</span></label>
                 <input type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Sueldo Base (CLP) <span className="text-red-500">*</span></label>
                 <input type="number" min={SUELDO_MINIMO} step="1000" value={sueldoBase} onChange={(e) => setSueldoBase(e.target.value)} required
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div className="md:col-span-2">
                 <label className="block text-xs font-medium text-slate-600 mb-1">Tipo Gratificación</label>
                 <select value={gratificacionTipo} onChange={(e) => setGratificacionTipo(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                   <option value="legal">Gratificación Legal (25% de lo devengado, tope 4.75 IMM)</option>
                   <option value="garantizada">Gratificación Garantizada (25% de 1 IMM / 12)</option>
                   <option value="proporcional">Proporcional a días trabajados</option>
@@ -263,7 +263,7 @@ export default function TrabajadorForm({ empresa_id, afps, isapres }: Props) {
           Cancelar
         </button>
         <button type="submit" disabled={guardando}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50">
+          className="px-4 py-2 text-sm font-medium text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-colors disabled:opacity-50">
           {guardando ? 'Guardando...' : 'Registrar trabajador'}
         </button>
       </div>

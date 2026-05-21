@@ -90,7 +90,7 @@ export default function NuevoWorkflowClient({ empresa_id }: Props) {
             <div>
               <label className="block text-xs text-slate-500 mb-1">Módulo</label>
               <select value={modulo} onChange={(e) => setModulo(e.target.value as ModuloWorkflow)}
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                 {Object.entries(MODULO_WORKFLOW_LABELS).map(([v, l]) => (
                   <option key={v} value={v}>{l}</option>
                 ))}
@@ -100,26 +100,26 @@ export default function NuevoWorkflowClient({ empresa_id }: Props) {
               <label className="block text-xs text-slate-500 mb-1">Nombre</label>
               <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)}
                 placeholder="Aprobación facturas compras" required
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
           </div>
           <div>
             <label className="block text-xs text-slate-500 mb-1">Descripción (opcional)</label>
             <input type="text" value={descripcion} onChange={(e) => setDescripcion(e.target.value)}
-              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-slate-500 mb-1">Monto mínimo (USD)</label>
               <input type="number" value={montoMin} onChange={(e) => setMontoMin(e.target.value)}
                 placeholder="0 = siempre aplica" min="0" step="0.01"
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
             <div>
               <label className="block text-xs text-slate-500 mb-1">Monto máximo (USD)</label>
               <input type="number" value={montoMax} onChange={(e) => setMontoMax(e.target.value)}
                 placeholder="Sin límite" min="0" step="0.01"
-                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
           </div>
         </div>
@@ -129,24 +129,24 @@ export default function NuevoWorkflowClient({ empresa_id }: Props) {
         <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-slate-700">Pasos de aprobación</h2>
           <button type="button" onClick={addPaso}
-            className="text-xs text-blue-600 hover:text-blue-800 font-medium">
+            className="text-xs text-emerald-700 hover:text-emerald-900 font-medium">
             + Agregar paso
           </button>
         </div>
         <div className="divide-y divide-slate-100">
           {pasos.map((paso, idx) => (
             <div key={idx} className="px-5 py-3 flex items-center gap-3">
-              <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center shrink-0">
+              <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-center shrink-0">
                 {paso.orden}
               </span>
               <input type="text" value={paso.nombre}
                 onChange={(e) => updatePaso(idx, 'nombre', e.target.value)}
                 placeholder="Nombre del paso" required
-                className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               <input type="text" value={paso.rol_requerido}
                 onChange={(e) => updatePaso(idx, 'rol_requerido', e.target.value)}
                 placeholder="Rol aprobador (opcional)"
-                className="w-40 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-40 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               {pasos.length > 1 && (
                 <button type="button" onClick={() => removePaso(idx)}
                   className="text-slate-400 hover:text-red-500 text-sm">✕</button>
@@ -162,7 +162,7 @@ export default function NuevoWorkflowClient({ empresa_id }: Props) {
           Cancelar
         </button>
         <button type="submit" disabled={guardando}
-          className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors">
+          className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors">
           {guardando ? 'Guardando...' : 'Crear flujo'}
         </button>
       </div>

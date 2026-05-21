@@ -215,33 +215,33 @@ export default function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="w-64 bg-slate-900 flex flex-col h-full shrink-0">
+    <aside className="w-64 bg-green-950 flex flex-col h-full shrink-0">
       {/* Logo */}
-      <div className="px-4 py-5 border-b border-slate-800">
+      <div className="px-4 py-5 border-b border-green-900">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-emerald-700 flex items-center justify-center shrink-0">
             <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
           <div>
             <p className="text-white font-semibold text-sm leading-tight">ERP SaaS Chile</p>
-            <p className="text-slate-400 text-xs">v0.1.0</p>
+            <p className="text-green-300 text-xs">v0.1.0</p>
           </div>
         </div>
       </div>
 
       {/* Empresa activa */}
-      <div className="px-4 py-3 border-b border-slate-800">
-        <button className="w-full flex items-center gap-2 text-left hover:bg-slate-800 rounded-lg px-2 py-1.5 transition-colors group">
-          <div className="w-6 h-6 rounded bg-blue-600/20 flex items-center justify-center shrink-0">
-            <span className="text-blue-400 text-xs font-bold">E</span>
+      <div className="px-4 py-3 border-b border-green-900">
+        <button className="w-full flex items-center gap-2 text-left hover:bg-green-900 rounded-lg px-2 py-1.5 transition-colors group">
+          <div className="w-6 h-6 rounded bg-emerald-700/20 flex items-center justify-center shrink-0">
+            <span className="text-emerald-400 text-xs font-bold">E</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-slate-300 text-xs font-medium truncate">Sin empresa</p>
+            <p className="text-green-100 text-xs font-medium truncate">Sin empresa</p>
             <p className="text-slate-500 text-xs truncate">Selecciona empresa</p>
           </div>
-          <svg className="w-3.5 h-3.5 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-3.5 h-3.5 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
           </svg>
         </button>
@@ -263,7 +263,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-3 border-t border-slate-800">
+      <div className="px-3 py-3 border-t border-green-900">
         <p className="text-slate-600 text-xs text-center">ERP SaaS Chile © 2026</p>
       </div>
     </aside>
@@ -278,7 +278,7 @@ function NavItemComponent({ item, pathname }: { item: NavItem; pathname: string 
   if (!item.disponible) {
     return (
       <div className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg opacity-40 cursor-not-allowed">
-        <span className="text-slate-500 shrink-0">{item.icon}</span>
+        <span className="text-green-400 shrink-0">{item.icon}</span>
         <span className="text-slate-500 text-sm">{item.label}</span>
       </div>
     )
@@ -292,11 +292,11 @@ function NavItemComponent({ item, pathname }: { item: NavItem; pathname: string 
           className={cn(
             'flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors',
             childrenActive
-              ? 'text-white bg-slate-700'
-              : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+              ? 'text-white bg-green-800'
+              : 'text-green-300 hover:bg-green-900 hover:text-slate-200'
           )}
         >
-          <span className={cn('shrink-0', childrenActive ? 'text-blue-400' : 'text-slate-500')}>
+          <span className={cn('shrink-0', childrenActive ? 'text-emerald-400' : 'text-slate-500')}>
             {item.icon}
           </span>
           <span className="flex-1">{item.label}</span>
@@ -308,7 +308,7 @@ function NavItemComponent({ item, pathname }: { item: NavItem; pathname: string 
           </svg>
         </Link>
         {childrenActive && (
-          <div className="mt-0.5 ml-3 pl-3 border-l border-slate-700 space-y-0.5">
+          <div className="mt-0.5 ml-3 pl-3 border-l border-green-800 space-y-0.5">
             {item.children!.map((child) => (
               <Link
                 key={child.href}
@@ -316,8 +316,8 @@ function NavItemComponent({ item, pathname }: { item: NavItem; pathname: string 
                 className={cn(
                   'block px-2.5 py-1 text-xs rounded-lg transition-colors',
                   pathname === child.href || (child.href !== item.href && pathname.startsWith(child.href))
-                    ? 'text-white bg-blue-600'
-                    : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                    ? 'text-white bg-emerald-700'
+                    : 'text-green-300 hover:bg-green-900 hover:text-slate-200'
                 )}
               >
                 {child.label}
@@ -335,8 +335,8 @@ function NavItemComponent({ item, pathname }: { item: NavItem; pathname: string 
       className={cn(
         'flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors',
         isActive
-          ? 'bg-blue-600 text-white'
-          : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+          ? 'bg-emerald-700 text-white'
+          : 'text-green-300 hover:bg-green-900 hover:text-slate-200'
       )}
     >
       <span className={cn('shrink-0', isActive ? 'text-white' : 'text-slate-500')}>

@@ -48,7 +48,7 @@ export default async function ComprasPage() {
         </div>
         <div className="bg-white border border-slate-200 rounded-xl p-4">
           <p className="text-xs text-slate-500 uppercase tracking-wide">IVA Crédito Fiscal</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">{formatCurrency(iva.total_iva)}</p>
+          <p className="text-2xl font-bold text-emerald-700 mt-1">{formatCurrency(iva.total_iva)}</p>
           <p className="text-xs text-slate-400 mt-0.5">{iva.cantidad} documentos</p>
         </div>
         <div className="bg-white border border-slate-200 rounded-xl p-4">
@@ -67,12 +67,12 @@ export default async function ComprasPage() {
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <h2 className="text-sm font-semibold text-slate-700">Últimos Documentos de Compra</h2>
-          <Link href="/compras/documentos" className="text-xs text-blue-600 hover:underline">Ver todos →</Link>
+          <Link href="/compras/documentos" className="text-xs text-emerald-700 hover:underline">Ver todos →</Link>
         </div>
         {listaDoc.length === 0 ? (
           <div className="py-12 text-center">
             <p className="text-slate-400 text-sm">No hay documentos registrados.</p>
-            <Link href="/compras/documentos/nuevo" className="mt-2 inline-block text-sm text-blue-600 hover:underline">
+            <Link href="/compras/documentos/nuevo" className="mt-2 inline-block text-sm text-emerald-700 hover:underline">
               Registrar primer documento →
             </Link>
           </div>
@@ -119,7 +119,7 @@ export default async function ComprasPage() {
 function EstadoBadge({ estado }: { estado: string }) {
   const map: Record<string, string> = {
     pendiente: 'bg-amber-100 text-amber-700',
-    contabilizado: 'bg-blue-100 text-blue-700',
+    contabilizado: 'bg-emerald-100 text-emerald-800',
     pagado: 'bg-green-100 text-green-700',
     anulado: 'bg-red-100 text-red-700',
   }

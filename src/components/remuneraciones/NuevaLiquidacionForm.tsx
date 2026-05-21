@@ -101,8 +101,8 @@ export default function NuevaLiquidacionForm({ empresa_id, trabajadores, mes, an
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <p className="text-sm text-blue-800">
+      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+        <p className="text-sm text-emerald-900">
           Liquidación de remuneraciones — <strong>{MESES[mes - 1]} {anio}</strong>
         </p>
       </div>
@@ -112,7 +112,7 @@ export default function NuevaLiquidacionForm({ empresa_id, trabajadores, mes, an
           <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
             <h2 className="text-sm font-semibold text-slate-700">Trabajador</h2>
             <select value={trabajadorId} onChange={(e) => setTrabajadorId(e.target.value)} required
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
               <option value="">— Seleccionar trabajador —</option>
               {trabajadores.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -135,27 +135,27 @@ export default function NuevaLiquidacionForm({ empresa_id, trabajadores, mes, an
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Días Trabajados</label>
                 <input type="number" min="1" max="31" value={diasTrabajados} onChange={(e) => setDiasTrabajados(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Horas Extra</label>
                 <input type="number" min="0" value={horasExtra} onChange={(e) => setHorasExtra(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Asig. Movilización</label>
                 <input type="number" min="0" step="1000" value={asigMovilizacion} onChange={(e) => setAsigMovilizacion(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Asig. Colación</label>
                 <input type="number" min="0" step="1000" value={asigColacion} onChange={(e) => setAsigColacion(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Otros Descuentos</label>
                 <input type="number" min="0" step="1000" value={otrosDescuentos} onChange={(e) => setOtrosDescuentos(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
             </div>
           </div>
@@ -205,7 +205,7 @@ export default function NuevaLiquidacionForm({ empresa_id, trabajadores, mes, an
           Cancelar
         </button>
         <button type="submit" disabled={guardando || !resultado}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50">
+          className="px-4 py-2 text-sm font-medium text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-colors disabled:opacity-50">
           {guardando ? 'Guardando...' : 'Generar liquidación'}
         </button>
       </div>

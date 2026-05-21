@@ -36,7 +36,7 @@ export default async function InventarioPage() {
         </div>
         <div className="flex gap-2">
           <Link href="/inventario/productos/nuevo"
-            className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg transition-colors">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
@@ -73,7 +73,7 @@ export default async function InventarioPage() {
           { href: '/inventario/bodegas', label: 'Bodegas', desc: 'Gestión de ubicaciones' },
         ].map((item) => (
           <Link key={item.href} href={item.href}
-            className="bg-white border border-slate-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition-all">
+            className="bg-white border border-slate-200 rounded-xl p-4 hover:border-emerald-300 hover:shadow-sm transition-all">
             <p className="text-sm font-semibold text-slate-800">{item.label}</p>
             <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
           </Link>
@@ -84,7 +84,7 @@ export default async function InventarioPage() {
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <h2 className="text-sm font-semibold text-slate-700">Últimos movimientos</h2>
-          <Link href="/inventario/kardex" className="text-xs text-blue-600 hover:underline">Ver todos →</Link>
+          <Link href="/inventario/kardex" className="text-xs text-emerald-700 hover:underline">Ver todos →</Link>
         </div>
         {movimientos.length === 0 ? (
           <p className="text-center py-8 text-slate-400 text-sm">Sin movimientos registrados.</p>

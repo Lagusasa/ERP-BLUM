@@ -57,7 +57,7 @@ export default async function ReportesPage({ searchParams }: { searchParams: Pro
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white border border-slate-200 rounded-xl p-4">
               <p className="text-xs text-slate-500 uppercase tracking-wide">Ventas mes</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1 tabular-nums">{formatCurrency(k.ventas_mes)}</p>
+              <p className="text-2xl font-bold text-emerald-700 mt-1 tabular-nums">{formatCurrency(k.ventas_mes)}</p>
               {varVentas !== 0 && (
                 <p className={`text-xs mt-1 ${varVentas >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {varVentas >= 0 ? '▲' : '▼'} {Math.abs(varVentas).toFixed(1)}% vs mes ant.
@@ -95,8 +95,8 @@ export default async function ReportesPage({ searchParams }: { searchParams: Pro
           <h2 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">Indicadores de gestión</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
                 </svg>
               </div>
@@ -165,7 +165,7 @@ export default async function ReportesPage({ searchParams }: { searchParams: Pro
             { label: 'Kardex Inventario',   href: '/inventario/kardex',                            color: 'slate' },
           ].map((r) => (
             <Link key={r.href} href={r.href}
-              className="bg-white border border-slate-200 rounded-xl p-3 hover:border-blue-300 hover:shadow-sm transition-all">
+              className="bg-white border border-slate-200 rounded-xl p-3 hover:border-emerald-300 hover:shadow-sm transition-all">
               <p className="text-sm font-medium text-slate-700">{r.label}</p>
               <p className="text-xs text-slate-400 mt-0.5">Ver reporte →</p>
             </Link>

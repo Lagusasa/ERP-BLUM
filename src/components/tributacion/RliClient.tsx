@@ -88,7 +88,7 @@ export default function RliClient({ empresa_id, anio, resumen: initialResumen }:
           <select
             value={tasa}
             onChange={(e) => setTasa(Number(e.target.value))}
-            className="text-xs border border-slate-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-xs border border-slate-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
             {TASAS.map((t) => (
               <option key={t.value} value={t.value}>{t.label}</option>
@@ -99,9 +99,9 @@ export default function RliClient({ empresa_id, anio, resumen: initialResumen }:
         <Linea label="Resultado Contable del Ejercicio" monto={resumen.resultado_contable}
           colorClass={resumen.resultado_contable >= 0 ? 'text-green-700' : 'text-red-700'} />
         <Linea label="(+) Total Agregados" monto={resumen.total_agrega} colorClass="text-orange-700" />
-        <Linea label="(−) Total Deducidos" monto={resumen.total_deduce} colorClass="text-blue-700" />
+        <Linea label="(−) Total Deducidos" monto={resumen.total_deduce} colorClass="text-emerald-800" />
 
-        <div className="flex items-center justify-between px-5 py-3 bg-blue-50 border-b-2 border-blue-200">
+        <div className="flex items-center justify-between px-5 py-3 bg-emerald-50 border-b-2 border-emerald-200">
           <span className="text-sm font-bold text-blue-900">Renta Líquida Imponible (RLI)</span>
           <span className={`text-base font-bold tabular-nums ${resumen.rli >= 0 ? 'text-blue-900' : 'text-red-700'}`}>
             {formatCurrency(resumen.rli)}
@@ -131,7 +131,7 @@ export default function RliClient({ empresa_id, anio, resumen: initialResumen }:
         <AjustesTable
           titulo="Deducidos (−)"
           items={deducidos}
-          colorClass="text-blue-700"
+          colorClass="text-emerald-800"
           onDelete={handleDelete}
         />
       </div>
@@ -145,7 +145,7 @@ export default function RliClient({ empresa_id, anio, resumen: initialResumen }:
           <div className="flex flex-col gap-1">
             <label className="text-xs text-slate-500">Tipo</label>
             <select value={tipo} onChange={(e) => setTipo(e.target.value as 'agrega' | 'deduce')}
-              className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
               <option value="agrega">Agrega (+)</option>
               <option value="deduce">Deduce (−)</option>
             </select>
@@ -155,17 +155,17 @@ export default function RliClient({ empresa_id, anio, resumen: initialResumen }:
             <input type="text" value={concepto} onChange={(e) => setConcepto(e.target.value)}
               placeholder="Descripción del ajuste"
               required
-              className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-xs text-slate-500">Monto</label>
             <input type="number" value={monto} onChange={(e) => setMonto(e.target.value)}
               placeholder="0"
               required min="0" step="1"
-              className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 w-36 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 w-36 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <button type="submit" disabled={adding}
-            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap">
+            className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap">
             {adding ? 'Guardando...' : 'Agregar'}
           </button>
         </form>

@@ -39,7 +39,7 @@ export default function ProveedoresClient({ proveedores }: Props) {
             placeholder="Buscar por RUT, razón social o email..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
         <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">

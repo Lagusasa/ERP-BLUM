@@ -40,9 +40,9 @@ export default function BalanceGeneralClient({ data }: Props) {
       {/* Left: Activos */}
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <Grupo titulo="Activos" items={data.activos} total={data.total_activo} />
-        <div className="flex items-center justify-between px-4 py-3 bg-blue-50 border-t-2 border-blue-200">
-          <span className="text-sm font-bold text-blue-800">TOTAL ACTIVOS</span>
-          <span className="text-sm font-bold tabular-nums text-blue-800">{formatCurrency(data.total_activo)}</span>
+        <div className="flex items-center justify-between px-4 py-3 bg-emerald-50 border-t-2 border-emerald-200">
+          <span className="text-sm font-bold text-emerald-900">TOTAL ACTIVOS</span>
+          <span className="text-sm font-bold tabular-nums text-emerald-900">{formatCurrency(data.total_activo)}</span>
         </div>
       </div>
 
@@ -50,9 +50,9 @@ export default function BalanceGeneralClient({ data }: Props) {
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <Grupo titulo="Pasivos" items={data.pasivos} total={data.total_pasivo} />
         <Grupo titulo="Patrimonio" items={data.patrimonio} total={data.total_patrimonio} />
-        <div className="flex items-center justify-between px-4 py-3 bg-blue-50 border-t-2 border-blue-200">
-          <span className="text-sm font-bold text-blue-800">TOTAL PASIVO + PATRIMONIO</span>
-          <span className="text-sm font-bold tabular-nums text-blue-800">
+        <div className="flex items-center justify-between px-4 py-3 bg-emerald-50 border-t-2 border-emerald-200">
+          <span className="text-sm font-bold text-emerald-900">TOTAL PASIVO + PATRIMONIO</span>
+          <span className="text-sm font-bold tabular-nums text-emerald-900">
             {formatCurrency(data.total_pasivo + data.total_patrimonio)}
           </span>
         </div>

@@ -25,7 +25,7 @@ export default async function DtePage() {
           <p className="text-sm text-slate-500 mt-0.5">Registro de DTEs emitidos y recibidos.</p>
         </div>
         <Link href="/sii/dte/nuevo"
-          className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg">
+          className="flex items-center gap-1.5 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
@@ -44,7 +44,7 @@ export default async function DtePage() {
         </div>
         <div className="bg-white border border-slate-200 rounded-xl p-4">
           <p className="text-xs text-slate-500 uppercase tracking-wide">Total bruto</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1 tabular-nums">{formatCurrency(totalTotal)}</p>
+          <p className="text-2xl font-bold text-emerald-700 mt-1 tabular-nums">{formatCurrency(totalTotal)}</p>
         </div>
       </div>
 
@@ -52,7 +52,7 @@ export default async function DtePage() {
         {dtes.length === 0 ? (
           <div className="py-12 text-center">
             <p className="text-slate-400 text-sm">Sin documentos registrados.</p>
-            <Link href="/sii/dte/nuevo" className="mt-2 inline-block text-sm text-blue-600 hover:underline">
+            <Link href="/sii/dte/nuevo" className="mt-2 inline-block text-sm text-emerald-700 hover:underline">
               Registrar primer DTE →
             </Link>
           </div>

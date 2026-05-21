@@ -49,9 +49,9 @@ export default function ReportesPage() {
           <Link
             key={r.href}
             href={r.href}
-            className="bg-white border border-slate-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-sm transition-all group"
+            className="bg-white border border-slate-200 rounded-xl p-5 hover:border-emerald-300 hover:shadow-sm transition-all group"
           >
-            <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-3 group-hover:bg-blue-100 transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3 group-hover:bg-emerald-100 transition-colors">
               {r.icon}
             </div>
             <h2 className="text-sm font-semibold text-slate-800">{r.titulo}</h2>

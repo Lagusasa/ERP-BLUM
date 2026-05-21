@@ -57,7 +57,7 @@ export default function LoginForm() {
           required
           autoComplete="email"
           placeholder="usuario@empresa.cl"
-          className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-blue-500 transition-colors"
         />
       </div>
 
@@ -66,7 +66,7 @@ export default function LoginForm() {
           <label htmlFor="password" className="block text-sm font-medium text-slate-700">
             Contraseña
           </label>
-          <a href="/recuperar-password" className="text-xs text-blue-600 hover:underline">
+          <a href="/recuperar-password" className="text-xs text-emerald-700 hover:underline">
             ¿Olvidaste tu contraseña?
           </a>
         </div>
@@ -78,7 +78,7 @@ export default function LoginForm() {
           required
           autoComplete="current-password"
           placeholder="••••••••"
-          className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-blue-500 transition-colors"
         />
       </div>
 
@@ -91,7 +91,7 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="w-full py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 disabled:bg-blue-400 text-white font-medium rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">

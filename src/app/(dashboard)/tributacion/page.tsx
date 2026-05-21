@@ -58,7 +58,7 @@ export default async function TributacionPage() {
         <div className="bg-white border border-slate-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-slate-700">Libro IVA Compras</h3>
-            <Link href={`/tributacion/libro-compras?mes=${mes}&anio=${anio}`} className="text-xs text-blue-600 hover:underline">
+            <Link href={`/tributacion/libro-compras?mes=${mes}&anio=${anio}`} className="text-xs text-emerald-700 hover:underline">
               Ver detalle →
             </Link>
           </div>
@@ -74,7 +74,7 @@ export default async function TributacionPage() {
         <div className="bg-white border border-slate-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-slate-700">Libro IVA Ventas</h3>
-            <Link href={`/tributacion/libro-ventas?mes=${mes}&anio=${anio}`} className="text-xs text-blue-600 hover:underline">
+            <Link href={`/tributacion/libro-ventas?mes=${mes}&anio=${anio}`} className="text-xs text-emerald-700 hover:underline">
               Ver detalle →
             </Link>
           </div>
