@@ -36,8 +36,8 @@ export default function LoginForm() {
 
       router.push('/dashboard')
       router.refresh()
-    } catch {
-      setError('Error inesperado. Intenta nuevamente.')
+    } catch (err) {
+      setError('Error: ' + (err instanceof Error ? err.message : String(err)))
     } finally {
       setLoading(false)
     }
