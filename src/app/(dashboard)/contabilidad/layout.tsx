@@ -44,7 +44,7 @@ export default async function ContabilidadLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-3 py-3 text-sm text-slate-500 hover:text-slate-800 border-b-2 border-transparent hover:border-blue-500 transition-colors whitespace-nowrap"
+                className="px-3 py-3 text-sm text-slate-500 hover:text-slate-800 border-b-2 border-transparent hover:border-emerald-600 transition-colors whitespace-nowrap"
               >
                 {item.label}
               </Link>

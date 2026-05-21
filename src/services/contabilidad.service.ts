@@ -476,3 +476,125 @@ export async function getBalanceGeneral(
     diferencia: total_activo - (total_pasivo + total_patrimonio),
   }
 }
+
+export interface LibroMayorCuenta {
+  cuenta_id: string
+  codigo: string
+  nombre: string
+  clase: string
+  saldo_normal: string
+  saldo_anterior: number
+  movimientos: Array<{
+    fecha: string
+    numero: number
+    glosa: string
+    debe: number
+    haber: number
+    saldo: number
+  }>
+  total_debe: number
+  total_haber: number
+  saldo_final: number
+}
+
+export async function getLibroMayor(
+  empresa_id: string,
+  desde: string,
+  hasta: string,
+  cuenta_id?: string
+): Promise<LibroMayorCuenta[]> {
+  const supabase = await createClient()
+
+  // Movimientos del período
+  let query = supabase
+    .from('comprobante_lineas')
+    .select(`
+      id, debe, haber,
+      cuenta:plan_cuentas(id, codigo, nombre, clase, saldo_normal),
+      comprobante:comprobantes!inner(numero, fecha, glosa, estado)
+    `)
+    .eq('empresa_id', empresa_id)
+    .eq('comprobantes.estado', 'aprobado')
+    .gte('comprobantes.fecha', desde)
+    .lte('comprobantes.fecha', hasta)
+    .order('comprobantes.fecha', { ascending: true })
+    .order('comprobantes.numero', { ascending: true })
+
+  if (cuenta_id) query = query.eq('cuenta_id', cuenta_id)
+
+  const { data, error } = await query
+  if (error) throw new Error(error.message)
+
+  // Saldos anteriores (antes del período)
+  const { data: prevData } = await supabase
+    .from('comprobante_lineas')
+    .select(`
+      debe, haber,
+      cuenta:plan_cuentas(id, codigo, nombre, clase, saldo_normal),
+      comprobante:comprobantes!inner(estado)
+    `)
+    .eq('empresa_id', empresa_id)
+    .eq('comprobantes.estado', 'aprobado')
+    .lt('comprobantes.fecha', desde)
+
+  // Acumular saldos anteriores por cuenta
+  const saldosAnt = new Map<string, number>()
+  for (const l of prevData ?? []) {
+    const c = l.cuenta as unknown as { id: string; saldo_normal: string } | null
+    if (!c) continue
+    const prev = saldosAnt.get(c.id) ?? 0
+    const delta = c.saldo_normal === 'deudor' ? l.debe - l.haber : l.haber - l.debe
+    saldosAnt.set(c.id, prev + delta)
+  }
+
+  // Agrupar movimientos por cuenta
+  const map = new Map<string, LibroMayorCuenta>()
+
+  for (const l of data ?? []) {
+    const c = l.cuenta as unknown as { id: string; codigo: string; nombre: string; clase: string; saldo_normal: string } | null
+    const comp = l.comprobante as unknown as { numero: number; fecha: string; glosa: string } | null
+    if (!c || !comp) continue
+
+    if (!map.has(c.id)) {
+      map.set(c.id, {
+        cuenta_id: c.id,
+        codigo: c.codigo,
+        nombre: c.nombre,
+        clase: c.clase,
+        saldo_normal: c.saldo_normal,
+        saldo_anterior: saldosAnt.get(c.id) ?? 0,
+        movimientos: [],
+        total_debe: 0,
+        total_haber: 0,
+        saldo_final: 0,
+      })
+    }
+
+    const entry = map.get(c.id)!
+    const saldoAcum = entry.saldo_anterior + entry.movimientos.reduce((s, m) => {
+      return s + (c.saldo_normal === 'deudor' ? m.debe - m.haber : m.haber - m.debe)
+    }, 0)
+    const delta = c.saldo_normal === 'deudor' ? l.debe - l.haber : l.haber - l.debe
+
+    entry.movimientos.push({
+      fecha: comp.fecha,
+      numero: comp.numero,
+      glosa: comp.glosa ?? '',
+      debe: l.debe,
+      haber: l.haber,
+      saldo: saldoAcum + delta,
+    })
+    entry.total_debe += l.debe
+    entry.total_haber += l.haber
+  }
+
+  // Calcular saldo final
+  for (const entry of map.values()) {
+    const delta = entry.saldo_normal === 'deudor'
+      ? entry.total_debe - entry.total_haber
+      : entry.total_haber - entry.total_debe
+    entry.saldo_final = entry.saldo_anterior + delta
+  }
+
+  return Array.from(map.values()).sort((a, b) => a.codigo.localeCompare(b.codigo))
+}
