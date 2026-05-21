@@ -1,12 +1,15 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import type { PlanCuenta } from '@/types/contabilidad.types'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import type { PlanCuenta, ClaseCuenta } from '@/types/contabilidad.types'
 import { CLASE_CUENTA_LABELS } from '@/types/contabilidad.types'
 import { cn } from '@/lib/utils'
 
 interface Props {
   cuentas: PlanCuenta[]
+  empresa_id: string
 }
 
 const CLASE_COLORS: Record<string, string> = {
@@ -19,11 +22,15 @@ const CLASE_COLORS: Record<string, string> = {
   orden:      'text-slate-700 bg-slate-100',
 }
 
-export default function PlanCuentasClient({ cuentas }: Props) {
+export default function PlanCuentasClient({ cuentas, empresa_id }: Props) {
+  const router = useRouter()
   const [busqueda, setBusqueda] = useState('')
   const [claseActiva, setClaseActiva] = useState<string>('todas')
   const [expandidos, setExpandidos] = useState<Set<string>>(new Set())
   const [expandirTodo, setExpandirTodo] = useState(false)
+  const [showNueva, setShowNueva] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [importError, setImportError] = useState('')
 
   const cuentasMap = useMemo(() => {
     const map = new Map<string, PlanCuenta>()
@@ -91,7 +98,61 @@ export default function PlanCuentasClient({ cuentas }: Props) {
     return Array.from(set)
   }, [cuentas])
 
+  async function importarPlanEstandar() {
+    setImporting(true)
+    setImportError('')
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.rpc('importar_plan_cuentas_template', { p_empresa_id: empresa_id })
+      if (error) throw new Error(error.message)
+      router.refresh()
+    } catch (e) {
+      setImportError(e instanceof Error ? e.message : 'Error al importar')
+    } finally {
+      setImporting(false)
+    }
+  }
+
   return (
+    <div className="space-y-4">
+      {/* Acciones */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {cuentas.length === 0 && (
+          <div className="flex-1 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
+            Sin cuentas configuradas. Importa el plan estándar chileno o agrega cuentas manualmente.
+          </div>
+        )}
+        <div className="ml-auto flex gap-2">
+          {cuentas.length === 0 && (
+            <button onClick={importarPlanEstandar} disabled={importing}
+              className="flex items-center gap-1.5 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white text-sm font-medium rounded-lg">
+              {importing ? (
+                <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Importando…</>
+              ) : (
+                <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>Importar Plan Estándar Chileno</>
+              )}
+            </button>
+          )}
+          <button onClick={() => setShowNueva(true)}
+            className="flex items-center gap-1.5 px-3 py-2 text-sm border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Nueva Cuenta
+          </button>
+        </div>
+        {importError && <p className="w-full text-xs text-red-600">{importError}</p>}
+      </div>
+
+      {showNueva && (
+        <NuevaCuentaForm
+          empresa_id={empresa_id}
+          cuentas={cuentas}
+          onCancel={() => setShowNueva(false)}
+          onSave={() => { setShowNueva(false); router.refresh() }}
+        />
+      )}
+
     <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
       {/* Filtros */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100 flex-wrap">
@@ -173,6 +234,129 @@ export default function PlanCuentasClient({ cuentas }: Props) {
       <div className="px-4 py-2.5 border-t border-slate-100 text-xs text-slate-400 text-right">
         {cuentas.length} cuentas en total
       </div>
+    </div>
+    </div>
+  )
+}
+
+// ─── Formulario nueva cuenta ───────────────────────────────────────────────────
+
+function NuevaCuentaForm({
+  empresa_id, cuentas, onCancel, onSave,
+}: { empresa_id: string; cuentas: PlanCuenta[]; onCancel: () => void; onSave: () => void }) {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [form, setForm] = useState({
+    codigo: '',
+    nombre: '',
+    clase: 'activo' as ClaseCuenta,
+    tipo: 'detalle' as 'encabezado' | 'detalle',
+    saldo_normal: 'deudor' as 'deudor' | 'acreedor',
+    cuenta_padre_id: '',
+  })
+
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm(f => ({ ...f, [k]: e.target.value }))
+
+  const nivel = form.codigo.split('.').length
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true); setError('')
+    const res = await fetch('/api/contabilidad/cuentas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        empresa_id,
+        codigo: form.codigo,
+        nombre: form.nombre,
+        clase: form.clase,
+        tipo: form.tipo,
+        nivel,
+        saldo_normal: form.saldo_normal,
+        es_imputable: form.tipo === 'detalle',
+        cuenta_padre_id: form.cuenta_padre_id || null,
+      }),
+    })
+    const json = await res.json()
+    if (!json.ok) { setError(json.error ?? 'Error'); setLoading(false); return }
+    onSave()
+  }
+
+  return (
+    <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
+      <h3 className="font-semibold text-slate-800">Nueva Cuenta</h3>
+      <form onSubmit={submit} className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Código</label>
+            <input required value={form.codigo} onChange={set('codigo')}
+              placeholder="Ej: 1.1.05.01"
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white font-mono" />
+            <p className="text-xs text-slate-400 mt-0.5">Nivel detectado: {nivel}</p>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Nombre</label>
+            <input required value={form.nombre} onChange={set('nombre')}
+              placeholder="Ej: Caja Chica"
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Clase</label>
+            <select value={form.clase} onChange={set('clase')}
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+              {(Object.entries(CLASE_CUENTA_LABELS) as [ClaseCuenta, string][]).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Tipo</label>
+            <select value={form.tipo} onChange={set('tipo')}
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+              <option value="detalle">Detalle (imputable)</option>
+              <option value="encabezado">Encabezado (agrupador)</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Saldo normal</label>
+            <select value={form.saldo_normal} onChange={set('saldo_normal')}
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+              <option value="deudor">Deudor</option>
+              <option value="acreedor">Acreedor</option>
+            </select>
+          </div>
+        </div>
+
+        {cuentas.length > 0 && (
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Cuenta Padre (opcional)</label>
+            <select value={form.cuenta_padre_id} onChange={set('cuenta_padre_id')}
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+              <option value="">— Sin padre (cuenta raíz) —</option>
+              {cuentas.filter(c => c.tipo === 'encabezado').map(c => (
+                <option key={c.id} value={c.id}>{c.codigo} — {c.nombre}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {error && <p className="text-sm text-red-600">{error}</p>}
+
+        <div className="flex gap-2 pt-1">
+          <button type="button" onClick={onCancel}
+            className="px-3 py-1.5 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-100">
+            Cancelar
+          </button>
+          <button type="submit" disabled={loading}
+            className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg disabled:opacity-50">
+            {loading ? 'Guardando…' : 'Crear Cuenta'}
+          </button>
+        </div>
+      </form>
     </div>
   )
 }

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -13,15 +15,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Faltan campos requeridos' }, { status: 400 })
   }
 
+  const nombre = `${MESES[mes - 1] ?? mes} ${anio}`
+  const fecha_inicio = `${anio}-${String(mes).padStart(2, '0')}-01`
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await supabase
     .from('periodos_contables')
     .insert({
       empresa_id,
       anio,
       mes,
+      nombre,
       estado: 'abierto',
-      fecha_apertura: new Date().toISOString(),
-    })
+      fecha_inicio,
+    } as any)
     .select()
     .single()
 
