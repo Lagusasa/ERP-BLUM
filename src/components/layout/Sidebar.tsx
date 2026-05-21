@@ -26,7 +26,13 @@ const NAV_MODULOS: NavItem[] = [
   {
     label: 'Contabilidad',
     href: '/contabilidad',
-    disponible: false,
+    disponible: true,
+    children: [
+      { label: 'Resumen',         href: '/contabilidad',              icon: null, disponible: true },
+      { label: 'Plan de Cuentas', href: '/contabilidad/plan-cuentas', icon: null, disponible: true },
+      { label: 'Libro Diario',    href: '/contabilidad/libro-diario', icon: null, disponible: true },
+      { label: 'Libro Mayor',     href: '/contabilidad/libro-mayor',  icon: null, disponible: true },
+    ],
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -36,7 +42,12 @@ const NAV_MODULOS: NavItem[] = [
   {
     label: 'Compras',
     href: '/compras',
-    disponible: false,
+    disponible: true,
+    children: [
+      { label: 'Resumen',     href: '/compras',               icon: null, disponible: true },
+      { label: 'Documentos',  href: '/compras/documentos',    icon: null, disponible: true },
+      { label: 'Proveedores', href: '/compras/proveedores',   icon: null, disponible: true },
+    ],
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -46,7 +57,12 @@ const NAV_MODULOS: NavItem[] = [
   {
     label: 'Ventas',
     href: '/ventas',
-    disponible: false,
+    disponible: true,
+    children: [
+      { label: 'Resumen',    href: '/ventas',             icon: null, disponible: true },
+      { label: 'Documentos', href: '/ventas/documentos',  icon: null, disponible: true },
+      { label: 'Clientes',   href: '/ventas/clientes',    icon: null, disponible: true },
+    ],
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -190,12 +206,59 @@ export default function Sidebar() {
 
 function NavItemComponent({ item, pathname }: { item: NavItem; pathname: string }) {
   const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+  const hasChildren = (item.children?.length ?? 0) > 0
+  const childrenActive = hasChildren && pathname.startsWith(item.href)
 
   if (!item.disponible) {
     return (
       <div className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg opacity-40 cursor-not-allowed">
         <span className="text-slate-500 shrink-0">{item.icon}</span>
         <span className="text-slate-500 text-sm">{item.label}</span>
+      </div>
+    )
+  }
+
+  if (hasChildren) {
+    return (
+      <div>
+        <Link
+          href={item.href}
+          className={cn(
+            'flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors',
+            childrenActive
+              ? 'text-white bg-slate-700'
+              : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+          )}
+        >
+          <span className={cn('shrink-0', childrenActive ? 'text-blue-400' : 'text-slate-500')}>
+            {item.icon}
+          </span>
+          <span className="flex-1">{item.label}</span>
+          <svg
+            className={cn('w-3 h-3 transition-transform text-slate-500', childrenActive ? 'rotate-90' : '')}
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
+        {childrenActive && (
+          <div className="mt-0.5 ml-3 pl-3 border-l border-slate-700 space-y-0.5">
+            {item.children!.map((child) => (
+              <Link
+                key={child.href}
+                href={child.href}
+                className={cn(
+                  'block px-2.5 py-1 text-xs rounded-lg transition-colors',
+                  pathname === child.href || (child.href !== item.href && pathname.startsWith(child.href))
+                    ? 'text-white bg-blue-600'
+                    : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                )}
+              >
+                {child.label}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     )
   }
