@@ -688,6 +688,47 @@ export type Database = {
         Update: Partial<Omit<Database['public']['Tables']['declaraciones_f29']['Row'], 'id' | 'created_at'>>
         Relationships: []
       }
+      dte_documentos: {
+        Row: {
+          id: string; empresa_id: string; tipo_dte: string; folio: number
+          rut_contraparte: string; razon_social: string | null
+          fecha_emision: string; monto_neto: number; monto_iva: number; monto_total: number
+          estado: string; xml_raw: string | null; track_id: string | null
+          referencia_id: string | null; created_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['dte_documentos']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Database['public']['Tables']['dte_documentos']['Insert']>
+        Relationships: []
+      }
+      boletas_honorarios: {
+        Row: {
+          id: string; empresa_id: string; tipo: string; numero: number
+          rut_prestador: string; nombre_prestador: string; rut_pagador: string; nombre_pagador: string | null
+          fecha: string; monto_bruto: number; retencion_10: number; monto_liquido: number
+          concepto: string | null; estado: string; created_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['boletas_honorarios']['Row'], 'id' | 'created_at' | 'retencion_10' | 'monto_liquido'>>
+        Update: Partial<Database['public']['Tables']['boletas_honorarios']['Insert']>
+        Relationships: []
+      }
+      f22_declaraciones: {
+        Row: {
+          id: string; empresa_id: string; anio_tributario: number; estado: string
+          folio_sii: string | null; fecha_envio: string | null; datos_json: Record<string, number>; created_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['f22_declaraciones']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Database['public']['Tables']['f22_declaraciones']['Insert']>
+        Relationships: []
+      }
+      sii_config: {
+        Row: {
+          id: string; empresa_id: string; ambiente: string; rut_empresa: string
+          razon_social: string; actividades: Json; created_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['sii_config']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Database['public']['Tables']['sii_config']['Insert']>
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
