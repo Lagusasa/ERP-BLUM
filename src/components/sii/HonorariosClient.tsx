@@ -4,6 +4,72 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { BoletaHonorarios, TipoBoleta } from '@/types/sii.types'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import ImportCsvModal from '@/components/sii/ImportCsvModal'
+import type { ImportModalConfig, ParseResult } from '@/components/sii/ImportCsvModal'
+import { col, parseDate, parseNum, normText } from '@/components/sii/ImportCsvModal'
+
+// ─── Honorarios CSV parser ──────────────────────────────────────────────────────
+
+type HonImportRow = {
+  tipo: TipoBoleta
+  numero: number
+  rut_prestador: string
+  nombre_prestador: string
+  rut_pagador: string
+  nombre_pagador: string | null
+  fecha: string
+  monto_bruto: number
+}
+
+function parseHonorarioRow(raw: Record<string, string>): ParseResult<HonImportRow> {
+  const numeroRaw = col(raw, 'N° BOLETA','N BOLETA','NUMERO','Numero','numero','FOLIO','Folio','N°','N')
+  const numero = parseInt(numeroRaw.replace(/\D/g, ''))
+  if (!numero || isNaN(numero)) return { ok: false, error: `Número de boleta inválido: "${numeroRaw}"` }
+
+  const rut_prestador = col(raw, 'RUT PRESTADOR','Rut Prestador','rut_prestador','RUT','Rut')
+  if (!rut_prestador) return { ok: false, error: 'RUT Prestador no encontrado' }
+
+  const nombre_prestador = col(raw, 'NOMBRE PRESTADOR','Nombre Prestador','nombre_prestador','NOMBRE','Nombre')
+  if (!nombre_prestador) return { ok: false, error: 'Nombre Prestador requerido' }
+
+  const rut_pagador = col(raw, 'RUT PAGADOR','Rut Pagador','rut_pagador','RUT EMPRESA','Rut Empresa')
+
+  const nombre_pagador = col(raw, 'NOMBRE PAGADOR','Nombre Pagador','nombre_pagador','NOMBRE EMPRESA','Empresa') || null
+
+  const fechaRaw = col(raw, 'FECHA','Fecha','fecha','FECHA EMISION','Fecha Emision','FECHA PAGO','Fecha Pago')
+  const fecha = parseDate(fechaRaw)
+  if (!fecha) return { ok: false, error: `Fecha inválida: "${fechaRaw}"` }
+
+  const monto_bruto = parseNum(col(raw, 'MONTO BRUTO','Monto Bruto','monto_bruto','BRUTO','Bruto','MONTO','Monto','HONORARIO','Honorario'))
+  if (monto_bruto <= 0) return { ok: false, error: 'Monto bruto debe ser mayor a 0' }
+
+  const tipoRaw = normText(col(raw, 'TIPO','Tipo','tipo','TIPO BOLETA','Tipo Boleta') || 'recibida')
+  const tipo: TipoBoleta = tipoRaw.includes('emit') ? 'emitida' : 'recibida'
+
+  return { ok: true, row: { tipo, numero, rut_prestador, nombre_prestador, rut_pagador, nombre_pagador, fecha, monto_bruto } }
+}
+
+const HON_CONFIG = (empresa_id: string): ImportModalConfig<HonImportRow> => ({
+  title: 'Importar Boletas de Honorarios desde CSV',
+  description: 'Compatible con el archivo descargable del portal SII de Boletas de Honorarios.',
+  siiNote: 'Exporta desde SII → Boletas de Honorarios → Consultar → Descargar Excel/CSV. También acepta la plantilla propia.',
+  templateHeaders: 'TIPO;N° BOLETA;RUT PRESTADOR;NOMBRE PRESTADOR;RUT PAGADOR;NOMBRE PAGADOR;FECHA;MONTO BRUTO',
+  templateExample: 'recibida;1001;12.345.678-9;Juan Pérez González;76.543.210-K;Mi Empresa S.A.;15-01-2024;100000\nemitida;500;12.345.678-9;Juan Pérez González;76.999.000-1;Otra Empresa;20-01-2024;80000',
+  endpoint: '/api/sii/honorarios/import',
+  empresa_id,
+  payloadKey: 'boletas',
+  parseRow: parseHonorarioRow,
+  previewCols: [
+    { key: 'tipo',             label: 'Tipo',      fmt: (v) => v === 'emitida' ? 'Emitida' : 'Recibida' },
+    { key: 'numero',           label: 'N°',        fmt: (v) => `#${v}` },
+    { key: 'rut_prestador',    label: 'Prestador' },
+    { key: 'nombre_prestador', label: 'Nombre' },
+    { key: 'fecha',            label: 'Fecha' },
+    { key: 'monto_bruto',      label: 'Bruto',     fmt: (v) => `$${Number(v).toLocaleString('es-CL')}` },
+  ],
+})
+
+// ─── Component ─────────────────────────────────────────────────────────────────
 
 interface Props {
   empresa_id: string
@@ -14,15 +80,24 @@ export default function HonorariosClient({ empresa_id, boletas }: Props) {
   const router = useRouter()
   const [filtro, setFiltro] = useState<'todos' | TipoBoleta>('todos')
   const [showForm, setShowForm] = useState(false)
+  const [showImport, setShowImport] = useState(false)
 
   const filtradas = filtro === 'todos' ? boletas : boletas.filter((b) => b.tipo === filtro)
-  const totalBruto    = filtradas.reduce((s, b) => s + b.monto_bruto, 0)
+  const totalBruto     = filtradas.reduce((s, b) => s + b.monto_bruto, 0)
   const totalRetencion = filtradas.reduce((s, b) => s + b.retencion_10, 0)
 
   return (
     <div className="space-y-4">
+      {showImport && (
+        <ImportCsvModal
+          config={HON_CONFIG(empresa_id)}
+          onClose={() => setShowImport(false)}
+          onSuccess={() => { setShowImport(false); router.refresh() }}
+        />
+      )}
+
       {/* Filtros */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         {(['todos', 'emitida', 'recibida'] as const).map((f) => (
           <button key={f} onClick={() => setFiltro(f)}
             className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
@@ -35,17 +110,35 @@ export default function HonorariosClient({ empresa_id, boletas }: Props) {
           <span>Bruto: <strong className="text-slate-700">{formatCurrency(totalBruto)}</strong></span>
           <span>Retención 10%: <strong className="text-orange-600">{formatCurrency(totalRetencion)}</strong></span>
         </div>
+        <button onClick={() => setShowImport(true)}
+          className="flex items-center gap-1.5 px-4 py-1.5 border border-emerald-300 text-emerald-700 hover:bg-emerald-50 text-sm font-medium rounded-lg">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+          Importar CSV
+        </button>
         <button onClick={() => setShowForm(true)}
           className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg">
           + Boleta
         </button>
       </div>
 
-      {showForm && <NuevoHonorarioForm empresa_id={empresa_id} onCancel={() => setShowForm(false)} onSave={() => { setShowForm(false); router.refresh() }} />}
+      {showForm && (
+        <NuevoHonorarioForm
+          empresa_id={empresa_id}
+          onCancel={() => setShowForm(false)}
+          onSave={() => { setShowForm(false); router.refresh() }}
+        />
+      )}
 
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         {filtradas.length === 0 ? (
-          <p className="text-center py-10 text-slate-400 text-sm">Sin boletas registradas.</p>
+          <div className="py-10 text-center space-y-2">
+            <p className="text-slate-400 text-sm">Sin boletas registradas.</p>
+            <button onClick={() => setShowImport(true)} className="text-sm text-emerald-700 hover:underline">
+              Importar CSV del SII →
+            </button>
+          </div>
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-slate-200">
