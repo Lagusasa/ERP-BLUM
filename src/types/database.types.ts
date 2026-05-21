@@ -451,6 +451,39 @@ export type Database = {
         Update: Partial<Omit<Database['public']['Tables']['liquidaciones']['Row'], 'id' | 'created_at'>>
         Relationships: []
       }
+      cuentas_bancarias: {
+        Row: {
+          id: string; empresa_id: string; banco: string; tipo_cuenta: string
+          numero_cuenta: string; moneda: string
+          saldo_inicial: number; saldo_actual: number; is_active: boolean
+          created_at: string; updated_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['cuentas_bancarias']['Row'], 'id' | 'created_at' | 'updated_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['cuentas_bancarias']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      movimientos_caja: {
+        Row: {
+          id: string; empresa_id: string; cuenta_id: string; tipo: string
+          categoria: string; descripcion: string; monto: number; fecha: string
+          referencia: string | null; conciliado: boolean
+          referencia_tabla: string | null; referencia_id: string | null
+          created_at: string; created_by: string | null
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['movimientos_caja']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['movimientos_caja']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      proyecciones_caja: {
+        Row: {
+          id: string; empresa_id: string; fecha: string; tipo: string
+          categoria: string; descripcion: string; monto: number
+          es_recurrente: boolean; periodicidad: string | null; created_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['proyecciones_caja']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['proyecciones_caja']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
       bodegas: {
         Row: {
           id: string; empresa_id: string; codigo: string; nombre: string
