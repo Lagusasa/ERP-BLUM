@@ -451,6 +451,68 @@ export type Database = {
         Update: Partial<Omit<Database['public']['Tables']['liquidaciones']['Row'], 'id' | 'created_at'>>
         Relationships: []
       }
+      workflow_configs: {
+        Row: {
+          id: string
+          empresa_id: string
+          modulo: string
+          nombre: string
+          descripcion: string | null
+          monto_min: number | null
+          monto_max: number | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['workflow_configs']['Row'], 'id' | 'created_at' | 'updated_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['workflow_configs']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      workflow_pasos: {
+        Row: {
+          id: string
+          workflow_id: string
+          orden: number
+          nombre: string
+          rol_requerido: string | null
+          user_id: string | null
+          es_paralelo: boolean
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['workflow_pasos']['Row'], 'id'>>
+        Update: Partial<Database['public']['Tables']['workflow_pasos']['Insert']>
+        Relationships: []
+      }
+      workflow_instancias: {
+        Row: {
+          id: string
+          empresa_id: string
+          workflow_id: string
+          referencia_tabla: string
+          referencia_id: string
+          estado: string
+          paso_actual: number
+          iniciado_por: string | null
+          creado_at: string
+          completado_at: string | null
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['workflow_instancias']['Row'], 'id' | 'creado_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['workflow_instancias']['Row'], 'id' | 'creado_at'>>
+        Relationships: []
+      }
+      workflow_decisiones: {
+        Row: {
+          id: string
+          instancia_id: string
+          paso_id: string
+          user_id: string | null
+          decision: string
+          comentario: string | null
+          created_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['workflow_decisiones']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['workflow_decisiones']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
       documentos_gestion: {
         Row: {
           id: string
