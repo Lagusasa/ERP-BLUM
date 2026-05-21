@@ -451,6 +451,22 @@ export type Database = {
         Update: Partial<Omit<Database['public']['Tables']['liquidaciones']['Row'], 'id' | 'created_at'>>
         Relationships: []
       }
+      rli_ajustes: {
+        Row: {
+          id: string
+          empresa_id: string
+          anio: number
+          tipo: string
+          concepto: string
+          monto: number
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['rli_ajustes']['Row'], 'id' | 'created_at' | 'updated_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['rli_ajustes']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
       config_contable: {
         Row: {
           empresa_id: string

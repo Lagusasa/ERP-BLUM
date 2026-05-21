@@ -42,6 +42,26 @@ export interface BalanceGeneral {
   diferencia: number
 }
 
+export interface RliAjuste {
+  id: string
+  empresa_id: string
+  anio: number
+  tipo: 'agrega' | 'deduce'
+  concepto: string
+  monto: number
+  created_at: string
+}
+
+export interface RliResumen {
+  resultado_contable: number
+  total_agrega: number
+  total_deduce: number
+  rli: number
+  tasa: number
+  impuesto: number
+  ajustes: RliAjuste[]
+}
+
 export interface ConfigContable {
   empresa_id: string
   cuenta_iva_cf_id: string | null

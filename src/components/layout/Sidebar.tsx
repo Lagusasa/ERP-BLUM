@@ -80,6 +80,7 @@ const NAV_MODULOS: NavItem[] = [
       { label: 'Libro Compras',    href: '/tributacion/libro-compras',  icon: null, disponible: true },
       { label: 'Libro Ventas',     href: '/tributacion/libro-ventas',   icon: null, disponible: true },
       { label: 'Declaración F29',  href: '/tributacion/f29',            icon: null, disponible: true },
+      { label: 'RLI',              href: '/tributacion/rli',            icon: null, disponible: true },
     ],
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
