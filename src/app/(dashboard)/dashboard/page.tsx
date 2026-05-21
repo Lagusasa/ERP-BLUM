@@ -12,16 +12,19 @@ export const metadata: Metadata = { title: 'Dashboard' }
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 
 const MODULOS = [
-  { nombre: 'Contabilidad',    descripcion: 'Plan de cuentas y libros',    href: '/contabilidad',    disponible: true },
-  { nombre: 'Compras',         descripcion: 'Proveedores y facturas',      href: '/compras',         disponible: true },
-  { nombre: 'Ventas',          descripcion: 'Clientes y documentos',       href: '/ventas',          disponible: true },
-  { nombre: 'Tributación',     descripcion: 'IVA, F29, Libro CV',          href: '/tributacion',     disponible: true },
-  { nombre: 'Remuneraciones',  descripcion: 'Liquidaciones y cotizaciones', href: '/remuneraciones', disponible: true },
-  { nombre: 'Administración',  descripcion: 'Empresas y usuarios',         href: '/admin',           disponible: true },
-  { nombre: 'RRHH',            descripcion: 'Próximamente',                href: '/rrhh',            disponible: false },
-  { nombre: 'Inventario',      descripcion: 'Próximamente',                href: '/inventario',      disponible: false },
-  { nombre: 'Finanzas',        descripcion: 'Próximamente',                href: '/finanzas',        disponible: false },
-  { nombre: 'Reportes',        descripcion: 'Próximamente',                href: '/reportes',        disponible: false },
+  { nombre: 'Contabilidad',    descripcion: 'Plan de cuentas y libros',         href: '/contabilidad',     disponible: true },
+  { nombre: 'Compras',         descripcion: 'Proveedores y facturas',           href: '/compras',          disponible: true },
+  { nombre: 'Ventas',          descripcion: 'Clientes y documentos',            href: '/ventas',           disponible: true },
+  { nombre: 'Tributación',     descripcion: 'IVA, F29, Libro CV',               href: '/tributacion',      disponible: true },
+  { nombre: 'Remuneraciones',  descripcion: 'Liquidaciones y cotizaciones',     href: '/remuneraciones',   disponible: true },
+  { nombre: 'Inventario',      descripcion: 'Productos, kardex y bodegas',      href: '/inventario',       disponible: true },
+  { nombre: 'Finanzas',        descripcion: 'Flujo de caja y tesorería',        href: '/finanzas',         disponible: true },
+  { nombre: 'SII',             descripcion: 'DTE, honorarios y F22',            href: '/sii',              disponible: true },
+  { nombre: 'Gestión Documental', descripcion: 'Documentos y archivos',         href: '/gestion-documental', disponible: true },
+  { nombre: 'Workflows',       descripcion: 'Aprobaciones y flujos',            href: '/workflows',        disponible: true },
+  { nombre: 'BI & Reportes',   descripcion: 'Analytics y reportes ejecutivos',  href: '/reportes',         disponible: true },
+  { nombre: 'Administración',  descripcion: 'Empresas y usuarios',              href: '/admin',            disponible: true },
+  { nombre: 'RRHH',            descripcion: 'Próximamente',                     href: '/rrhh',             disponible: false },
 ]
 
 export default async function DashboardPage() {
