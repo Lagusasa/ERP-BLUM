@@ -451,6 +451,60 @@ export type Database = {
         Update: Partial<Omit<Database['public']['Tables']['liquidaciones']['Row'], 'id' | 'created_at'>>
         Relationships: []
       }
+      bodegas: {
+        Row: {
+          id: string; empresa_id: string; codigo: string; nombre: string
+          ubicacion: string | null; is_active: boolean
+          created_at: string; updated_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['bodegas']['Row'], 'id' | 'created_at' | 'updated_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['bodegas']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      unidades_medida: {
+        Row: { id: string; empresa_id: string; codigo: string; nombre: string; created_at: string }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['unidades_medida']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Database['public']['Tables']['unidades_medida']['Insert']>
+        Relationships: []
+      }
+      categorias_producto: {
+        Row: { id: string; empresa_id: string; nombre: string; descripcion: string | null; created_at: string }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['categorias_producto']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Database['public']['Tables']['categorias_producto']['Insert']>
+        Relationships: []
+      }
+      productos: {
+        Row: {
+          id: string; empresa_id: string; sku: string; nombre: string; descripcion: string | null
+          categoria_id: string | null; unidad_id: string | null
+          tipo: string; precio_compra: number; precio_venta: number
+          stock_minimo: number; afecto_iva: boolean; is_active: boolean
+          created_at: string; updated_at: string; deleted_at: string | null
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['productos']['Row'], 'id' | 'created_at' | 'updated_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['productos']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      stock_bodega: {
+        Row: {
+          id: string; empresa_id: string; producto_id: string; bodega_id: string
+          cantidad: number; costo_prom: number; updated_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['stock_bodega']['Row'], 'id' | 'updated_at'>>
+        Update: Partial<Database['public']['Tables']['stock_bodega']['Insert']>
+        Relationships: []
+      }
+      movimientos_inventario: {
+        Row: {
+          id: string; empresa_id: string; producto_id: string; bodega_id: string
+          tipo: string; cantidad: number; costo_unitario: number; total: number
+          stock_resultante: number; referencia_tabla: string | null; referencia_id: string | null
+          glosa: string | null; created_at: string; created_by: string | null
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['movimientos_inventario']['Row'], 'id' | 'created_at' | 'total'>>
+        Update: Partial<Omit<Database['public']['Tables']['movimientos_inventario']['Row'], 'id' | 'created_at' | 'total'>>
+        Relationships: []
+      }
       workflow_configs: {
         Row: {
           id: string
