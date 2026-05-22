@@ -156,6 +156,13 @@ export default function LibroDiarioClient({ comprobantes, empresa_id }: Props) {
                   </td>
                   <td className="px-4 py-2.5 text-center">
                     <div className="flex items-center justify-center gap-1">
+                      <Link
+                        href={`/contabilidad/libro-diario/${c.id}`}
+                        className="text-xs px-2 py-1 bg-slate-50 text-slate-600 hover:bg-slate-100 rounded transition-colors"
+                        title="Ver detalle"
+                      >
+                        Ver
+                      </Link>
                       {c.estado === 'borrador' && (
                         <button
                           onClick={() => aprobar(c.id)}
