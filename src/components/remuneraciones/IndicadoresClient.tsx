@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { IndicadoresPrevisionales } from '@/services/remuneraciones.service'
+import { INDICADORES_DEFAULT } from '@/services/remuneraciones.service'
 import type { AFP } from '@/types/remuneraciones.types'
 
 interface Props {
@@ -50,7 +51,9 @@ function AfpRow({ afp, onGuardar, guardando }: {
 export default function IndicadoresClient({ indicadores: init, afps: initAfps, empresa_id, anio }: Props) {
   const router = useRouter()
 
-  const [ind, setInd]         = useState<IndicadoresPrevisionales>(init)
+  const [ind, setInd]         = useState<IndicadoresPrevisionales>(
+    init ?? { empresa_id, anio, ...INDICADORES_DEFAULT }
+  )
   const [afps, setAfps]       = useState<AFP[]>(initAfps)
   const [guardando, setGuardando] = useState(false)
   const [guardandoAfp, setGuardandoAfp] = useState<string | null>(null)
@@ -123,8 +126,8 @@ export default function IndicadoresClient({ indicadores: init, afps: initAfps, e
     tipo: 'currency' | 'pct' | 'number' = 'currency',
     hint?: string
   ) => {
-    const raw = ind[key] as number | null
-    const display = tipo === 'pct' ? pct(raw ?? 0) : String(raw ?? '')
+    const raw = (ind?.[key] ?? null) as number | null
+    const display = tipo === 'pct' ? pct(raw ?? 0) : String(raw ?? 0)
     return (
       <div>
         <label className="block text-xs font-medium text-slate-600 mb-1">{label}</label>

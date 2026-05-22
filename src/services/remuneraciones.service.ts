@@ -317,15 +317,20 @@ export async function getIndicadores(
   empresa_id: string,
   anio: number
 ): Promise<IndicadoresPrevisionales> {
-  const supabase = await createClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data } = await (supabase as any)
-    .from('indicadores_previsionales')
-    .select('*')
-    .eq('empresa_id', empresa_id)
-    .eq('anio', anio)
-    .maybeSingle() as { data: IndicadoresPrevisionales | null }
-  return data ?? { empresa_id, anio, ...INDICADORES_DEFAULT }
+  try {
+    const supabase = await createClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase as any)
+      .from('indicadores_previsionales')
+      .select('*')
+      .eq('empresa_id', empresa_id)
+      .eq('anio', anio)
+      .maybeSingle() as { data: Partial<IndicadoresPrevisionales> | null }
+    // Always merge with defaults so no field is ever undefined
+    return { empresa_id, anio, ...INDICADORES_DEFAULT, ...(data ?? {}) }
+  } catch {
+    return { empresa_id, anio, ...INDICADORES_DEFAULT }
+  }
 }
 
 export async function upsertIndicadores(ind: IndicadoresPrevisionales): Promise<boolean> {
