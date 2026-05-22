@@ -15,6 +15,8 @@ export default function ClientesClient({ clientes, empresa_id }: Props) {
   const [busqueda, setBusqueda] = useState('')
   const [soloActivos, setSoloActivos] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [editando, setEditando] = useState<Cliente | null>(null)
+  const [toggling, setToggling] = useState<string | null>(null)
 
   const filtrados = useMemo(() => {
     const termino = busqueda.toLowerCase()
@@ -29,15 +31,30 @@ export default function ClientesClient({ clientes, empresa_id }: Props) {
     })
   }, [clientes, busqueda, soloActivos])
 
+  async function toggleActivo(id: string, current: boolean) {
+    setToggling(id)
+    await fetch('/api/ventas/clientes', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, is_active: !current }),
+    })
+    setToggling(null)
+    router.refresh()
+  }
+
+  function startEdit(c: Cliente) {
+    setShowForm(false)
+    setEditando(c)
+  }
+
   return (
     <div className="space-y-4">
-      {/* Header con botón */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-slate-900">Clientes</h1>
           <p className="text-sm text-slate-500 mt-0.5">{clientes.filter((c) => c.is_active).length} clientes activos</p>
         </div>
-        <button onClick={() => setShowForm(true)}
+        <button onClick={() => { setEditando(null); setShowForm(true) }}
           className="flex items-center gap-1.5 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -47,10 +64,16 @@ export default function ClientesClient({ clientes, empresa_id }: Props) {
       </div>
 
       {showForm && (
-        <NuevoClienteForm
-          empresa_id={empresa_id}
+        <ClienteForm empresa_id={empresa_id}
           onCancel={() => setShowForm(false)}
           onSave={() => { setShowForm(false); router.refresh() }}
+        />
+      )}
+
+      {editando && (
+        <ClienteForm empresa_id={empresa_id} cliente={editando}
+          onCancel={() => setEditando(null)}
+          onSave={() => { setEditando(null); router.refresh() }}
         />
       )}
 
@@ -79,25 +102,23 @@ export default function ClientesClient({ clientes, empresa_id }: Props) {
               <th className="text-left px-4 py-2.5 text-xs font-medium text-slate-500">Email</th>
               <th className="text-right px-4 py-2.5 text-xs font-medium text-slate-500">Límite Crédito</th>
               <th className="text-center px-4 py-2.5 text-xs font-medium text-slate-500">Estado</th>
+              <th className="text-right px-4 py-2.5 text-xs font-medium text-slate-500">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {filtrados.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-8 text-slate-400">
+                <td colSpan={7} className="text-center py-8 text-slate-400">
                   {clientes.length === 0 ? (
-                    <span>
-                      No hay clientes.{' '}
-                      <button onClick={() => setShowForm(true)} className="text-emerald-700 hover:underline">
-                        Agregar primero →
-                      </button>
+                    <span>No hay clientes.{' '}
+                      <button onClick={() => setShowForm(true)} className="text-emerald-700 hover:underline">Agregar primero →</button>
                     </span>
                   ) : 'No se encontraron resultados.'}
                 </td>
               </tr>
             ) : (
               filtrados.map((c) => (
-                <tr key={c.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={c.id} className={cn('hover:bg-slate-50 transition-colors', !c.is_active && 'opacity-60')}>
                   <td className="px-5 py-3 font-mono text-xs text-slate-700">{formatRut(c.rut)}</td>
                   <td className="px-4 py-3">
                     <p className="font-medium text-slate-800">{c.razon_social}</p>
@@ -113,6 +134,26 @@ export default function ClientesClient({ clientes, empresa_id }: Props) {
                       {c.is_active ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-1">
+                      <button onClick={() => startEdit(c)} title="Editar"
+                        className="p-1 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button onClick={() => toggleActivo(c.id, c.is_active)} disabled={toggling === c.id}
+                        title={c.is_active ? 'Dar de baja' : 'Activar'}
+                        className="p-1 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors disabled:opacity-40">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          {c.is_active
+                            ? <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                            : <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          }
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))
             )}
@@ -126,13 +167,29 @@ export default function ClientesClient({ clientes, empresa_id }: Props) {
   )
 }
 
-function NuevoClienteForm({ empresa_id, onCancel, onSave }: { empresa_id: string; onCancel: () => void; onSave: () => void }) {
+function ClienteForm({
+  empresa_id, cliente, onCancel, onSave,
+}: {
+  empresa_id: string
+  cliente?: Cliente
+  onCancel: () => void
+  onSave: () => void
+}) {
+  const isEdit = !!cliente
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
-    rut: '', razon_social: '', nombre_fantasia: '', giro: '',
-    email: '', telefono: '', direccion: '', comuna: '', ciudad: '',
-    limite_credito: '', condicion_pago: '',
+    rut:              cliente?.rut              ?? '',
+    razon_social:     cliente?.razon_social     ?? '',
+    nombre_fantasia:  cliente?.nombre_fantasia  ?? '',
+    giro:             cliente?.giro             ?? '',
+    email:            cliente?.email            ?? '',
+    telefono:         cliente?.telefono         ?? '',
+    direccion:        cliente?.direccion        ?? '',
+    comuna:           cliente?.comuna           ?? '',
+    ciudad:           cliente?.ciudad           ?? '',
+    limite_credito:   cliente?.limite_credito   ? String(cliente.limite_credito) : '',
+    condicion_pago:   cliente?.condicion_pago   ?? '',
   })
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -141,10 +198,14 @@ function NuevoClienteForm({ empresa_id, onCancel, onSave }: { empresa_id: string
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true); setError('')
-    const res = await fetch('/api/ventas/clientes', {
-      method: 'POST',
+    const url = '/api/ventas/clientes'
+    const body = isEdit
+      ? { id: cliente!.id, ...form }
+      : { empresa_id, ...form }
+    const res = await fetch(url, {
+      method: isEdit ? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ empresa_id, ...form }),
+      body: JSON.stringify(body),
     })
     const json = await res.json()
     if (!json.ok) { setError(json.error ?? 'Error'); setLoading(false); return }
@@ -153,13 +214,14 @@ function NuevoClienteForm({ empresa_id, onCancel, onSave }: { empresa_id: string
 
   return (
     <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
-      <h3 className="font-semibold text-slate-800">Nuevo Cliente</h3>
+      <h3 className="font-semibold text-slate-800">{isEdit ? 'Editar Cliente' : 'Nuevo Cliente'}</h3>
       <form onSubmit={submit} className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">RUT *</label>
             <input required value={form.rut} onChange={set('rut')} placeholder="76.543.210-K"
-              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
+              disabled={isEdit}
+              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white disabled:bg-slate-100" />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Razón Social *</label>
@@ -167,7 +229,6 @@ function NuevoClienteForm({ empresa_id, onCancel, onSave }: { empresa_id: string
               className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
           </div>
         </div>
-
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Nombre Fantasía</label>
@@ -180,7 +241,6 @@ function NuevoClienteForm({ empresa_id, onCancel, onSave }: { empresa_id: string
               className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
           </div>
         </div>
-
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Email</label>
@@ -193,7 +253,6 @@ function NuevoClienteForm({ empresa_id, onCancel, onSave }: { empresa_id: string
               className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
           </div>
         </div>
-
         <div className="grid grid-cols-3 gap-3">
           <div className="col-span-2">
             <label className="block text-xs font-medium text-slate-600 mb-1">Dirección</label>
@@ -206,7 +265,6 @@ function NuevoClienteForm({ empresa_id, onCancel, onSave }: { empresa_id: string
               className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white" />
           </div>
         </div>
-
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Límite de Crédito</label>
@@ -225,9 +283,7 @@ function NuevoClienteForm({ empresa_id, onCancel, onSave }: { empresa_id: string
             </select>
           </div>
         </div>
-
         {error && <p className="text-sm text-red-600">{error}</p>}
-
         <div className="flex gap-2 pt-1">
           <button type="button" onClick={onCancel}
             className="px-3 py-1.5 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-100">
@@ -235,7 +291,7 @@ function NuevoClienteForm({ empresa_id, onCancel, onSave }: { empresa_id: string
           </button>
           <button type="submit" disabled={loading}
             className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg disabled:opacity-50">
-            {loading ? 'Guardando…' : 'Guardar Cliente'}
+            {loading ? 'Guardando…' : isEdit ? 'Actualizar' : 'Guardar Cliente'}
           </button>
         </div>
       </form>

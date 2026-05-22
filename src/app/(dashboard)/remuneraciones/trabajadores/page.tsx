@@ -9,5 +9,5 @@ export default async function TrabajadoresPage() {
   const empresa = await getEmpresaActiva()
   if (!empresa) return null
   const trabajadores = await getTrabajadores(empresa.id)
-  return <TrabajadoresClient trabajadores={trabajadores} />
+  return <TrabajadoresClient trabajadores={trabajadores} empresa_id={empresa.id} />
 }

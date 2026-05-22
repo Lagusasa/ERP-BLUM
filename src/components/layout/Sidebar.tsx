@@ -4,6 +4,11 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
+interface EmpresaInfo {
+  razon_social: string
+  rut: string
+}
+
 interface NavItem {
   label: string
   href: string
@@ -211,8 +216,11 @@ const NAV_CONFIG: NavItem[] = [
   },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ empresaActiva }: { empresaActiva?: EmpresaInfo | null }) {
   const pathname = usePathname()
+  const iniciales = empresaActiva
+    ? empresaActiva.razon_social.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase()
+    : '?'
 
   return (
     <aside className="w-64 bg-green-950 flex flex-col h-full shrink-0">
@@ -233,18 +241,22 @@ export default function Sidebar() {
 
       {/* Empresa activa */}
       <div className="px-4 py-3 border-b border-green-900">
-        <button className="w-full flex items-center gap-2 text-left hover:bg-green-900 rounded-lg px-2 py-1.5 transition-colors group">
-          <div className="w-6 h-6 rounded bg-emerald-700/20 flex items-center justify-center shrink-0">
-            <span className="text-emerald-400 text-xs font-bold">E</span>
+        <Link href="/admin/empresas" className="w-full flex items-center gap-2 text-left hover:bg-green-900 rounded-lg px-2 py-1.5 transition-colors group">
+          <div className="w-6 h-6 rounded bg-emerald-700/40 flex items-center justify-center shrink-0">
+            <span className="text-emerald-300 text-xs font-bold">{iniciales}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-green-100 text-xs font-medium truncate">Sin empresa</p>
-            <p className="text-slate-500 text-xs truncate">Selecciona empresa</p>
+            <p className="text-green-100 text-xs font-medium truncate">
+              {empresaActiva?.razon_social ?? 'Sin empresa'}
+            </p>
+            <p className="text-slate-500 text-xs truncate">
+              {empresaActiva?.rut ?? 'Selecciona empresa'}
+            </p>
           </div>
-          <svg className="w-3.5 h-3.5 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-3.5 h-3.5 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
           </svg>
-        </button>
+        </Link>
       </div>
 
       {/* Navegación */}

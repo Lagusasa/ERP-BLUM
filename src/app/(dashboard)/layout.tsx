@@ -22,7 +22,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
-      <Sidebar />
+      <Sidebar empresaActiva={empresaActiva} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header
           user={perfil}

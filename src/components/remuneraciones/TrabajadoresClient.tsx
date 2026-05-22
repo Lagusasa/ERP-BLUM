@@ -2,16 +2,20 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import type { Trabajador } from '@/types/remuneraciones.types'
 import { formatRut, formatCurrency, cn } from '@/lib/utils'
 import { TIPO_CONTRATO_LABELS } from '@/types/remuneraciones.types'
 
 interface Props {
   trabajadores: Trabajador[]
+  empresa_id: string
 }
 
-export default function TrabajadoresClient({ trabajadores }: Props) {
+export default function TrabajadoresClient({ trabajadores, empresa_id: _empresa_id }: Props) {
+  const router = useRouter()
   const [busqueda, setBusqueda] = useState('')
+  const [toggling, setToggling] = useState<string | null>(null)
 
   const filtrados = useMemo(() => {
     const t = busqueda.toLowerCase()
@@ -23,6 +27,17 @@ export default function TrabajadoresClient({ trabajadores }: Props) {
         w.rut.includes(t)
     )
   }, [trabajadores, busqueda])
+
+  async function toggleActivo(id: string, current: boolean) {
+    setToggling(id)
+    await fetch('/api/remuneraciones/trabajadores', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, is_active: !current }),
+    })
+    setToggling(null)
+    router.refresh()
+  }
 
   return (
     <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
@@ -54,18 +69,19 @@ export default function TrabajadoresClient({ trabajadores }: Props) {
             <th className="text-right px-4 py-2.5 text-xs font-medium text-slate-500">Sueldo Base</th>
             <th className="text-left px-4 py-2.5 text-xs font-medium text-slate-500">AFP</th>
             <th className="text-center px-4 py-2.5 text-xs font-medium text-slate-500">Estado</th>
+            <th className="text-right px-4 py-2.5 text-xs font-medium text-slate-500">Acciones</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
           {filtrados.length === 0 ? (
             <tr>
-              <td colSpan={7} className="text-center py-8 text-slate-400">
+              <td colSpan={8} className="text-center py-8 text-slate-400">
                 {trabajadores.length === 0 ? 'No hay trabajadores registrados.' : 'No se encontraron resultados.'}
               </td>
             </tr>
           ) : (
             filtrados.map((w) => (
-              <tr key={w.id} className="hover:bg-slate-50 transition-colors">
+              <tr key={w.id} className={cn('hover:bg-slate-50 transition-colors', !w.is_active && 'opacity-60')}>
                 <td className="px-5 py-3 font-mono text-xs text-slate-700">{formatRut(w.rut)}</td>
                 <td className="px-4 py-3">
                   <p className="font-medium text-slate-800">{w.nombre} {w.apellido_paterno}</p>
@@ -85,6 +101,26 @@ export default function TrabajadoresClient({ trabajadores }: Props) {
                   )}>
                     {w.is_active ? 'Activo' : 'Inactivo'}
                   </span>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-end gap-1">
+                    <Link href={`/remuneraciones/trabajadores/nuevo?edit=${w.id}`} title="Editar"
+                      className="p-1 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors">
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </Link>
+                    <button onClick={() => toggleActivo(w.id, w.is_active)} disabled={toggling === w.id}
+                      title={w.is_active ? 'Dar de baja' : 'Reactivar'}
+                      className="p-1 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors disabled:opacity-40">
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        {w.is_active
+                          ? <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 115.636 5.636m12.728 12.728L5.636 5.636" />
+                          : <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        }
+                      </svg>
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))

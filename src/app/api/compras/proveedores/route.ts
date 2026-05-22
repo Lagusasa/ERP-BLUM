@@ -7,26 +7,25 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
 
   const body = await req.json()
-  const { empresa_id, rut, razon_social, nombre_fantasia, giro, email, telefono, direccion, comuna, ciudad, limite_credito, condicion_pago } = body
+  const { empresa_id, rut, razon_social, nombre_fantasia, giro, email, telefono, direccion, comuna, ciudad, condicion_pago } = body
 
   if (!empresa_id || !rut || !razon_social) {
     return NextResponse.json({ ok: false, error: 'RUT y Razón Social son obligatorios' }, { status: 400 })
   }
 
   const { data, error } = await supabase
-    .from('clientes')
+    .from('proveedores')
     .insert({
       empresa_id, rut, razon_social,
-      nombre_fantasia:  nombre_fantasia  || null,
-      giro:             giro             || null,
-      email:            email            || null,
-      telefono:         telefono         || null,
-      direccion:        direccion        || null,
-      comuna:           comuna           || null,
-      ciudad:           ciudad           || null,
-      limite_credito:   limite_credito   ? Number(limite_credito) : null,
-      condicion_pago:   condicion_pago   || null,
-      is_active:        true,
+      nombre_fantasia: nombre_fantasia || null,
+      giro:            giro            || null,
+      email:           email           || null,
+      telefono:        telefono        || null,
+      direccion:       direccion       || null,
+      comuna:          comuna          || null,
+      ciudad:          ciudad          || null,
+      condicion_pago:  condicion_pago  || null,
+      is_active:       true,
     })
     .select()
     .single()
@@ -45,7 +44,7 @@ export async function PATCH(req: NextRequest) {
   if (!id) return NextResponse.json({ ok: false, error: 'ID requerido' }, { status: 400 })
 
   const updates: Record<string, unknown> = {}
-  if (fields.razon_social   !== undefined) updates.razon_social    = fields.razon_social
+  if (fields.razon_social    !== undefined) updates.razon_social    = fields.razon_social
   if (fields.nombre_fantasia !== undefined) updates.nombre_fantasia = fields.nombre_fantasia || null
   if (fields.giro            !== undefined) updates.giro            = fields.giro            || null
   if (fields.email           !== undefined) updates.email           = fields.email           || null
@@ -55,9 +54,8 @@ export async function PATCH(req: NextRequest) {
   if (fields.ciudad          !== undefined) updates.ciudad          = fields.ciudad          || null
   if (fields.condicion_pago  !== undefined) updates.condicion_pago  = fields.condicion_pago  || null
   if (fields.is_active       !== undefined) updates.is_active       = fields.is_active
-  if (fields.limite_credito  !== undefined) updates.limite_credito  = fields.limite_credito ? Number(fields.limite_credito) : null
 
-  const { data, error } = await supabase.from('clientes').update(updates as any).eq('id', id).select().single()
+  const { data, error } = await supabase.from('proveedores').update(updates as any).eq('id', id).select().single()
   if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 400 })
   return NextResponse.json({ ok: true, data })
 }
