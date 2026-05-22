@@ -144,7 +144,6 @@ export async function getComprobantes(filtros: FiltrosComprobante): Promise<Comp
       periodo:periodos_contables(*)
     `)
     .eq('empresa_id', filtros.empresa_id)
-    .neq('estado', 'anulado')
     .order('numero', { ascending: false })
 
   if (filtros.tipo) query = query.eq('tipo', filtros.tipo)
