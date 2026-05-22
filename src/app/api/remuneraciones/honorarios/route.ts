@@ -7,22 +7,23 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
   const body = await req.json()
-  const { empresa_id, proveedor_rut, proveedor_nombre, fecha, numero_boleta, monto_bruto, retencion_pct, concepto, anio } = body
+  const { empresa_id, rut_prestador, nombre_prestador, fecha, n_boleta, monto_bruto, retencion_pct, concepto, trabajador_id, referencia } = body
 
-  if (!empresa_id || !proveedor_rut || !fecha || !monto_bruto) {
+  if (!empresa_id || !rut_prestador || !nombre_prestador || !fecha || !monto_bruto) {
     return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 })
   }
 
   const { data, error } = await (supabase as any).from('pagos_honorarios').insert({
     empresa_id,
-    proveedor_rut,
-    proveedor_nombre: proveedor_nombre ?? null,
+    rut_prestador,
+    nombre_prestador,
     fecha,
-    numero_boleta: numero_boleta ?? null,
+    n_boleta: n_boleta ?? null,
     monto_bruto,
     retencion_pct: retencion_pct ?? 0.1375,
     concepto: concepto ?? null,
-    anio: anio ?? new Date(fecha).getFullYear(),
+    trabajador_id: trabajador_id ?? null,
+    referencia: referencia ?? null,
     estado: 'pendiente',
   }).select().single()
 
