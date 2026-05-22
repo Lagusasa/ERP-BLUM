@@ -620,7 +620,7 @@ export async function getLibroMayor(
   // 2. Líneas de esos comprobantes
   let linQuery = supabase
     .from('comprobante_lineas')
-    .select('comprobante_id, debe, haber, cuenta:plan_cuentas(id, codigo, nombre, clase, saldo_normal)')
+    .select('comprobante_id, debe, haber, glosa, cuenta:plan_cuentas(id, codigo, nombre, clase, saldo_normal)')
     .in('comprobante_id', compIds)
 
   if (cuenta_id) linQuery = linQuery.eq('cuenta_id', cuenta_id)
@@ -687,10 +687,11 @@ export async function getLibroMayor(
     }, 0)
     const delta = c.saldo_normal === 'deudor' ? l.debe - l.haber : l.haber - l.debe
 
+    const lineaGlosa = (l as unknown as { glosa: string | null }).glosa
     entry.movimientos.push({
       fecha: comp.fecha,
       numero: comp.numero,
-      glosa: comp.glosa ?? '',
+      glosa: lineaGlosa || comp.glosa || '',
       debe: l.debe,
       haber: l.haber,
       saldo: saldoAcum + delta,
