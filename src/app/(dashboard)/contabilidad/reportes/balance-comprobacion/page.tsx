@@ -4,7 +4,7 @@ import { getBalanceComprobacion } from '@/services/contabilidad.service'
 import { ReportePeriodo } from '@/components/contabilidad/ReporteLayout'
 import BalanceComprobacionClient from '@/components/contabilidad/BalanceComprobacionClient'
 
-export const metadata: Metadata = { title: 'Balance de Comprobación' }
+export const metadata: Metadata = { title: 'Balance de 8 Columnas' }
 
 interface Props {
   searchParams: Promise<{ desde?: string; hasta?: string }>
@@ -24,8 +24,8 @@ export default async function BalanceComprobacionPage({ searchParams }: Props) {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-bold text-slate-900">Balance de Comprobación</h1>
-        <p className="text-sm text-slate-500 mt-0.5">Sumas y saldos por cuenta — solo comprobantes aprobados.</p>
+        <h1 className="text-xl font-bold text-slate-900">Balance de Comprobación y Saldos (8 columnas)</h1>
+        <p className="text-sm text-slate-500 mt-0.5">Hoja de trabajo: sumas, saldos, balance e inventario de resultados.</p>
       </div>
       <ReportePeriodo desde={desde} hasta={hasta}>
         <BalanceComprobacionClient lineas={lineas} />

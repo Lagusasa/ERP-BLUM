@@ -7,6 +7,25 @@ export interface BalanceComprobacionLinea {
   total_haber: number
   saldo_deudor: number
   saldo_acreedor: number
+  balance_debe: number
+  balance_haber: number
+  resultado_debe: number
+  resultado_haber: number
+}
+
+export interface FlujoCajaItem {
+  categoria: string
+  tipo: 'ingreso' | 'egreso'
+  total: number
+}
+
+export interface FlujoCajaResumen {
+  operacion:       { items: FlujoCajaItem[]; neto: number }
+  inversion:       { items: FlujoCajaItem[]; neto: number }
+  financiamiento:  { items: FlujoCajaItem[]; neto: number }
+  variacion_neta: number
+  saldo_inicial:  number
+  saldo_final:    number
 }
 
 export interface ResultadoItem {

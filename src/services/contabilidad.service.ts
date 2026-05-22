@@ -372,7 +372,13 @@ export async function getBalanceComprobacion(
     const c = l.cuenta as unknown as { id: string; codigo: string; nombre: string; clase: string; saldo_normal: string } | null
     if (!c) continue
     if (!map.has(c.id)) {
-      map.set(c.id, { codigo: c.codigo, nombre: c.nombre, clase: c.clase, saldo_normal: c.saldo_normal, total_debe: 0, total_haber: 0, saldo_deudor: 0, saldo_acreedor: 0 })
+      map.set(c.id, {
+        codigo: c.codigo, nombre: c.nombre, clase: c.clase, saldo_normal: c.saldo_normal,
+        total_debe: 0, total_haber: 0,
+        saldo_deudor: 0, saldo_acreedor: 0,
+        balance_debe: 0, balance_haber: 0,
+        resultado_debe: 0, resultado_haber: 0,
+      })
     }
     const e = map.get(c.id)!
     e.total_debe += l.debe
@@ -381,8 +387,18 @@ export async function getBalanceComprobacion(
 
   for (const e of map.values()) {
     const saldo = e.total_debe - e.total_haber
-    e.saldo_deudor = saldo > 0 ? saldo : 0
+    e.saldo_deudor   = saldo > 0 ? saldo : 0
     e.saldo_acreedor = saldo < 0 ? -saldo : 0
+
+    if (e.clase === 'activo') {
+      e.balance_debe  = e.saldo_deudor
+    } else if (e.clase === 'pasivo' || e.clase === 'patrimonio') {
+      e.balance_haber = e.saldo_acreedor
+    } else if (e.clase === 'gasto' || e.clase === 'costo') {
+      e.resultado_debe = e.saldo_deudor
+    } else if (e.clase === 'ingreso') {
+      e.resultado_haber = e.saldo_acreedor
+    }
   }
 
   return Array.from(map.values()).sort((a, b) => a.codigo.localeCompare(b.codigo))
@@ -474,6 +490,76 @@ export async function getBalanceGeneral(
     activos, pasivos, patrimonio,
     total_activo, total_pasivo, total_patrimonio,
     diferencia: total_activo - (total_pasivo + total_patrimonio),
+  }
+}
+
+import type { FlujoCajaResumen, FlujoCajaItem } from '@/types/reportes.types'
+import { CATEGORIA_LABELS } from '@/types/finanzas.types'
+
+const CAT_OPERACION    = new Set(['cobranza_clientes','pago_proveedores','remuneraciones','impuestos','servicios','arriendo','gastos_financieros','otros_ingresos','otros_egresos'])
+const CAT_INVERSION    = new Set(['inversion'])
+const CAT_FINANCIAMIENTO = new Set(['prestamo','aporte_capital'])
+
+export async function getFlujoCaja(
+  empresa_id: string,
+  desde: string,
+  hasta: string
+): Promise<FlujoCajaResumen> {
+  const supabase = await createClient()
+
+  const { data: movs } = await supabase
+    .from('movimientos_caja')
+    .select('tipo, categoria, monto')
+    .eq('empresa_id', empresa_id)
+    .gte('fecha', desde)
+    .lte('fecha', hasta)
+
+  const { data: cuentas } = await supabase
+    .from('cuentas_bancarias')
+    .select('saldo_inicial, saldo_actual')
+    .eq('empresa_id', empresa_id)
+    .eq('is_active', true)
+
+  const rows = movs ?? []
+
+  const totales = new Map<string, number>()
+  for (const m of rows) {
+    const key = `${m.tipo}|${m.categoria}`
+    totales.set(key, (totales.get(key) ?? 0) + m.monto)
+  }
+
+  function buildItems(cats: Set<string>): FlujoCajaItem[] {
+    const items: FlujoCajaItem[] = []
+    for (const [key, total] of totales.entries()) {
+      const [tipo, cat] = key.split('|') as ['ingreso' | 'egreso', string]
+      if (cats.has(cat)) {
+        items.push({ categoria: CATEGORIA_LABELS[cat] ?? cat, tipo, total })
+      }
+    }
+    return items.sort((a, b) => a.categoria.localeCompare(b.categoria))
+  }
+
+  function neto(items: FlujoCajaItem[]) {
+    return items.reduce((s, i) => s + (i.tipo === 'ingreso' ? i.total : -i.total), 0)
+  }
+
+  const opItems = buildItems(CAT_OPERACION)
+  const invItems = buildItems(CAT_INVERSION)
+  const finItems = buildItems(CAT_FINANCIAMIENTO)
+  const opNeto  = neto(opItems)
+  const invNeto = neto(invItems)
+  const finNeto = neto(finItems)
+
+  const saldo_inicial = (cuentas ?? []).reduce((s, c) => s + c.saldo_inicial, 0)
+  const saldo_final   = (cuentas ?? []).reduce((s, c) => s + c.saldo_actual,  0)
+
+  return {
+    operacion:      { items: opItems,  neto: opNeto  },
+    inversion:      { items: invItems, neto: invNeto },
+    financiamiento: { items: finItems, neto: finNeto },
+    variacion_neta: opNeto + invNeto + finNeto,
+    saldo_inicial,
+    saldo_final,
   }
 }
 

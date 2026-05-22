@@ -4,7 +4,7 @@ import { getBalanceGeneral } from '@/services/contabilidad.service'
 import { ReporteFecha } from '@/components/contabilidad/ReporteLayout'
 import BalanceGeneralClient from '@/components/contabilidad/BalanceGeneralClient'
 
-export const metadata: Metadata = { title: 'Balance General' }
+export const metadata: Metadata = { title: 'Estado de Situación Financiera' }
 
 interface Props {
   searchParams: Promise<{ hasta?: string }>
@@ -22,7 +22,7 @@ export default async function BalanceGeneralPage({ searchParams }: Props) {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-bold text-slate-900">Balance General</h1>
+        <h1 className="text-xl font-bold text-slate-900">Estado de Situación Financiera</h1>
         <p className="text-sm text-slate-500 mt-0.5">Activos, pasivos y patrimonio acumulados hasta la fecha.</p>
       </div>
       <ReporteFecha hasta={hasta}>
