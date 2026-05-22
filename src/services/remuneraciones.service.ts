@@ -197,3 +197,148 @@ export async function getResumenRemuneraciones(
     liquidaciones_aprobadas: data.filter((l) => l.estado === 'aprobada' || l.estado === 'pagada').length,
   }
 }
+
+// ── LIBRO DE REMUNERACIONES ──────────────────────────────────
+export async function getLibroRemuneraciones(
+  empresa_id: string,
+  mes: number,
+  anio: number
+): Promise<Liquidacion[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('liquidaciones')
+    .select(`
+      *,
+      trabajador:trabajadores(nombre, apellido_paterno, apellido_materno, rut)
+    `)
+    .eq('empresa_id', empresa_id)
+    .eq('periodo_mes', mes)
+    .eq('periodo_anio', anio)
+    .in('estado', ['aprobada', 'pagada'])
+    .order('trabajador_id', { ascending: true })
+  return (data ?? []) as unknown as Liquidacion[]
+}
+
+// ── LIBRO DE HONORARIOS ──────────────────────────────────────
+export interface PagoHonorarios {
+  id: string
+  empresa_id: string
+  trabajador_id: string | null
+  rut_prestador: string
+  nombre_prestador: string
+  fecha: string
+  concepto: string
+  n_boleta: string | null
+  monto_bruto: number
+  retencion_pct: number
+  retencion_monto: number
+  monto_neto: number
+  estado: 'pendiente' | 'pagado' | 'anulado'
+  referencia: string | null
+  created_at: string
+}
+
+export async function getPagosHonorarios(
+  empresa_id: string,
+  anio?: number,
+  mes?: number
+): Promise<PagoHonorarios[]> {
+  const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let q = (supabase as any)
+    .from('pagos_honorarios')
+    .select('*')
+    .eq('empresa_id', empresa_id)
+    .neq('estado', 'anulado')
+    .order('fecha', { ascending: false }) as { data: PagoHonorarios[] | null; error: { message: string } | null }
+
+  if (anio) q = (q as unknown as ReturnType<typeof supabase.from>).gte('fecha', `${anio}-01-01`).lte('fecha', `${anio}-12-31`) as unknown as typeof q
+  if (mes && anio) q = (q as unknown as ReturnType<typeof supabase.from>).gte('fecha', `${anio}-${String(mes).padStart(2,'0')}-01`).lte('fecha', `${anio}-${String(mes).padStart(2,'0')}-31`) as unknown as typeof q
+
+  const { data } = await q
+  return data ?? []
+}
+
+export type CreatePagoHonorariosInput = Omit<PagoHonorarios, 'id' | 'retencion_monto' | 'monto_neto' | 'created_at'>
+
+export async function createPagoHonorarios(
+  input: CreatePagoHonorariosInput
+): Promise<{ id: string } | null> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from('pagos_honorarios')
+    .insert({ ...input, created_by: user?.id })
+    .select('id')
+    .single() as { data: { id: string } | null; error: { message: string } | null }
+  if (error || !data) return null
+  return { id: data.id }
+}
+
+export async function updateEstadoHonorario(id: string, estado: 'pagado' | 'anulado'): Promise<boolean> {
+  const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).from('pagos_honorarios').update({ estado }).eq('id', id)
+  return !error
+}
+
+// ── INDICADORES PREVISIONALES ────────────────────────────────
+export interface IndicadoresPrevisionales {
+  id?: string
+  empresa_id: string
+  anio: number
+  sueldo_minimo: number
+  uf_referencia: number | null
+  utm: number | null
+  tope_imponible_uf: number
+  retencion_honorarios_pct: number
+  tasa_seg_ces_trab: number
+  tasa_seg_ces_emp_indef: number
+  tasa_seg_ces_emp_plazo: number
+  tasa_scs: number
+  tasa_mutualidad: number
+}
+
+export const INDICADORES_DEFAULT: Omit<IndicadoresPrevisionales, 'id' | 'empresa_id' | 'anio'> = {
+  sueldo_minimo: 500000,
+  uf_referencia: 37000,
+  utm: 66081,
+  tope_imponible_uf: 81.6,
+  retencion_honorarios_pct: 0.1375,
+  tasa_seg_ces_trab: 0.006,
+  tasa_seg_ces_emp_indef: 0.024,
+  tasa_seg_ces_emp_plazo: 0.030,
+  tasa_scs: 0.010,
+  tasa_mutualidad: 0.0093,
+}
+
+export async function getIndicadores(
+  empresa_id: string,
+  anio: number
+): Promise<IndicadoresPrevisionales> {
+  const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (supabase as any)
+    .from('indicadores_previsionales')
+    .select('*')
+    .eq('empresa_id', empresa_id)
+    .eq('anio', anio)
+    .maybeSingle() as { data: IndicadoresPrevisionales | null }
+  return data ?? { empresa_id, anio, ...INDICADORES_DEFAULT }
+}
+
+export async function upsertIndicadores(ind: IndicadoresPrevisionales): Promise<boolean> {
+  const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from('indicadores_previsionales')
+    .upsert({ ...ind }, { onConflict: 'empresa_id,anio' })
+  return !error
+}
+
+export async function updateAfpTasa(id: string, tasa: number): Promise<boolean> {
+  const supabase = await createClient()
+  const { error } = await supabase.from('afp').update({ tasa } as never).eq('id', id)
+  return !error
+}

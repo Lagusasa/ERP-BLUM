@@ -5,9 +5,12 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const TABS = [
-  { label: 'Resumen',       href: '/remuneraciones' },
-  { label: 'Trabajadores',  href: '/remuneraciones/trabajadores' },
-  { label: 'Liquidaciones', href: '/remuneraciones/liquidaciones' },
+  { label: 'Resumen',         href: '/remuneraciones' },
+  { label: 'Trabajadores',    href: '/remuneraciones/trabajadores' },
+  { label: 'Liquidaciones',   href: '/remuneraciones/liquidaciones' },
+  { label: 'Libro de Rem.',   href: '/remuneraciones/libro' },
+  { label: 'Honorarios',      href: '/remuneraciones/honorarios' },
+  { label: 'Indicadores',     href: '/remuneraciones/indicadores' },
 ]
 
 export default function RemuneracionesNav() {
