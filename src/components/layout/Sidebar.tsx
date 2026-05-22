@@ -159,9 +159,10 @@ const NAV_MODULOS: NavItem[] = [
     href: '/finanzas',
     disponible: true,
     children: [
-      { label: 'Flujo de Caja',   href: '/finanzas',                    icon: null, disponible: true },
-      { label: 'Nueva Cuenta',    href: '/finanzas/cuentas/nueva',      icon: null, disponible: true },
-      { label: 'Nuevo Movimiento',href: '/finanzas/movimientos/nuevo',  icon: null, disponible: true },
+      { label: 'Flujo de Caja',    href: '/finanzas',                     icon: null, disponible: true },
+      { label: 'Conciliación',     href: '/finanzas/conciliacion',        icon: null, disponible: true },
+      { label: 'Nueva Cuenta',     href: '/finanzas/cuentas/nueva',       icon: null, disponible: true },
+      { label: 'Nuevo Movimiento', href: '/finanzas/movimientos/nuevo',   icon: null, disponible: true },
     ],
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
