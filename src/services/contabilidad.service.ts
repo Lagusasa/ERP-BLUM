@@ -38,7 +38,7 @@ export async function getCuentasImputables(empresa_id: string): Promise<PlanCuen
     .eq('is_active', true)
     .order('codigo', { ascending: true })
 
-  if (error) throw new Error(error.message)
+  if (error) { console.error('[getCuentasImputables]', error.message); return [] }
   return (data ?? []) as PlanCuenta[]
 }
 
@@ -618,7 +618,7 @@ export async function getLibroMayor(
   if (cuenta_id) query = query.eq('cuenta_id', cuenta_id)
 
   const { data, error } = await query
-  if (error) throw new Error(error.message)
+  if (error) { console.error('[getLibroMayor]', error.message); return [] }
 
   // Saldos anteriores (antes del período)
   const { data: prevData } = await supabase
@@ -708,7 +708,7 @@ export async function getActivosFijos(empresa_id: string): Promise<ActivoFijo[]>
     .eq('is_active', true)
     .order('codigo') as { data: ActivoFijo[] | null; error: { message: string } | null }
 
-  if (error) throw new Error(error.message)
+  if (error) { console.error('[getActivosFijos]', error.message); return [] }
   if (!activos?.length) return []
 
   const ids = activos.map((a) => a.id)
