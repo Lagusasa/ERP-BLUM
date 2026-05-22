@@ -600,41 +600,57 @@ export async function getLibroMayor(
 ): Promise<LibroMayorCuenta[]> {
   const supabase = await createClient()
 
-  // Movimientos del período
-  let query = supabase
-    .from('comprobante_lineas')
-    .select(`
-      id, debe, haber,
-      cuenta:plan_cuentas(id, codigo, nombre, clase, saldo_normal),
-      comprobante:comprobantes!inner(numero, fecha, glosa, estado)
-    `)
+  // 1. Comprobantes aprobados en el período (filtramos directamente en su tabla)
+  const { data: comps, error: errComps } = await supabase
+    .from('comprobantes')
+    .select('id, numero, fecha, glosa')
     .eq('empresa_id', empresa_id)
-    .eq('comprobantes.estado', 'aprobado')
-    .gte('comprobantes.fecha', desde)
-    .lte('comprobantes.fecha', hasta)
-    .order('comprobantes.fecha', { ascending: true })
-    .order('comprobantes.numero', { ascending: true })
+    .eq('estado', 'aprobado')
+    .gte('fecha', desde)
+    .lte('fecha', hasta)
+    .order('fecha', { ascending: true })
+    .order('numero', { ascending: true })
 
-  if (cuenta_id) query = query.eq('cuenta_id', cuenta_id)
+  if (errComps) { console.error('[getLibroMayor] comps', errComps.message); return [] }
+  if (!comps?.length) return []
 
-  const { data, error } = await query
-  if (error) { console.error('[getLibroMayor]', error.message); return [] }
+  const compIds = comps.map((c) => c.id)
+  const compMap = new Map(comps.map((c) => [c.id, c]))
 
-  // Saldos anteriores (antes del período)
-  const { data: prevData } = await supabase
+  // 2. Líneas de esos comprobantes
+  let linQuery = supabase
     .from('comprobante_lineas')
-    .select(`
-      debe, haber,
-      cuenta:plan_cuentas(id, codigo, nombre, clase, saldo_normal),
-      comprobante:comprobantes!inner(estado)
-    `)
+    .select('comprobante_id, debe, haber, cuenta:plan_cuentas(id, codigo, nombre, clase, saldo_normal)')
+    .in('comprobante_id', compIds)
+
+  if (cuenta_id) linQuery = linQuery.eq('cuenta_id', cuenta_id)
+
+  const { data: lineas, error: errLin } = await linQuery
+  if (errLin) { console.error('[getLibroMayor] lineas', errLin.message); return [] }
+
+  // 3. Saldos anteriores al período
+  const { data: compsAnt } = await supabase
+    .from('comprobantes')
+    .select('id')
     .eq('empresa_id', empresa_id)
-    .eq('comprobantes.estado', 'aprobado')
-    .lt('comprobantes.fecha', desde)
+    .eq('estado', 'aprobado')
+    .lt('fecha', desde)
+
+  const prevIds = (compsAnt ?? []).map((c) => c.id)
+  let prevData: { debe: number; haber: number; cuenta: unknown }[] = []
+  if (prevIds.length) {
+    let prevQ = supabase
+      .from('comprobante_lineas')
+      .select('debe, haber, cuenta:plan_cuentas(id, saldo_normal)')
+      .in('comprobante_id', prevIds)
+    if (cuenta_id) prevQ = prevQ.eq('cuenta_id', cuenta_id)
+    const { data: pRows } = await prevQ
+    prevData = (pRows ?? []) as typeof prevData
+  }
 
   // Acumular saldos anteriores por cuenta
   const saldosAnt = new Map<string, number>()
-  for (const l of prevData ?? []) {
+  for (const l of prevData) {
     const c = l.cuenta as unknown as { id: string; saldo_normal: string } | null
     if (!c) continue
     const prev = saldosAnt.get(c.id) ?? 0
@@ -645,9 +661,9 @@ export async function getLibroMayor(
   // Agrupar movimientos por cuenta
   const map = new Map<string, LibroMayorCuenta>()
 
-  for (const l of data ?? []) {
+  for (const l of lineas ?? []) {
     const c = l.cuenta as unknown as { id: string; codigo: string; nombre: string; clase: string; saldo_normal: string } | null
-    const comp = l.comprobante as unknown as { numero: number; fecha: string; glosa: string } | null
+    const comp = compMap.get((l as unknown as { comprobante_id: string }).comprobante_id) ?? null
     if (!c || !comp) continue
 
     if (!map.has(c.id)) {
