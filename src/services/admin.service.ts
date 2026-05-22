@@ -31,12 +31,17 @@ export interface UsuarioEmpresa {
   } | null
 }
 
-export async function getEmpresas(): Promise<EmpresaAdmin[]> {
+export interface EmpresaAdminConMembership extends EmpresaAdmin {
+  es_miembro: boolean
+}
+
+export async function getEmpresas(): Promise<EmpresaAdminConMembership[]> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  const { data, error } = await supabase
+  // Empresas donde el usuario es miembro activo
+  const { data: miembro } = await supabase
     .from('empresa_usuarios')
     .select(`
       empresa_id,
@@ -47,9 +52,25 @@ export async function getEmpresas(): Promise<EmpresaAdmin[]> {
     .eq('user_id', user.id)
     .eq('is_active', true)
 
-  if (error || !data) return []
+  // Empresas creadas por el usuario pero sin membership (registro faltante)
+  const { data: creadas } = await supabase
+    .from('empresas')
+    .select('id, razon_social, rut, giro, email, telefono, direccion, comuna, ciudad, is_active, created_at')
+    .eq('created_by', user.id)
 
-  return data.map((row) => row.empresas as unknown as EmpresaAdmin)
+  const miembroIds = new Set((miembro ?? []).map((m) => m.empresa_id))
+
+  const resultado: EmpresaAdminConMembership[] = [
+    ...(miembro ?? []).map((m) => ({ ...(m.empresas as unknown as EmpresaAdmin), es_miembro: true })),
+  ]
+
+  for (const e of creadas ?? []) {
+    if (!miembroIds.has(e.id)) {
+      resultado.push({ ...(e as unknown as EmpresaAdmin), es_miembro: false })
+    }
+  }
+
+  return resultado
 }
 
 export async function getEmpresa(id: string): Promise<EmpresaAdmin | null> {

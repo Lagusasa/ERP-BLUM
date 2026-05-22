@@ -90,3 +90,71 @@ export interface ConfigContable {
   cuenta_ingreso_id: string | null
   cuenta_gasto_id: string | null
 }
+
+// ── RAZONES FINANCIERAS ──────────────────────────────────────
+
+export interface RazonesFinancierasData {
+  activo_corriente:      number
+  activo_no_corriente:   number
+  inventarios:           number
+  pasivo_corriente:      number
+  liquidez_corriente:    number | null
+  prueba_acida:          number | null
+  endeudamiento:         number | null
+  endeudamiento_patrimonio: number | null
+  roa:                   number | null
+  roe:                   number | null
+  margen_bruto:          number | null
+  margen_neto:           number | null
+  total_activo:          number
+  total_pasivo:          number
+  total_patrimonio:      number
+  resultado_neto:        number
+  total_ingresos:        number
+}
+
+// ── ANTIGÜEDAD DE SALDOS ─────────────────────────────────────
+
+export type AntiguedadBucket = '0-30' | '31-60' | '61-90' | '90+'
+
+export interface AntiguedadLinea {
+  id: string
+  numero: string
+  rut: string
+  nombre: string
+  fecha_emision: string
+  fecha_vencimiento: string | null
+  total: number
+  dias_vencido: number
+  bucket: AntiguedadBucket
+}
+
+export interface AntiguedadTotales {
+  '0-30': number
+  '31-60': number
+  '61-90': number
+  '90+': number
+  total: number
+}
+
+export interface AntiguedadSaldosData {
+  cxc: AntiguedadLinea[]
+  cxp: AntiguedadLinea[]
+  totales_cxc: AntiguedadTotales
+  totales_cxp: AntiguedadTotales
+}
+
+// ── PRESUPUESTO VS REAL ──────────────────────────────────────
+
+export interface PresupuestoLinea {
+  cuenta_id: string
+  codigo: string
+  nombre: string
+  clase: string
+  presupuesto: number[]
+  real: number[]
+  total_presupuesto: number
+  total_real: number
+  variacion: number
+  variacion_pct: number
+}

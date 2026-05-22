@@ -145,7 +145,7 @@ export type Database = {
           nivel: number
           cuenta_padre_id: string | null
           es_imputable: boolean
-          es_activo: boolean
+          is_active: boolean
           permite_ajuste: boolean
           created_at: string
           updated_at: string

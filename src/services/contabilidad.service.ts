@@ -35,7 +35,7 @@ export async function getCuentasImputables(empresa_id: string): Promise<PlanCuen
     .select('id, codigo, nombre, clase, saldo_normal')
     .eq('empresa_id', empresa_id)
     .eq('es_imputable', true)
-    .eq('es_activo', true)
+    .eq('is_active', true)
     .order('codigo', { ascending: true })
 
   if (error) throw new Error(error.message)
@@ -493,7 +493,16 @@ export async function getBalanceGeneral(
   }
 }
 
-import type { FlujoCajaResumen, FlujoCajaItem } from '@/types/reportes.types'
+import type {
+  FlujoCajaResumen,
+  FlujoCajaItem,
+  RazonesFinancierasData,
+  AntiguedadSaldosData,
+  AntiguedadLinea,
+  AntiguedadBucket,
+  PresupuestoLinea,
+} from '@/types/reportes.types'
+import type { ActivoFijo } from '@/types/activos_fijos.types'
 import { CATEGORIA_LABELS } from '@/types/finanzas.types'
 
 const CAT_OPERACION    = new Set(['cobranza_clientes','pago_proveedores','remuneraciones','impuestos','servicios','arriendo','gastos_financieros','otros_ingresos','otros_egresos'])
@@ -684,3 +693,348 @@ export async function getLibroMayor(
 
   return Array.from(map.values()).sort((a, b) => a.codigo.localeCompare(b.codigo))
 }
+
+// ============================================================
+// ACTIVOS FIJOS
+// ============================================================
+
+export async function getActivosFijos(empresa_id: string): Promise<ActivoFijo[]> {
+  const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: activos, error } = await (supabase as any)
+    .from('activos_fijos')
+    .select('*')
+    .eq('empresa_id', empresa_id)
+    .eq('is_active', true)
+    .order('codigo') as { data: ActivoFijo[] | null; error: { message: string } | null }
+
+  if (error) throw new Error(error.message)
+  if (!activos?.length) return []
+
+  const ids = activos.map((a) => a.id)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: deps } = await (supabase as any)
+    .from('depreciaciones')
+    .select('activo_id, monto')
+    .in('activo_id', ids) as { data: { activo_id: string; monto: number }[] | null }
+
+  const depMap = new Map<string, { total: number; meses: number }>()
+  for (const d of deps ?? []) {
+    const curr = depMap.get(d.activo_id) ?? { total: 0, meses: 0 }
+    depMap.set(d.activo_id, { total: curr.total + d.monto, meses: curr.meses + 1 })
+  }
+
+  return activos.map((a) => ({
+    ...a,
+    depreciacion_acumulada: depMap.get(a.id)?.total ?? 0,
+    meses_depreciados: depMap.get(a.id)?.meses ?? 0,
+  })) as ActivoFijo[]
+}
+
+export async function createActivoFijo(empresa_id: string, data: Omit<ActivoFijo, 'id' | 'empresa_id' | 'created_at'>): Promise<ActivoFijo> {
+  const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: result, error } = await (supabase as any)
+    .from('activos_fijos')
+    .insert({ ...data, empresa_id })
+    .select()
+    .single() as { data: ActivoFijo | null; error: { message: string } | null }
+
+  if (error) throw new Error(error.message)
+  return result as ActivoFijo
+}
+
+export async function updateActivoFijo(id: string, empresa_id: string, data: Partial<ActivoFijo>): Promise<ActivoFijo> {
+  const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: result, error } = await (supabase as any)
+    .from('activos_fijos')
+    .update({ ...data, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .eq('empresa_id', empresa_id)
+    .select()
+    .single() as { data: ActivoFijo | null; error: { message: string } | null }
+
+  if (error) throw new Error(error.message)
+  return result as ActivoFijo
+}
+
+export async function registrarDepreciacionMes(
+  empresa_id: string,
+  anio: number,
+  mes: number
+): Promise<{ registrados: number; monto_total: number }> {
+  const supabase = await createClient()
+  const activos = await getActivosFijos(empresa_id)
+  const activos_activos = activos.filter((a) => a.estado === 'activo')
+
+  let registrados = 0
+  let monto_total = 0
+
+  for (const activo of activos_activos) {
+    const mesesDep = activo.meses_depreciados ?? 0
+    if (mesesDep >= activo.vida_util_meses) continue
+
+    const base = activo.valor_adquisicion - activo.valor_residual
+    let monto = 0
+
+    if (activo.metodo === 'lineal') {
+      monto = base / activo.vida_util_meses
+    } else {
+      const restantes = activo.vida_util_meses - mesesDep
+      const sumaDigitos = (activo.vida_util_meses * (activo.vida_util_meses + 1)) / 2
+      monto = (base * restantes) / sumaDigitos
+    }
+
+    const yaDepreciado = activo.depreciacion_acumulada ?? 0
+    monto = Math.min(monto, base - yaDepreciado)
+    if (monto <= 0) continue
+
+    const montoR = Math.round(monto * 100) / 100
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from('depreciaciones').upsert(
+      { activo_id: activo.id, empresa_id, anio, mes, monto: montoR },
+      { onConflict: 'activo_id,anio,mes' }
+    )
+
+    if (!error) {
+      registrados++
+      monto_total += montoR
+    }
+  }
+
+  return { registrados, monto_total }
+}
+
+// ============================================================
+// RAZONES FINANCIERAS
+// ============================================================
+
+export async function getRazonesFinancieras(empresa_id: string): Promise<RazonesFinancierasData> {
+  const hoy = new Date().toISOString().split('T')[0]
+  const anio = new Date().getFullYear()
+  const desde = `${anio}-01-01`
+
+  const [balance, resultados] = await Promise.all([
+    getBalanceGeneral(empresa_id, hoy),
+    getEstadoResultados(empresa_id, desde, hoy),
+  ])
+
+  const activo_corriente = balance.activos
+    .filter((a) => a.codigo.startsWith('1.1'))
+    .reduce((s, a) => s + a.saldo, 0)
+
+  const activo_no_corriente = balance.activos
+    .filter((a) => !a.codigo.startsWith('1.1'))
+    .reduce((s, a) => s + a.saldo, 0)
+
+  const inventarios = balance.activos
+    .filter(
+      (a) =>
+        a.codigo.startsWith('1.1.3') ||
+        a.nombre.toLowerCase().includes('existencia') ||
+        a.nombre.toLowerCase().includes('inventario') ||
+        a.nombre.toLowerCase().includes('mercader')
+    )
+    .reduce((s, a) => s + a.saldo, 0)
+
+  const pasivo_corriente = balance.pasivos
+    .filter((p) => p.codigo.startsWith('2.1'))
+    .reduce((s, p) => s + p.saldo, 0)
+
+  const safe = (n: number, d: number) => (d === 0 ? null : Math.round((n / d) * 100) / 100)
+  const pct = (n: number, d: number) => (d === 0 ? null : Math.round((n / d) * 10000) / 100)
+
+  return {
+    activo_corriente,
+    activo_no_corriente,
+    inventarios,
+    pasivo_corriente,
+    total_activo: balance.total_activo,
+    total_pasivo: balance.total_pasivo,
+    total_patrimonio: balance.total_patrimonio,
+    resultado_neto: resultados.resultado_neto,
+    total_ingresos: resultados.total_ingresos,
+    liquidez_corriente: safe(activo_corriente, pasivo_corriente),
+    prueba_acida: safe(activo_corriente - inventarios, pasivo_corriente),
+    endeudamiento: pct(balance.total_pasivo, balance.total_activo),
+    endeudamiento_patrimonio: safe(balance.total_pasivo, balance.total_patrimonio),
+    roa: pct(resultados.resultado_neto, balance.total_activo),
+    roe: pct(resultados.resultado_neto, balance.total_patrimonio),
+    margen_bruto: pct(resultados.resultado_bruto, resultados.total_ingresos),
+    margen_neto: pct(resultados.resultado_neto, resultados.total_ingresos),
+  }
+}
+
+// ============================================================
+// ANTIGÜEDAD DE SALDOS
+// ============================================================
+
+export async function getAntiguedadSaldos(empresa_id: string): Promise<AntiguedadSaldosData> {
+  const supabase = await createClient()
+  const hoy = new Date()
+
+  const [{ data: ventas }, { data: compras }] = await Promise.all([
+    supabase
+      .from('documentos_venta')
+      .select('id, numero_documento, fecha_emision, fecha_vencimiento, total, cliente:clientes(rut, razon_social)')
+      .eq('empresa_id', empresa_id)
+      .not('estado', 'in', '("cobrado","anulado")')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .eq('is_active' as any, true),
+    supabase
+      .from('documentos_compra')
+      .select('id, numero_documento, fecha_emision, fecha_vencimiento, total, proveedor:proveedores(rut, razon_social)')
+      .eq('empresa_id', empresa_id)
+      .not('estado', 'in', '("pagado","anulado")')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .eq('is_active' as any, true),
+  ])
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function buildLineas(docs: any[], tipo: 'venta' | 'compra'): AntiguedadLinea[] {
+    return (docs ?? []).map((d) => {
+      const vencDate = d.fecha_vencimiento
+        ? new Date(d.fecha_vencimiento)
+        : new Date(new Date(d.fecha_emision).getTime() + 30 * 86_400_000)
+      const dias = Math.floor((hoy.getTime() - vencDate.getTime()) / 86_400_000)
+      const bucket: AntiguedadBucket =
+        dias <= 0 ? '0-30' : dias <= 30 ? '0-30' : dias <= 60 ? '31-60' : dias <= 90 ? '61-90' : '90+'
+      const tercero = tipo === 'venta' ? d.cliente : d.proveedor
+      return {
+        id: d.id,
+        numero: d.numero_documento,
+        rut: tercero?.rut ?? '',
+        nombre: tercero?.razon_social ?? '',
+        fecha_emision: d.fecha_emision,
+        fecha_vencimiento: d.fecha_vencimiento ?? null,
+        total: d.total,
+        dias_vencido: Math.max(0, dias),
+        bucket,
+      }
+    })
+  }
+
+  function sumaB(lineas: AntiguedadLinea[]) {
+    return {
+      '0-30':  lineas.filter((l) => l.bucket === '0-30').reduce((s, l) => s + l.total, 0),
+      '31-60': lineas.filter((l) => l.bucket === '31-60').reduce((s, l) => s + l.total, 0),
+      '61-90': lineas.filter((l) => l.bucket === '61-90').reduce((s, l) => s + l.total, 0),
+      '90+':   lineas.filter((l) => l.bucket === '90+').reduce((s, l) => s + l.total, 0),
+      total:   lineas.reduce((s, l) => s + l.total, 0),
+    }
+  }
+
+  const cxc = buildLineas(ventas ?? [], 'venta')
+  const cxp = buildLineas(compras ?? [], 'compra')
+
+  return { cxc, cxp, totales_cxc: sumaB(cxc), totales_cxp: sumaB(cxp) }
+}
+
+// ============================================================
+// PRESUPUESTO VS REAL
+// ============================================================
+
+export async function getPresupuestoVsReal(
+  empresa_id: string,
+  anio: number
+): Promise<PresupuestoLinea[]> {
+  const supabase = await createClient()
+
+  const { data: comps } = await supabase
+    .from('comprobantes')
+    .select('id, fecha')
+    .eq('empresa_id', empresa_id)
+    .eq('estado', 'aprobado')
+    .gte('fecha', `${anio}-01-01`)
+    .lte('fecha', `${anio}-12-31`)
+
+  const compMap = new Map((comps ?? []).map((c) => [c.id, new Date(c.fecha).getMonth()]))
+  const ids = (comps ?? []).map((c) => c.id)
+
+  const RESULT_CLASES = new Set(['ingreso', 'costo', 'gasto'])
+  const realMap = new Map<string, { codigo: string; nombre: string; clase: string; saldo_normal: string; real: number[] }>()
+
+  if (ids.length) {
+    const { data: lineas } = await supabase
+      .from('comprobante_lineas')
+      .select('comprobante_id, debe, haber, cuenta:plan_cuentas!cuenta_id(id, codigo, nombre, clase, saldo_normal)')
+      .in('comprobante_id', ids)
+
+    for (const l of lineas ?? []) {
+      const c = l.cuenta as unknown as { id: string; codigo: string; nombre: string; clase: string; saldo_normal: string } | null
+      if (!c || !RESULT_CLASES.has(c.clase)) continue
+      const mes = compMap.get(l.comprobante_id) ?? 0
+      if (!realMap.has(c.id)) {
+        realMap.set(c.id, { codigo: c.codigo, nombre: c.nombre, clase: c.clase, saldo_normal: c.saldo_normal, real: Array(12).fill(0) })
+      }
+      const entry = realMap.get(c.id)!
+      const monto = c.saldo_normal === 'acreedor' ? l.haber - l.debe : l.debe - l.haber
+      entry.real[mes] += monto
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: presupuestos } = await (supabase as any)
+    .from('presupuestos_contables')
+    .select('cuenta_id, mes, monto')
+    .eq('empresa_id', empresa_id)
+    .eq('anio', anio) as { data: { cuenta_id: string; mes: number; monto: number }[] | null }
+
+  const presMap = new Map<string, number[]>()
+  for (const p of presupuestos ?? []) {
+    if (!presMap.has(p.cuenta_id)) presMap.set(p.cuenta_id, Array(12).fill(0))
+    presMap.get(p.cuenta_id)![p.mes - 1] = p.monto
+  }
+
+  const budgetOnlyIds = [...presMap.keys()].filter((id) => !realMap.has(id))
+  if (budgetOnlyIds.length) {
+    const { data: bCuentas } = await supabase
+      .from('plan_cuentas')
+      .select('id, codigo, nombre, clase, saldo_normal')
+      .in('id', budgetOnlyIds)
+    for (const c of bCuentas ?? []) {
+      if (RESULT_CLASES.has(c.clase))
+        realMap.set(c.id, { codigo: c.codigo, nombre: c.nombre, clase: c.clase, saldo_normal: c.saldo_normal, real: Array(12).fill(0) })
+    }
+  }
+
+  const result: PresupuestoLinea[] = []
+  for (const [cuentaId, r] of realMap.entries()) {
+    const presupuesto = presMap.get(cuentaId) ?? Array(12).fill(0)
+    const total_real = r.real.reduce((s, v) => s + v, 0)
+    const total_presupuesto = presupuesto.reduce((s, v) => s + v, 0)
+    const variacion = total_real - total_presupuesto
+    result.push({
+      cuenta_id: cuentaId,
+      codigo: r.codigo,
+      nombre: r.nombre,
+      clase: r.clase,
+      presupuesto,
+      real: r.real,
+      total_presupuesto,
+      total_real,
+      variacion,
+      variacion_pct: total_presupuesto === 0 ? 0 : Math.round((variacion / total_presupuesto) * 10000) / 100,
+    })
+  }
+
+  return result.sort((a, b) => a.codigo.localeCompare(b.codigo))
+}
+
+export async function upsertPresupuesto(
+  empresa_id: string,
+  cuenta_id: string,
+  anio: number,
+  mes: number,
+  monto: number
+): Promise<void> {
+  const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).from('presupuestos_contables').upsert(
+    { empresa_id, cuenta_id, anio, mes, monto, updated_at: new Date().toISOString() },
+    { onConflict: 'empresa_id,cuenta_id,anio,mes' }
+  )
+  if (error) throw new Error(error.message)
+}
+

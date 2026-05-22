@@ -16,7 +16,7 @@ export interface PlanCuenta {
   nivel: number
   saldo_normal: SaldoNormal
   es_imputable: boolean
-  es_activo: boolean
+  is_active: boolean
   permite_ajuste: boolean
   created_at: string
   updated_at: string

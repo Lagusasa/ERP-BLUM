@@ -53,40 +53,19 @@ export default function EmpresaForm({ empresa }: Props) {
         router.push('/admin/empresas')
         router.refresh()
       } else {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) throw new Error('No autenticado')
-
-        const { data: newEmpresa, error: dbError } = await supabase
-          .from('empresas')
-          .insert({ ...payload, is_active: true, created_by: user.id })
-          .select('id')
-          .single()
-        if (dbError || !newEmpresa) throw new Error(dbError?.message ?? 'Error al crear empresa')
-
-        const { data: rolAdmin } = await supabase
-          .from('roles')
-          .select('id')
-          .eq('nombre', 'Administrador')
-          .is('empresa_id', null)
-          .maybeSingle()
-
-        await supabase.from('empresa_usuarios').insert({
-          empresa_id: newEmpresa.id,
-          user_id: user.id,
-          rol_id: rolAdmin?.id ?? null,
-          is_active: true,
-          created_by: user.id,
-        })
-
-        const res = await fetch('/api/empresa/switch', {
+        // Usar endpoint servidor para evitar problemas de RLS en empresa_usuarios
+        const res = await fetch('/api/empresa/crear', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ empresa_id: newEmpresa.id }),
+          body: JSON.stringify(payload),
         })
-        if (!res.ok) console.warn('No se pudo activar la empresa automáticamente')
+        const d = await res.json()
+        if (!res.ok) throw new Error(d.error ?? 'Error al crear empresa')
+        if (d.warning) console.warn(d.warning)
 
-        router.push('/admin/empresas')
-        router.refresh()
+        // Hard reload so the new cookie (set by /api/empresa/crear) takes effect
+        window.location.href = '/admin/empresas'
+        return
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar')

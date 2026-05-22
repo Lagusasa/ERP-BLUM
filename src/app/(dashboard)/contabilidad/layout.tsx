@@ -11,11 +11,14 @@ export const metadata: Metadata = {
 }
 
 const SUBMENU = [
-  { label: 'Resumen',       href: '/contabilidad' },
+  { label: 'Resumen',        href: '/contabilidad' },
   { label: 'Plan de Cuentas', href: '/contabilidad/plan-cuentas' },
-  { label: 'Libro Diario',  href: '/contabilidad/libro-diario' },
-  { label: 'Libro Mayor',   href: '/contabilidad/libro-mayor' },
-  { label: 'Períodos',      href: '/contabilidad/periodos' },
+  { label: 'Libro Diario',   href: '/contabilidad/libro-diario' },
+  { label: 'Libro Mayor',    href: '/contabilidad/libro-mayor' },
+  { label: 'Períodos',       href: '/contabilidad/periodos' },
+  { label: 'Activos Fijos',  href: '/contabilidad/activos-fijos' },
+  { label: 'Presupuesto',    href: '/contabilidad/presupuesto' },
+  { label: 'Reportes',       href: '/contabilidad/reportes' },
 ]
 
 export default async function ContabilidadLayout({

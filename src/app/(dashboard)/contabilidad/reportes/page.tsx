@@ -48,6 +48,28 @@ const REPORTES = [
       </svg>
     ),
   },
+  {
+    href: '/contabilidad/reportes/razones-financieras',
+    titulo: 'Razones Financieras',
+    descripcion: 'Liquidez, endeudamiento y rentabilidad: ROA, ROE, margen neto y más.',
+    badge: null,
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    ),
+  },
+  {
+    href: '/contabilidad/reportes/antiguedad-saldos',
+    titulo: 'Antigüedad de Saldos',
+    descripcion: 'Cuentas por cobrar y por pagar ordenadas por tramos de vencimiento.',
+    badge: null,
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+  },
 ]
 
 export default function ReportesPage() {

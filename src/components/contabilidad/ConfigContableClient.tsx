@@ -35,7 +35,7 @@ export default function ConfigContableClient({ empresa_id, cuentas, config }: Pr
   const [ok, setOk] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const cuentasImputables = cuentas.filter((c) => c.es_imputable && c.es_activo)
+  const cuentasImputables = cuentas.filter((c) => c.es_imputable && c.is_active)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import type { EmpresaBasica } from '@/types/auth.types'
 import { cn } from '@/lib/utils'
 
@@ -11,14 +10,17 @@ interface Props {
 }
 
 export default function EmpresaSwitcher({ empresas, empresaActiva }: Props) {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [cambiando, setCambiando] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
+        setErrorMsg('')
+      }
     }
     document.addEventListener('mousedown', onClickOutside)
     return () => document.removeEventListener('mousedown', onClickOutside)
@@ -27,14 +29,23 @@ export default function EmpresaSwitcher({ empresas, empresaActiva }: Props) {
   async function switchEmpresa(id: string) {
     if (id === empresaActiva?.id || cambiando) return
     setCambiando(true)
+    setErrorMsg('')
     try {
-      await fetch('/api/empresa/switch', {
+      const res = await fetch('/api/empresa/switch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ empresa_id: id }),
       })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}))
+        setErrorMsg(d.error ?? `Error ${res.status}`)
+        return
+      }
       setOpen(false)
-      router.refresh()
+      // Hard reload to ensure the new cookie is sent with the next server request
+      window.location.reload()
+    } catch {
+      setErrorMsg('Error de red al cambiar empresa')
     } finally {
       setCambiando(false)
     }
@@ -67,8 +78,11 @@ export default function EmpresaSwitcher({ empresas, empresaActiva }: Props) {
       {open && (
         <div className="absolute top-full mt-1 left-0 w-64 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 py-2 border-b border-slate-100">
-            Empresas
+            {cambiando ? 'Cambiando empresa…' : 'Empresas'}
           </p>
+          {errorMsg && (
+            <p className="text-xs text-red-600 px-3 py-2 bg-red-50 border-b border-red-100">{errorMsg}</p>
+          )}
           <div className="max-h-64 overflow-y-auto">
             {empresas.map((e) => (
               <button

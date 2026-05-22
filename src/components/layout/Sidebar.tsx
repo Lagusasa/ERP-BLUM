@@ -37,6 +37,8 @@ const NAV_MODULOS: NavItem[] = [
       { label: 'Plan de Cuentas',     href: '/contabilidad/plan-cuentas',                        icon: null, disponible: true },
       { label: 'Libro Diario',        href: '/contabilidad/libro-diario',                        icon: null, disponible: true },
       { label: 'Libro Mayor',         href: '/contabilidad/libro-mayor',                         icon: null, disponible: true },
+      { label: 'Activos Fijos',       href: '/contabilidad/activos-fijos',                       icon: null, disponible: true },
+      { label: 'Presupuesto',         href: '/contabilidad/presupuesto',                         icon: null, disponible: true },
       { label: 'Reportes',            href: '/contabilidad/reportes',                            icon: null, disponible: true },
       { label: 'Configuración',       href: '/contabilidad/config',                              icon: null, disponible: true },
     ],

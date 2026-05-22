@@ -2,15 +2,35 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import type { EmpresaAdmin } from '@/services/admin.service'
+import type { EmpresaAdminConMembership } from '@/services/admin.service'
 import { formatDate, cn } from '@/lib/utils'
 
 interface Props {
-  empresas: EmpresaAdmin[]
+  empresas: EmpresaAdminConMembership[]
 }
 
 export default function EmpresasClient({ empresas }: Props) {
   const [busqueda, setBusqueda] = useState('')
+  const [uniendose, setUniendose] = useState<string | null>(null)
+
+  async function unirseEmpresa(empresaId: string) {
+    setUniendose(empresaId)
+    try {
+      const res = await fetch('/api/empresa/unirse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ empresa_id: empresaId }),
+      })
+      if (res.ok) {
+        window.location.reload()
+      } else {
+        const d = await res.json()
+        alert(d.error ?? 'Error al unirse a la empresa')
+      }
+    } finally {
+      setUniendose(null)
+    }
+  }
 
   const filtradas = useMemo(() => {
     const t = busqueda.toLowerCase()
@@ -70,17 +90,34 @@ export default function EmpresasClient({ empresas }: Props) {
                 <td className="px-4 py-3 text-xs text-slate-600">{e.email ?? '—'}</td>
                 <td className="px-4 py-3 text-xs text-slate-500">{formatDate(e.created_at)}</td>
                 <td className="px-4 py-3 text-center">
-                  <span className={cn('inline-block px-2 py-0.5 rounded-full text-xs font-medium',
-                    e.is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
-                  )}>
-                    {e.is_active ? 'Activa' : 'Inactiva'}
-                  </span>
+                  <div className="flex items-center justify-center gap-1.5">
+                    <span className={cn('inline-block px-2 py-0.5 rounded-full text-xs font-medium',
+                      e.is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
+                    )}>
+                      {e.is_active ? 'Activa' : 'Inactiva'}
+                    </span>
+                    {!e.es_miembro && (
+                      <span className="text-[10px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded font-medium">
+                        Sin acceso
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/admin/empresas/${e.id}`}
-                    className="text-xs text-emerald-700 hover:underline">
-                    Editar
-                  </Link>
+                  {e.es_miembro ? (
+                    <Link href={`/admin/empresas/${e.id}`}
+                      className="text-xs text-emerald-700 hover:underline">
+                      Editar
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => unirseEmpresa(e.id)}
+                      disabled={uniendose === e.id}
+                      className="text-xs text-white bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1 rounded-lg disabled:opacity-50 transition-colors"
+                    >
+                      {uniendose === e.id ? 'Uniendo…' : '+ Unirse'}
+                    </button>
+                  )}
                 </td>
               </tr>
             ))

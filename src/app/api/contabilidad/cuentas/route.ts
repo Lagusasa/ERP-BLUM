@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       saldo_normal,
       es_imputable: es_imputable ?? tipo === 'detalle',
       cuenta_padre_id: cuenta_padre_id || null,
-      es_activo: true,
+      is_active: true,
       permite_ajuste: false,
     } as any)
     .select()
