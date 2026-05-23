@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       direccion:       direccion       || null,
       comuna:          comuna          || null,
       ciudad:          ciudad          || null,
-      condicion_pago:  condicion_pago  || null,
+      condicion_pago:  condicion_pago != null ? Number(condicion_pago) : null,
       is_active:       true,
     })
     .select()
@@ -52,7 +52,7 @@ export async function PATCH(req: NextRequest) {
   if (fields.direccion       !== undefined) updates.direccion       = fields.direccion       || null
   if (fields.comuna          !== undefined) updates.comuna          = fields.comuna          || null
   if (fields.ciudad          !== undefined) updates.ciudad          = fields.ciudad          || null
-  if (fields.condicion_pago  !== undefined) updates.condicion_pago  = fields.condicion_pago  || null
+  if (fields.condicion_pago  !== undefined) updates.condicion_pago  = fields.condicion_pago != null ? Number(fields.condicion_pago) : null
   if (fields.is_active       !== undefined) updates.is_active       = fields.is_active
 
   const { data, error } = await supabase.from('proveedores').update(updates as any).eq('id', id).select().single()

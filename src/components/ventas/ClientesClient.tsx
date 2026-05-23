@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Cliente } from '@/types/compras.types'
-import { formatRut, formatCurrency, cn } from '@/lib/utils'
+import { formatRut, validateRut, cleanRut, formatCurrency, cn } from '@/lib/utils'
 
 interface Props {
   clientes: Cliente[]
@@ -178,6 +178,7 @@ function ClienteForm({
   const isEdit = !!cliente
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [rutError, setRutError] = useState('')
   const [form, setForm] = useState({
     rut:              cliente?.rut              ?? '',
     razon_social:     cliente?.razon_social     ?? '',
@@ -189,19 +190,40 @@ function ClienteForm({
     comuna:           cliente?.comuna           ?? '',
     ciudad:           cliente?.ciudad           ?? '',
     limite_credito:   cliente?.limite_credito   ? String(cliente.limite_credito) : '',
-    condicion_pago:   cliente?.condicion_pago   ?? '',
+    condicion_pago:   cliente?.condicion_pago   != null ? String(cliente.condicion_pago) : '',
   })
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
 
+  function handleRutChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = cleanRut(e.target.value)
+    const formatted = raw.length >= 2 ? formatRut(raw) : raw
+    setForm(f => ({ ...f, rut: formatted }))
+    setRutError('')
+  }
+
+  function handleRutBlur() {
+    if (form.rut && !validateRut(form.rut)) {
+      setRutError('RUT inválido')
+    } else {
+      setRutError('')
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault()
+    if (!isEdit && !validateRut(form.rut)) {
+      setRutError('RUT inválido — verifica el dígito verificador')
+      return
+    }
     setLoading(true); setError('')
+    const condicion_pago = form.condicion_pago !== '' ? parseInt(form.condicion_pago, 10) : null
+    const payload = { ...form, condicion_pago }
     const url = '/api/ventas/clientes'
     const body = isEdit
-      ? { id: cliente!.id, ...form }
-      : { empresa_id, ...form }
+      ? { id: cliente!.id, ...payload }
+      : { empresa_id, ...payload }
     const res = await fetch(url, {
       method: isEdit ? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -219,9 +241,16 @@ function ClienteForm({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">RUT *</label>
-            <input required value={form.rut} onChange={set('rut')} placeholder="76.543.210-K"
+            <input required value={form.rut}
+              onChange={handleRutChange}
+              onBlur={handleRutBlur}
+              placeholder="76.543.210-K"
               disabled={isEdit}
-              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white disabled:bg-slate-100" />
+              className={cn(
+                'w-full border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white disabled:bg-slate-100',
+                rutError ? 'border-red-400 focus:ring-red-400' : 'border-slate-200'
+              )} />
+            {rutError && <p className="text-xs text-red-500 mt-0.5">{rutError}</p>}
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Razón Social *</label>
@@ -276,10 +305,10 @@ function ClienteForm({
             <select value={form.condicion_pago} onChange={set('condicion_pago')}
               className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
               <option value="">— Seleccionar —</option>
-              <option value="contado">Contado</option>
-              <option value="30 días">30 días</option>
-              <option value="60 días">60 días</option>
-              <option value="90 días">90 días</option>
+              <option value="0">Contado</option>
+              <option value="30">30 días</option>
+              <option value="60">60 días</option>
+              <option value="90">90 días</option>
             </select>
           </div>
         </div>

@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       comuna:           comuna           || null,
       ciudad:           ciudad           || null,
       limite_credito:   limite_credito   ? Number(limite_credito) : null,
-      condicion_pago:   condicion_pago   || null,
+      condicion_pago:   condicion_pago != null ? Number(condicion_pago) : null,
       is_active:        true,
     })
     .select()
@@ -53,7 +53,7 @@ export async function PATCH(req: NextRequest) {
   if (fields.direccion       !== undefined) updates.direccion       = fields.direccion       || null
   if (fields.comuna          !== undefined) updates.comuna          = fields.comuna          || null
   if (fields.ciudad          !== undefined) updates.ciudad          = fields.ciudad          || null
-  if (fields.condicion_pago  !== undefined) updates.condicion_pago  = fields.condicion_pago  || null
+  if (fields.condicion_pago  !== undefined) updates.condicion_pago  = fields.condicion_pago != null ? Number(fields.condicion_pago) : null
   if (fields.is_active       !== undefined) updates.is_active       = fields.is_active
   if (fields.limite_credito  !== undefined) updates.limite_credito  = fields.limite_credito ? Number(fields.limite_credito) : null
 

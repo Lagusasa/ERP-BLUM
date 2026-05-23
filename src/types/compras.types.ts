@@ -27,7 +27,7 @@ export interface Proveedor {
   ciudad: string | null
   telefono: string | null
   email: string | null
-  condicion_pago: string | null
+  condicion_pago: number | null
   is_active: boolean
   created_at: string
   updated_at: string
@@ -47,7 +47,7 @@ export interface Cliente {
   telefono: string | null
   email: string | null
   limite_credito: number | null
-  condicion_pago: string | null
+  condicion_pago: number | null
   is_active: boolean
   created_at: string
   updated_at: string

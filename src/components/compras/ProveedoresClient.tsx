@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Proveedor } from '@/types/compras.types'
-import { formatRut, cn } from '@/lib/utils'
+import { formatRut, validateRut, cleanRut, cn } from '@/lib/utils'
 
 interface Props {
   proveedores: Proveedor[]
@@ -171,6 +171,7 @@ function ProveedorForm({
   const isEdit = !!proveedor
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [rutError, setRutError] = useState('')
   const [form, setForm] = useState({
     rut:             proveedor?.rut             ?? '',
     razon_social:    proveedor?.razon_social    ?? '',
@@ -186,10 +187,31 @@ function ProveedorForm({
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
 
+  function handleRutChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = cleanRut(e.target.value)
+    const formatted = raw.length >= 2 ? formatRut(raw) : raw
+    setForm(f => ({ ...f, rut: formatted }))
+    setRutError('')
+  }
+
+  function handleRutBlur() {
+    if (form.rut && !validateRut(form.rut)) {
+      setRutError('RUT inválido')
+    } else {
+      setRutError('')
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault()
+    if (!isEdit && !validateRut(form.rut)) {
+      setRutError('RUT inválido — verifica el dígito verificador')
+      return
+    }
     setLoading(true); setError('')
-    const body = isEdit ? { id: proveedor!.id, ...form } : { empresa_id, ...form }
+    const condicion_pago = form.condicion_pago !== '' ? parseInt(form.condicion_pago as string, 10) : null
+    const payload = { ...form, condicion_pago }
+    const body = isEdit ? { id: proveedor!.id, ...payload } : { empresa_id, ...payload }
     const res = await fetch('/api/compras/proveedores', {
       method: isEdit ? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -207,9 +229,16 @@ function ProveedorForm({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">RUT *</label>
-            <input required value={form.rut} onChange={set('rut')} placeholder="76.543.210-K"
+            <input required value={form.rut}
+              onChange={handleRutChange}
+              onBlur={handleRutBlur}
+              placeholder="76.543.210-K"
               disabled={isEdit}
-              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white disabled:bg-slate-100" />
+              className={cn(
+                'w-full border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white disabled:bg-slate-100',
+                rutError ? 'border-red-400 focus:ring-red-400' : 'border-slate-200'
+              )} />
+            {rutError && <p className="text-xs text-red-500 mt-0.5">{rutError}</p>}
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Razón Social *</label>
@@ -259,10 +288,10 @@ function ProveedorForm({
             <select value={form.condicion_pago} onChange={set('condicion_pago')}
               className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
               <option value="">— Seleccionar —</option>
-              <option value="contado">Contado</option>
-              <option value="30 días">30 días</option>
-              <option value="60 días">60 días</option>
-              <option value="90 días">90 días</option>
+              <option value="0">Contado</option>
+              <option value="30">30 días</option>
+              <option value="60">60 días</option>
+              <option value="90">90 días</option>
             </select>
           </div>
         </div>

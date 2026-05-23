@@ -233,7 +233,7 @@ export type Database = {
           direccion: string | null
           comuna: string | null
           ciudad: string | null
-          condicion_pago: string | null
+          condicion_pago: number | null
           is_active: boolean
           created_at: string
           updated_at: string
@@ -257,7 +257,7 @@ export type Database = {
           comuna: string | null
           ciudad: string | null
           limite_credito: number | null
-          condicion_pago: string | null
+          condicion_pago: number | null
           is_active: boolean
           created_at: string
           updated_at: string
