@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       url_externo: url_externo || null,
       storage_path: storage_path || null,
       mime_type: mime_type || null,
-      tamano: tamano || null,
+      tamano: tamano ?? null,
       referencia_tabla: null, referencia_id: null,
     } as Omit<DocumentoGestion, 'id' | 'empresa_id' | 'created_at' | 'created_by' | 'estado'>)
     return NextResponse.json({ ok: true, doc })

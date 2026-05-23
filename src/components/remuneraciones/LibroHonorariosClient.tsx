@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import * as XLSX from 'xlsx'
 import type { PagoHonorarios } from '@/services/remuneraciones.service'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency, formatDate, formatRut, validateRut, cleanRut } from '@/lib/utils'
 
 interface Props {
   pagos: PagoHonorarios[]
@@ -31,6 +31,7 @@ export default function LibroHonorariosClient({
 
   // Form state
   const [rut, setRut]           = useState('')
+  const [rutError, setRutError] = useState('')
   const [nombre, setNombre]     = useState('')
   const [fecha, setFecha]       = useState(new Date().toISOString().split('T')[0])
   const [concepto, setConcepto] = useState('')
@@ -43,10 +44,25 @@ export default function LibroHonorariosClient({
   const totalRetencion = pagos.reduce((s, p) => s + p.retencion_monto, 0)
   const totalNeto     = pagos.reduce((s, p) => s + p.monto_neto, 0)
 
+  function handleRutChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = cleanRut(e.target.value)
+    setRut(raw.length >= 2 ? formatRut(raw) : raw)
+    setRutError('')
+  }
+
+  function handleRutBlur() {
+    if (rut && !validateRut(rut)) setRutError('RUT inválido')
+    else setRutError('')
+  }
+
   async function guardar() {
     setError(null)
     if (!rut || !nombre || !fecha || !concepto || !monto) {
       setError('RUT, nombre, fecha, concepto y monto son obligatorios.')
+      return
+    }
+    if (!validateRut(rut)) {
+      setRutError('RUT inválido — verifica el dígito verificador')
       return
     }
     const montoN = parseFloat(monto)
@@ -164,8 +180,12 @@ export default function LibroHonorariosClient({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-medium text-slate-600 mb-1">RUT Prestador *</label>
-              <input value={rut} onChange={e=>setRut(e.target.value)} placeholder="12.345.678-9"
-                className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"/>
+              <input value={rut}
+                onChange={handleRutChange}
+                onBlur={handleRutBlur}
+                placeholder="12.345.678-9"
+                className={`w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${rutError ? 'border-red-400 focus:ring-red-400' : 'border-slate-300'}`}/>
+              {rutError && <p className="text-xs text-red-500 mt-0.5">{rutError}</p>}
             </div>
             <div className="md:col-span-2">
               <label className="block text-xs font-medium text-slate-600 mb-1">Nombre Prestador *</label>

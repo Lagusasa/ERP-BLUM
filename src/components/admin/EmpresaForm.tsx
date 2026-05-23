@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { EmpresaAdmin } from '@/services/admin.service'
+import { formatRut, validateRut, cleanRut } from '@/lib/utils'
 
 interface Props {
   empresa?: EmpresaAdmin
@@ -23,12 +24,25 @@ export default function EmpresaForm({ empresa }: Props) {
   const [ciudad, setCiudad] = useState(empresa?.ciudad ?? '')
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [rutError, setRutError] = useState('')
+
+  function handleRutChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = cleanRut(e.target.value)
+    setRut(raw.length >= 2 ? formatRut(raw) : raw)
+    setRutError('')
+  }
+
+  function handleRutBlur() {
+    if (rut && !validateRut(rut)) setRutError('RUT inválido')
+    else setRutError('')
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
     if (!razonSocial.trim()) { setError('La razón social es requerida.'); return }
     if (!rut.trim()) { setError('El RUT es requerido.'); return }
+    if (!validateRut(rut)) { setError('RUT inválido — verifica el dígito verificador.'); return }
 
     setGuardando(true)
     try {
@@ -87,9 +101,13 @@ export default function EmpresaForm({ empresa }: Props) {
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">RUT <span className="text-red-500">*</span></label>
-            <input type="text" value={rut} onChange={(e) => setRut(e.target.value)} required
+            <input type="text" value={rut}
+              onChange={handleRutChange}
+              onBlur={handleRutBlur}
+              required
               placeholder="76.123.456-7"
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              className={`w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${rutError ? 'border-red-400 focus:ring-red-400' : 'border-slate-300'}`} />
+            {rutError && <p className="text-xs text-red-500 mt-0.5">{rutError}</p>}
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Giro Comercial</label>

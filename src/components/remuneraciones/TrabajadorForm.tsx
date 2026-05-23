@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { AFP, Isapre, Mutualidad } from '@/types/remuneraciones.types'
 import { TIPO_CONTRATO_LABELS } from '@/types/remuneraciones.types'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, formatRut, validateRut, cleanRut } from '@/lib/utils'
 import { calcularLiquidacion, SUELDO_MINIMO } from '@/lib/remuneraciones-calc'
 
 interface Props {
@@ -19,6 +19,7 @@ export default function TrabajadorForm({ empresa_id, afps, isapres, mutualidades
   const router = useRouter()
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [rutError, setRutError] = useState('')
 
   // Datos personales
   const [rut, setRut] = useState('')
@@ -53,10 +54,22 @@ export default function TrabajadorForm({ empresa_id, afps, isapres, mutualidades
       })
     : null
 
+  function handleRutChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = cleanRut(e.target.value)
+    setRut(raw.length >= 2 ? formatRut(raw) : raw)
+    setRutError('')
+  }
+
+  function handleRutBlur() {
+    if (rut && !validateRut(rut)) setRutError('RUT inválido')
+    else setRutError('')
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
     if (!rut.trim()) { setError('RUT requerido'); return }
+    if (!validateRut(rut)) { setError('RUT inválido — verifica el dígito verificador'); return }
     if (!nombre.trim()) { setError('Nombre requerido'); return }
     if (!apellidoPaterno.trim()) { setError('Apellido paterno requerido'); return }
     if (sueldoNum < SUELDO_MINIMO) { setError(`Sueldo base mínimo: ${formatCurrency(SUELDO_MINIMO)}`); return }
@@ -122,9 +135,13 @@ export default function TrabajadorForm({ empresa_id, afps, isapres, mutualidades
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">RUT <span className="text-red-500">*</span></label>
-                <input type="text" value={rut} onChange={(e) => setRut(e.target.value)} required
+                <input type="text" value={rut}
+                  onChange={handleRutChange}
+                  onBlur={handleRutBlur}
+                  required
                   placeholder="12.345.678-9"
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                  className={`w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${rutError ? 'border-red-400 focus:ring-red-400' : 'border-slate-300'}`} />
+                {rutError && <p className="text-xs text-red-500 mt-0.5">{rutError}</p>}
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Nombre <span className="text-red-500">*</span></label>
