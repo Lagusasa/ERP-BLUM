@@ -1,6 +1,4 @@
-﻿-- ============================================================
--- MIGRACIÓN: 001_base_saas.sql
--- ============================================================
+-- ====== 001_base_saas.sql ======
 -- ============================================================
 -- ERP SaaS Chile — Migración 001: Arquitectura Base SaaS
 -- Multiempresa, usuarios, roles, permisos
@@ -293,9 +291,7 @@ INSERT INTO public.permisos (modulo, accion, recurso, descripcion) VALUES
 ON CONFLICT DO NOTHING;
 
 
--- ============================================================
--- MIGRACIÓN: 002_contabilidad.sql
--- ============================================================
+-- ====== 002_contabilidad.sql ======
 -- ============================================================
 -- ERP SaaS Chile — Migración 002: Motor Contable
 -- Plan de Cuentas, Comprobantes, Períodos, Centros de Costo
@@ -851,9 +847,7 @@ WHERE padre.empresa_id IS NULL
   );
 
 
--- ============================================================
--- MIGRACIÓN: 003_compras_ventas.sql
--- ============================================================
+-- ====== 003_compras_ventas.sql ======
 -- ============================================================
 -- ERP SaaS Chile — Migración 003: Compras y Ventas
 -- Proveedores, Clientes, Documentos tributarios
@@ -1156,9 +1150,7 @@ INSERT INTO public.tipos_documento (codigo, nombre, abreviatura, afecto_iva, es_
 ON CONFLICT (codigo) DO NOTHING;
 
 
--- ============================================================
--- MIGRACIÓN: 004_tributacion.sql
--- ============================================================
+-- ====== 004_tributacion.sql ======
 -- ============================================================
 -- ERP SaaS Chile — Migración 004: Tributación Chilena
 -- Libro IVA Compras/Ventas, Declaración F29, PPM
@@ -1360,9 +1352,7 @@ UPDATE public.tipos_documento SET afecta_iva_credito = TRUE
 WHERE codigo IN ('33', '34', '56');
 
 
--- ============================================================
--- MIGRACIÓN: 005_remuneraciones.sql
--- ============================================================
+-- ====== 005_remuneraciones.sql ======
 -- ============================================================
 -- ERP SaaS Chile — Migración 005: Remuneraciones
 -- Trabajadores, contratos, liquidaciones, cálculos chile
@@ -1558,9 +1548,7 @@ CREATE POLICY "public_afp" ON public.afp FOR SELECT USING (TRUE);
 CREATE POLICY "public_isapres" ON public.isapres FOR SELECT USING (TRUE);
 
 
--- ============================================================
--- MIGRACIÓN: 006_rls_fixes.sql
--- ============================================================
+-- ====== 006_rls_fixes.sql ======
 -- ============================================================
 -- ERP SaaS Chile — Migración 006: Fixes de políticas RLS
 -- Agrega políticas INSERT/UPDATE faltantes
@@ -1713,9 +1701,7 @@ CREATE POLICY "f29_update_member"
   );
 
 
--- ============================================================
--- MIGRACIÓN: 007_config_contable.sql
--- ============================================================
+-- ====== 007_config_contable.sql ======
 -- ============================================================
 -- ERP SaaS Chile — Migración 007: Configuración contable
 -- Tabla para mapeo de cuentas base por empresa (para centralización automática)
@@ -1767,9 +1753,7 @@ CREATE POLICY "config_contable_update_member"
   );
 
 
--- ============================================================
--- MIGRACIÓN: 008_rli.sql
--- ============================================================
+-- ====== 008_rli.sql ======
 -- ============================================================
 -- Fase 10: Renta Líquida Imponible (RLI)
 -- ============================================================
@@ -1796,9 +1780,7 @@ CREATE POLICY "rli_update"  ON rli_ajustes FOR UPDATE  USING (empresa_id IN (SEL
 CREATE POLICY "rli_delete"  ON rli_ajustes FOR DELETE  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = true));
 
 
--- ============================================================
--- MIGRACIÓN: 009_gestion_documental.sql
--- ============================================================
+-- ====== 009_gestion_documental.sql ======
 -- ============================================================
 -- Fase 12: Gestión Documental
 -- NOTA: Crear bucket 'documentos' en Supabase Storage antes de usar subidas
@@ -1841,9 +1823,7 @@ CREATE POLICY "doc_gestion_delete" ON documentos_gestion FOR DELETE
   USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = true));
 
 
--- ============================================================
--- MIGRACIÓN: 010_workflows.sql
--- ============================================================
+-- ====== 010_workflows.sql ======
 -- ============================================================
 -- Fase 13: Workflows y aprobaciones
 -- ============================================================
@@ -1924,9 +1904,7 @@ CREATE POLICY "wf_dec_select"       ON workflow_decisiones  FOR SELECT  USING (i
 CREATE POLICY "wf_dec_insert"       ON workflow_decisiones  FOR INSERT  WITH CHECK (instancia_id IN (SELECT id FROM workflow_instancias WHERE empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = true)));
 
 
--- ============================================================
--- MIGRACIÓN: 011_inventario.sql
--- ============================================================
+-- ====== 011_inventario.sql ======
 -- ============================================================
 -- Fase 14: Inventario y Bodegas
 -- ============================================================
@@ -2030,9 +2008,9 @@ CREATE POLICY "stock_all"           ON stock_bodega            USING (empresa_id
 CREATE POLICY "movimientos_all"     ON movimientos_inventario  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = true));
 
 
-
+-- ====== 012_flujo_caja.sql ======
 -- ============================================================
--- Fase 15: Flujo de Caja y TesorerÃ­a
+-- Fase 15: Flujo de Caja y Tesorería
 -- ============================================================
 
 CREATE TABLE cuentas_bancarias (
@@ -2090,15 +2068,18 @@ ALTER TABLE proyecciones_caja     ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "cuentas_bancarias_all" ON cuentas_bancarias  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = true));
 CREATE POLICY "mov_caja_all"          ON movimientos_caja   USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = true));
 CREATE POLICY "proy_caja_all"         ON proyecciones_caja  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = true));
+
+
+-- ====== 013_integraciones_sii.sql ======
 -- ============================================================
 -- 013 Integraciones SII: DTE, F22, boletas honorarios
 -- ============================================================
 
--- Documentos Tributarios ElectrÃ³nicos emitidos/recibidos
+-- Documentos Tributarios Electrónicos emitidos/recibidos
 create table if not exists dte_documentos (
   id            uuid primary key default gen_random_uuid(),
   empresa_id    uuid not null references empresas(id) on delete cascade,
-  tipo_dte      text not null,        -- 33=Factura, 34=F.Exenta, 39=Boleta, 61=N.CrÃ©dito, 52=GuÃ­a
+  tipo_dte      text not null,        -- 33=Factura, 34=F.Exenta, 39=Boleta, 61=N.Crédito, 52=Guía
   folio         integer not null,
   rut_contraparte text not null,
   razon_social  text,
@@ -2176,3 +2157,697 @@ create table if not exists sii_config (
 alter table sii_config enable row level security;
 create policy "tenant_sii_config" on sii_config
   using (empresa_id = (select (current_setting('app.empresa_id', true))::uuid));
+
+
+-- ====== 014_plan_cuentas_template.sql ======
+-- ============================================================
+-- ERP SaaS Chile — Migración 014: Template Plan de Cuentas
+-- Función RPC para importar el Plan de Cuentas Estándar Chileno (PYME)
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION public.importar_plan_cuentas_template(p_empresa_id uuid)
+RETURNS integer
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_count integer;
+BEGIN
+  -- No importar si ya existen cuentas
+  SELECT COUNT(*) INTO v_count FROM public.plan_cuentas WHERE empresa_id = p_empresa_id;
+  IF v_count > 0 THEN
+    RETURN v_count;
+  END IF;
+
+  -- --------------------------------------------------------
+  -- Insertar todas las cuentas sin padres (se actualizan después)
+  -- --------------------------------------------------------
+  INSERT INTO public.plan_cuentas
+    (empresa_id, codigo, nombre, clase, tipo, nivel, saldo_normal, es_imputable, orden, cuenta_padre_id)
+  VALUES
+  -- ============================
+  -- 1. ACTIVO
+  -- ============================
+  (p_empresa_id,'1','ACTIVO','activo','encabezado',1,'deudor',false,100,NULL),
+  (p_empresa_id,'1.1','Activo Corriente','activo','encabezado',2,'deudor',false,110,NULL),
+  (p_empresa_id,'1.1.01','Disponible','activo','encabezado',3,'deudor',false,111,NULL),
+  (p_empresa_id,'1.1.01.01','Caja','activo','detalle',4,'deudor',true,1110,NULL),
+  (p_empresa_id,'1.1.01.02','Banco Cuenta Corriente','activo','detalle',4,'deudor',true,1111,NULL),
+  (p_empresa_id,'1.1.01.03','Fondos por Rendir','activo','detalle',4,'deudor',true,1112,NULL),
+  (p_empresa_id,'1.1.02','Clientes y Deudores','activo','encabezado',3,'deudor',false,112,NULL),
+  (p_empresa_id,'1.1.02.01','Clientes Nacionales','activo','detalle',4,'deudor',true,1120,NULL),
+  (p_empresa_id,'1.1.02.02','Documentos por Cobrar','activo','detalle',4,'deudor',true,1121,NULL),
+  (p_empresa_id,'1.1.02.03','Deudores Varios','activo','detalle',4,'deudor',true,1122,NULL),
+  (p_empresa_id,'1.1.02.04','(-) Provisión Deudores Incobrables','activo','detalle',4,'acreedor',true,1123,NULL),
+  (p_empresa_id,'1.1.03','Existencias','activo','encabezado',3,'deudor',false,113,NULL),
+  (p_empresa_id,'1.1.03.01','Mercaderías','activo','detalle',4,'deudor',true,1130,NULL),
+  (p_empresa_id,'1.1.03.02','Materias Primas','activo','detalle',4,'deudor',true,1131,NULL),
+  (p_empresa_id,'1.1.03.03','Productos Terminados','activo','detalle',4,'deudor',true,1132,NULL),
+  (p_empresa_id,'1.1.04','Otros Activos Corrientes','activo','encabezado',3,'deudor',false,114,NULL),
+  (p_empresa_id,'1.1.04.01','IVA Crédito Fiscal','activo','detalle',4,'deudor',true,1140,NULL),
+  (p_empresa_id,'1.1.04.02','PPM por Recuperar','activo','detalle',4,'deudor',true,1141,NULL),
+  (p_empresa_id,'1.1.04.03','Seguros Pagados por Anticipado','activo','detalle',4,'deudor',true,1142,NULL),
+  (p_empresa_id,'1.1.04.04','Gastos Pagados por Anticipado','activo','detalle',4,'deudor',true,1143,NULL),
+  (p_empresa_id,'1.2','Activo No Corriente','activo','encabezado',2,'deudor',false,120,NULL),
+  (p_empresa_id,'1.2.01','Propiedades, Planta y Equipo','activo','encabezado',3,'deudor',false,121,NULL),
+  (p_empresa_id,'1.2.01.01','Terrenos','activo','detalle',4,'deudor',true,1210,NULL),
+  (p_empresa_id,'1.2.01.02','Edificios y Construcciones','activo','detalle',4,'deudor',true,1211,NULL),
+  (p_empresa_id,'1.2.01.03','Maquinaria y Equipos','activo','detalle',4,'deudor',true,1212,NULL),
+  (p_empresa_id,'1.2.01.04','Vehículos','activo','detalle',4,'deudor',true,1213,NULL),
+  (p_empresa_id,'1.2.01.05','Equipos de Oficina y Computacionales','activo','detalle',4,'deudor',true,1214,NULL),
+  (p_empresa_id,'1.2.01.06','(-) Dep. Acumulada Edificios','activo','detalle',4,'acreedor',true,1215,NULL),
+  (p_empresa_id,'1.2.01.07','(-) Dep. Acumulada Maquinaria','activo','detalle',4,'acreedor',true,1216,NULL),
+  (p_empresa_id,'1.2.01.08','(-) Dep. Acumulada Vehículos','activo','detalle',4,'acreedor',true,1217,NULL),
+  (p_empresa_id,'1.2.01.09','(-) Dep. Acumulada Equipos Oficina','activo','detalle',4,'acreedor',true,1218,NULL),
+  (p_empresa_id,'1.2.02','Activos Intangibles','activo','encabezado',3,'deudor',false,122,NULL),
+  (p_empresa_id,'1.2.02.01','Software y Licencias','activo','detalle',4,'deudor',true,1220,NULL),
+  (p_empresa_id,'1.2.02.02','Marcas y Patentes','activo','detalle',4,'deudor',true,1221,NULL),
+  (p_empresa_id,'1.2.02.03','(-) Amortización Acumulada Intangibles','activo','detalle',4,'acreedor',true,1222,NULL),
+  (p_empresa_id,'1.2.03','Otros Activos No Corrientes','activo','encabezado',3,'deudor',false,123,NULL),
+  (p_empresa_id,'1.2.03.01','Inversiones Permanentes','activo','detalle',4,'deudor',true,1230,NULL),
+  (p_empresa_id,'1.2.03.02','Garantías y Depósitos','activo','detalle',4,'deudor',true,1231,NULL),
+
+  -- ============================
+  -- 2. PASIVO
+  -- ============================
+  (p_empresa_id,'2','PASIVO','pasivo','encabezado',1,'acreedor',false,200,NULL),
+  (p_empresa_id,'2.1','Pasivo Corriente','pasivo','encabezado',2,'acreedor',false,210,NULL),
+  (p_empresa_id,'2.1.01','Proveedores y Cuentas por Pagar','pasivo','encabezado',3,'acreedor',false,211,NULL),
+  (p_empresa_id,'2.1.01.01','Proveedores Nacionales','pasivo','detalle',4,'acreedor',true,2110,NULL),
+  (p_empresa_id,'2.1.01.02','Documentos por Pagar','pasivo','detalle',4,'acreedor',true,2111,NULL),
+  (p_empresa_id,'2.1.01.03','Acreedores Varios','pasivo','detalle',4,'acreedor',true,2112,NULL),
+  (p_empresa_id,'2.1.02','Obligaciones Financieras CP','pasivo','encabezado',3,'acreedor',false,212,NULL),
+  (p_empresa_id,'2.1.02.01','Préstamos Bancarios Corto Plazo','pasivo','detalle',4,'acreedor',true,2120,NULL),
+  (p_empresa_id,'2.1.02.02','Líneas de Crédito Bancarias','pasivo','detalle',4,'acreedor',true,2121,NULL),
+  (p_empresa_id,'2.1.03','Obligaciones Tributarias y Laborales','pasivo','encabezado',3,'acreedor',false,213,NULL),
+  (p_empresa_id,'2.1.03.01','IVA Débito Fiscal','pasivo','detalle',4,'acreedor',true,2130,NULL),
+  (p_empresa_id,'2.1.03.02','Retención Impuesto Único Trabajadores','pasivo','detalle',4,'acreedor',true,2131,NULL),
+  (p_empresa_id,'2.1.03.03','Remuneraciones por Pagar','pasivo','detalle',4,'acreedor',true,2132,NULL),
+  (p_empresa_id,'2.1.03.04','AFP y Salud por Pagar','pasivo','detalle',4,'acreedor',true,2133,NULL),
+  (p_empresa_id,'2.1.03.05','Provisión Vacaciones','pasivo','detalle',4,'acreedor',true,2134,NULL),
+  (p_empresa_id,'2.1.03.06','PPM por Pagar','pasivo','detalle',4,'acreedor',true,2135,NULL),
+  (p_empresa_id,'2.2','Pasivo No Corriente','pasivo','encabezado',2,'acreedor',false,220,NULL),
+  (p_empresa_id,'2.2.01','Obligaciones Financieras LP','pasivo','encabezado',3,'acreedor',false,221,NULL),
+  (p_empresa_id,'2.2.01.01','Préstamos Bancarios Largo Plazo','pasivo','detalle',4,'acreedor',true,2210,NULL),
+  (p_empresa_id,'2.2.01.02','Leasing Financiero Largo Plazo','pasivo','detalle',4,'acreedor',true,2211,NULL),
+
+  -- ============================
+  -- 3. PATRIMONIO
+  -- ============================
+  (p_empresa_id,'3','PATRIMONIO','patrimonio','encabezado',1,'acreedor',false,300,NULL),
+  (p_empresa_id,'3.1','Capital','patrimonio','encabezado',2,'acreedor',false,310,NULL),
+  (p_empresa_id,'3.1.01','Capital Pagado','patrimonio','detalle',3,'acreedor',true,3100,NULL),
+  (p_empresa_id,'3.1.02','Capital por Enterar','patrimonio','detalle',3,'deudor',true,3101,NULL),
+  (p_empresa_id,'3.2','Reservas','patrimonio','encabezado',2,'acreedor',false,320,NULL),
+  (p_empresa_id,'3.2.01','Reserva Legal','patrimonio','detalle',3,'acreedor',true,3200,NULL),
+  (p_empresa_id,'3.2.02','Otras Reservas','patrimonio','detalle',3,'acreedor',true,3201,NULL),
+  (p_empresa_id,'3.3','Resultados','patrimonio','encabezado',2,'acreedor',false,330,NULL),
+  (p_empresa_id,'3.3.01','Utilidades Acumuladas','patrimonio','detalle',3,'acreedor',true,3300,NULL),
+  (p_empresa_id,'3.3.02','(-) Pérdidas Acumuladas','patrimonio','detalle',3,'deudor',true,3301,NULL),
+  (p_empresa_id,'3.3.03','Resultado del Ejercicio','patrimonio','detalle',3,'acreedor',true,3302,NULL),
+
+  -- ============================
+  -- 4. INGRESOS
+  -- ============================
+  (p_empresa_id,'4','INGRESOS','ingreso','encabezado',1,'acreedor',false,400,NULL),
+  (p_empresa_id,'4.1','Ingresos Operacionales','ingreso','encabezado',2,'acreedor',false,410,NULL),
+  (p_empresa_id,'4.1.01','Ventas Afectas (con IVA)','ingreso','detalle',3,'acreedor',true,4100,NULL),
+  (p_empresa_id,'4.1.02','Ventas Exentas (sin IVA)','ingreso','detalle',3,'acreedor',true,4101,NULL),
+  (p_empresa_id,'4.1.03','(-) Descuentos y Devoluciones s/Ventas','ingreso','detalle',3,'deudor',true,4102,NULL),
+  (p_empresa_id,'4.1.04','Servicios Prestados','ingreso','detalle',3,'acreedor',true,4103,NULL),
+  (p_empresa_id,'4.2','Ingresos No Operacionales','ingreso','encabezado',2,'acreedor',false,420,NULL),
+  (p_empresa_id,'4.2.01','Ingresos Financieros','ingreso','detalle',3,'acreedor',true,4200,NULL),
+  (p_empresa_id,'4.2.02','Utilidad en Venta de Activos','ingreso','detalle',3,'acreedor',true,4201,NULL),
+  (p_empresa_id,'4.2.03','Otros Ingresos No Operacionales','ingreso','detalle',3,'acreedor',true,4202,NULL),
+
+  -- ============================
+  -- 5. COSTOS
+  -- ============================
+  (p_empresa_id,'5','COSTOS','costo','encabezado',1,'deudor',false,500,NULL),
+  (p_empresa_id,'5.1','Costo de Ventas y Servicios','costo','encabezado',2,'deudor',false,510,NULL),
+  (p_empresa_id,'5.1.01','Costo de Mercaderías Vendidas','costo','detalle',3,'deudor',true,5100,NULL),
+  (p_empresa_id,'5.1.02','Costo de Materias Primas Utilizadas','costo','detalle',3,'deudor',true,5101,NULL),
+  (p_empresa_id,'5.1.03','Costo de Producción','costo','detalle',3,'deudor',true,5102,NULL),
+  (p_empresa_id,'5.1.04','Costo de Servicios Prestados','costo','detalle',3,'deudor',true,5103,NULL),
+
+  -- ============================
+  -- 6. GASTOS
+  -- ============================
+  (p_empresa_id,'6','GASTOS','gasto','encabezado',1,'deudor',false,600,NULL),
+  (p_empresa_id,'6.1','Gastos de Administración y Ventas','gasto','encabezado',2,'deudor',false,610,NULL),
+  (p_empresa_id,'6.1.01','Remuneraciones y Honorarios','gasto','encabezado',3,'deudor',false,611,NULL),
+  (p_empresa_id,'6.1.01.01','Sueldos y Salarios','gasto','detalle',4,'deudor',true,6110,NULL),
+  (p_empresa_id,'6.1.01.02','Honorarios a Terceros','gasto','detalle',4,'deudor',true,6111,NULL),
+  (p_empresa_id,'6.1.01.03','Bonos y Gratificaciones','gasto','detalle',4,'deudor',true,6112,NULL),
+  (p_empresa_id,'6.1.01.04','Indemnizaciones','gasto','detalle',4,'deudor',true,6113,NULL),
+  (p_empresa_id,'6.1.02','Servicios y Arriendos','gasto','encabezado',3,'deudor',false,612,NULL),
+  (p_empresa_id,'6.1.02.01','Arriendo de Oficinas y Locales','gasto','detalle',4,'deudor',true,6120,NULL),
+  (p_empresa_id,'6.1.02.02','Servicios Básicos (Agua, Luz, Gas)','gasto','detalle',4,'deudor',true,6121,NULL),
+  (p_empresa_id,'6.1.02.03','Telecomunicaciones e Internet','gasto','detalle',4,'deudor',true,6122,NULL),
+  (p_empresa_id,'6.1.03','Materiales y Suministros','gasto','encabezado',3,'deudor',false,613,NULL),
+  (p_empresa_id,'6.1.03.01','Materiales de Oficina','gasto','detalle',4,'deudor',true,6130,NULL),
+  (p_empresa_id,'6.1.03.02','Materiales de Limpieza y Aseo','gasto','detalle',4,'deudor',true,6131,NULL),
+  (p_empresa_id,'6.1.04','Publicidad y Ventas','gasto','encabezado',3,'deudor',false,614,NULL),
+  (p_empresa_id,'6.1.04.01','Publicidad y Marketing','gasto','detalle',4,'deudor',true,6140,NULL),
+  (p_empresa_id,'6.1.04.02','Gastos de Representación','gasto','detalle',4,'deudor',true,6141,NULL),
+  (p_empresa_id,'6.1.04.03','Comisiones Vendedores','gasto','detalle',4,'deudor',true,6142,NULL),
+  (p_empresa_id,'6.1.05','Seguros y Mantenimiento','gasto','encabezado',3,'deudor',false,615,NULL),
+  (p_empresa_id,'6.1.05.01','Seguros Generales','gasto','detalle',4,'deudor',true,6150,NULL),
+  (p_empresa_id,'6.1.05.02','Mantención y Reparaciones','gasto','detalle',4,'deudor',true,6151,NULL),
+  (p_empresa_id,'6.1.06','Depreciaciones y Amortizaciones','gasto','encabezado',3,'deudor',false,616,NULL),
+  (p_empresa_id,'6.1.06.01','Depreciación del Ejercicio','gasto','detalle',4,'deudor',true,6160,NULL),
+  (p_empresa_id,'6.1.06.02','Amortización del Ejercicio','gasto','detalle',4,'deudor',true,6161,NULL),
+  (p_empresa_id,'6.1.07','Otros Gastos Operacionales','gasto','encabezado',3,'deudor',false,617,NULL),
+  (p_empresa_id,'6.1.07.01','Capacitación y Perfeccionamiento','gasto','detalle',4,'deudor',true,6170,NULL),
+  (p_empresa_id,'6.1.07.02','Gastos de Viaje y Traslado','gasto','detalle',4,'deudor',true,6171,NULL),
+  (p_empresa_id,'6.1.07.03','Gastos Legales y Notariales','gasto','detalle',4,'deudor',true,6172,NULL),
+  (p_empresa_id,'6.1.07.04','Contabilidad y Auditoría','gasto','detalle',4,'deudor',true,6173,NULL),
+  (p_empresa_id,'6.1.07.05','Otros Gastos Generales','gasto','detalle',4,'deudor',true,6174,NULL),
+  (p_empresa_id,'6.2','Gastos Financieros','gasto','encabezado',2,'deudor',false,620,NULL),
+  (p_empresa_id,'6.2.01','Intereses Bancarios y Financieros','gasto','detalle',3,'deudor',true,6200,NULL),
+  (p_empresa_id,'6.2.02','Gastos Bancarios y Comisiones','gasto','detalle',3,'deudor',true,6201,NULL),
+  (p_empresa_id,'6.2.03','Pérdida por Diferencia de Cambio','gasto','detalle',3,'deudor',true,6202,NULL);
+
+  -- --------------------------------------------------------
+  -- Actualizar referencias a cuenta padre usando el código
+  -- El padre de '1.1.01.01' es '1.1.01', del '1.1.01' es '1.1', etc.
+  -- --------------------------------------------------------
+  UPDATE public.plan_cuentas AS pc
+  SET cuenta_padre_id = padre.id
+  FROM public.plan_cuentas AS padre
+  WHERE pc.empresa_id = p_empresa_id
+    AND padre.empresa_id = p_empresa_id
+    AND pc.nivel > 1
+    AND padre.codigo = regexp_replace(pc.codigo, '\.[^.]+$', '');
+
+  SELECT COUNT(*) INTO v_count FROM public.plan_cuentas WHERE empresa_id = p_empresa_id;
+  RETURN v_count;
+END;
+$$;
+
+-- Permitir que usuarios autenticados llamen a la función
+GRANT EXECUTE ON FUNCTION public.importar_plan_cuentas_template(uuid) TO authenticated;
+
+
+-- ====== 015_activos_fijos_presupuesto.sql ======
+-- ============================================================
+-- 015: ACTIVOS FIJOS Y PRESUPUESTO CONTABLE
+-- ============================================================
+
+-- ACTIVOS FIJOS
+CREATE TABLE IF NOT EXISTS public.activos_fijos (
+  id                      UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  empresa_id              UUID        NOT NULL REFERENCES public.empresas(id) ON DELETE CASCADE,
+  codigo                  VARCHAR(50) NOT NULL,
+  nombre                  VARCHAR(200) NOT NULL,
+  descripcion             TEXT,
+  categoria               VARCHAR(30) NOT NULL
+                            CHECK (categoria IN ('edificios','maquinaria','vehiculos','equipos_computacion','mobiliario','herramientas','otros')),
+  fecha_adquisicion       DATE        NOT NULL,
+  valor_adquisicion       NUMERIC(15,2) NOT NULL DEFAULT 0,
+  valor_residual          NUMERIC(15,2) NOT NULL DEFAULT 0,
+  vida_util_meses         INTEGER     NOT NULL,
+  metodo                  VARCHAR(20) NOT NULL DEFAULT 'lineal'
+                            CHECK (metodo IN ('lineal','acelerada')),
+  cuenta_activo_id        UUID        REFERENCES public.plan_cuentas(id),
+  cuenta_dep_acumulada_id UUID        REFERENCES public.plan_cuentas(id),
+  cuenta_gasto_dep_id     UUID        REFERENCES public.plan_cuentas(id),
+  estado                  VARCHAR(20) NOT NULL DEFAULT 'activo'
+                            CHECK (estado IN ('activo','dado_baja','vendido')),
+  is_active               BOOLEAN     NOT NULL DEFAULT TRUE,
+  created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(empresa_id, codigo)
+);
+
+-- DEPRECIACIONES MENSUALES
+CREATE TABLE IF NOT EXISTS public.depreciaciones (
+  id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  activo_id      UUID        NOT NULL REFERENCES public.activos_fijos(id) ON DELETE CASCADE,
+  empresa_id     UUID        NOT NULL REFERENCES public.empresas(id)      ON DELETE CASCADE,
+  anio           INTEGER     NOT NULL,
+  mes            INTEGER     NOT NULL CHECK (mes BETWEEN 1 AND 12),
+  monto          NUMERIC(15,2) NOT NULL DEFAULT 0,
+  comprobante_id UUID        REFERENCES public.comprobantes(id),
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(activo_id, anio, mes)
+);
+
+-- PRESUPUESTO CONTABLE
+CREATE TABLE IF NOT EXISTS public.presupuestos_contables (
+  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  empresa_id  UUID        NOT NULL REFERENCES public.empresas(id)    ON DELETE CASCADE,
+  cuenta_id   UUID        NOT NULL REFERENCES public.plan_cuentas(id) ON DELETE CASCADE,
+  anio        INTEGER     NOT NULL,
+  mes         INTEGER     NOT NULL CHECK (mes BETWEEN 1 AND 12),
+  monto       NUMERIC(15,2) NOT NULL DEFAULT 0,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(empresa_id, cuenta_id, anio, mes)
+);
+
+CREATE INDEX IF NOT EXISTS idx_activos_fijos_empresa ON public.activos_fijos(empresa_id);
+CREATE INDEX IF NOT EXISTS idx_depreciaciones_activo ON public.depreciaciones(activo_id, anio, mes);
+CREATE INDEX IF NOT EXISTS idx_presupuesto_empresa_anio ON public.presupuestos_contables(empresa_id, anio);
+
+-- RLS
+ALTER TABLE public.activos_fijos         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.depreciaciones         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.presupuestos_contables ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "activos_fijos_all" ON public.activos_fijos
+  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = true));
+
+CREATE POLICY "depreciaciones_all" ON public.depreciaciones
+  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = true));
+
+CREATE POLICY "presupuestos_all" ON public.presupuestos_contables
+  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = true));
+
+
+-- ====== 016_libro_honorarios_indicadores.sql ======
+-- ============================================================
+-- 016: Libro de Honorarios + Indicadores Previsionales
+-- ============================================================
+
+-- Pagos de honorarios (Libro de Honorarios)
+CREATE TABLE IF NOT EXISTS pagos_honorarios (
+  id              UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  empresa_id      UUID NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+  trabajador_id   UUID REFERENCES trabajadores(id) ON DELETE SET NULL,
+  rut_prestador   VARCHAR(20) NOT NULL,
+  nombre_prestador TEXT NOT NULL,
+  fecha           DATE NOT NULL,
+  concepto        TEXT NOT NULL,
+  n_boleta        VARCHAR(50),
+  monto_bruto     NUMERIC(14,2) NOT NULL DEFAULT 0,
+  retencion_pct   NUMERIC(6,4)  NOT NULL DEFAULT 0.1375,
+  retencion_monto NUMERIC(14,2) GENERATED ALWAYS AS (ROUND(monto_bruto * retencion_pct, 0)) STORED,
+  monto_neto      NUMERIC(14,2) GENERATED ALWAYS AS (monto_bruto - ROUND(monto_bruto * retencion_pct, 0)) STORED,
+  estado          VARCHAR(20) NOT NULL DEFAULT 'pendiente' CHECK (estado IN ('pendiente','pagado','anulado')),
+  referencia      TEXT,
+  created_by      UUID REFERENCES auth.users(id),
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_pagos_honorarios_empresa ON pagos_honorarios(empresa_id);
+CREATE INDEX IF NOT EXISTS idx_pagos_honorarios_periodo  ON pagos_honorarios(empresa_id, fecha);
+
+ALTER TABLE pagos_honorarios ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "pagos_honorarios_empresa" ON pagos_honorarios
+  USING (empresa_id IN (
+    SELECT empresa_id FROM empresa_usuarios
+    WHERE user_id = auth.uid() AND is_active = TRUE
+  ));
+
+-- Indicadores previsionales (por empresa y año)
+CREATE TABLE IF NOT EXISTS indicadores_previsionales (
+  id                          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  empresa_id                  UUID NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+  anio                        INTEGER NOT NULL,
+  sueldo_minimo               NUMERIC(12,2) NOT NULL DEFAULT 500000,
+  uf_referencia               NUMERIC(10,4)          DEFAULT 37000,
+  utm                         NUMERIC(12,2)          DEFAULT 66081,
+  tope_imponible_uf           NUMERIC(8,2)  NOT NULL DEFAULT 81.6,
+  retencion_honorarios_pct    NUMERIC(6,4)  NOT NULL DEFAULT 0.1375,
+  tasa_seg_ces_trab           NUMERIC(6,4)  NOT NULL DEFAULT 0.006,
+  tasa_seg_ces_emp_indef      NUMERIC(6,4)  NOT NULL DEFAULT 0.0240,
+  tasa_seg_ces_emp_plazo      NUMERIC(6,4)  NOT NULL DEFAULT 0.0300,
+  tasa_scs                    NUMERIC(6,4)  NOT NULL DEFAULT 0.0100,
+  tasa_mutualidad             NUMERIC(6,4)  NOT NULL DEFAULT 0.0093,
+  created_at                  TIMESTAMPTZ DEFAULT NOW(),
+  updated_at                  TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(empresa_id, anio)
+);
+
+CREATE INDEX IF NOT EXISTS idx_indicadores_empresa ON indicadores_previsionales(empresa_id, anio);
+
+ALTER TABLE indicadores_previsionales ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "indicadores_empresa" ON indicadores_previsionales
+  USING (empresa_id IN (
+    SELECT empresa_id FROM empresa_usuarios
+    WHERE user_id = auth.uid() AND is_active = TRUE
+  ));
+
+-- Trigger updated_at
+CREATE OR REPLACE FUNCTION trigger_set_updated_at()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN NEW.updated_at = NOW(); RETURN NEW; END; $$;
+
+CREATE TRIGGER trg_pagos_honorarios_updated
+  BEFORE UPDATE ON pagos_honorarios
+  FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
+
+CREATE TRIGGER trg_indicadores_updated
+  BEFORE UPDATE ON indicadores_previsionales
+  FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
+
+
+-- ====== 017_nuevos_modulos_contabilidad.sql ======
+-- ============================================================
+-- 017 — Nuevos módulos contabilidad: gastos LIR, registros SII,
+--       devolución IVA exportadores, convenios de pago
+-- ============================================================
+
+-- ─── 1. GASTOS LIR (art. 31 y art. 21) ─────────────────────
+CREATE TABLE IF NOT EXISTS gastos_lir (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  empresa_id          UUID NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+  cuenta_id           UUID REFERENCES plan_cuentas(id),
+  fecha               DATE NOT NULL,
+  anio                INTEGER NOT NULL,
+  concepto            TEXT NOT NULL,
+  monto               NUMERIC(15,2) NOT NULL DEFAULT 0,
+  articulo            TEXT NOT NULL CHECK (articulo IN ('31','21')),
+  tipo_gasto          TEXT,
+  rut_beneficiario    TEXT,
+  nombre_beneficiario TEXT,
+  is_active           BOOLEAN NOT NULL DEFAULT true,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE gastos_lir ENABLE ROW LEVEL SECURITY;
+CREATE POLICY gastos_lir_empresa ON gastos_lir
+  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE));
+
+CREATE INDEX IF NOT EXISTS idx_gastos_lir_empresa_anio ON gastos_lir(empresa_id, anio);
+
+-- ─── 2. REGISTROS EMPRESAS SII (RAI, DDAN, FUT, FUNT) ───────
+CREATE TABLE IF NOT EXISTS registros_empresa_sii (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  empresa_id  UUID NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+  tipo        TEXT NOT NULL CHECK (tipo IN ('RAI','DDAN','FUT','FUNT')),
+  anio        INTEGER NOT NULL,
+  concepto    TEXT NOT NULL,
+  monto       NUMERIC(15,2) NOT NULL DEFAULT 0,
+  descripcion TEXT,
+  is_active   BOOLEAN NOT NULL DEFAULT true,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE registros_empresa_sii ENABLE ROW LEVEL SECURITY;
+CREATE POLICY registros_empresa_sii_empresa ON registros_empresa_sii
+  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE));
+
+CREATE INDEX IF NOT EXISTS idx_registros_sii_empresa_tipo ON registros_empresa_sii(empresa_id, tipo, anio);
+
+-- ─── 3. DEVOLUCIÓN IVA EXPORTADORES ──────────────────────────
+CREATE TABLE IF NOT EXISTS devolucion_iva_exportador (
+  id                       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  empresa_id               UUID NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+  periodo                  TEXT NOT NULL,          -- YYYY-MM
+  monto_iva_exportaciones  NUMERIC(15,2) NOT NULL DEFAULT 0,
+  monto_solicitado         NUMERIC(15,2) NOT NULL DEFAULT 0,
+  numero_solicitud         TEXT,
+  estado                   TEXT NOT NULL DEFAULT 'pendiente'
+                             CHECK (estado IN ('pendiente','aprobada','rechazada','pagada')),
+  observacion              TEXT,
+  is_active                BOOLEAN NOT NULL DEFAULT true,
+  created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at               TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE devolucion_iva_exportador ENABLE ROW LEVEL SECURITY;
+CREATE POLICY devolucion_iva_empresa ON devolucion_iva_exportador
+  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE));
+
+-- ─── 4. CONVENIOS DE PAGO ─────────────────────────────────────
+CREATE TABLE IF NOT EXISTS convenios_pago (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  empresa_id   UUID NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+  acreedor     TEXT NOT NULL,
+  tipo         TEXT NOT NULL DEFAULT 'proveedor'
+                CHECK (tipo IN ('sii','tgr','proveedor','banco','otro')),
+  monto_total  NUMERIC(15,2) NOT NULL DEFAULT 0,
+  n_cuotas     INTEGER NOT NULL DEFAULT 1,
+  monto_cuota  NUMERIC(15,2) NOT NULL DEFAULT 0,
+  fecha_inicio DATE NOT NULL,
+  tasa_interes NUMERIC(6,4) NOT NULL DEFAULT 0,
+  descripcion  TEXT,
+  estado       TEXT NOT NULL DEFAULT 'vigente'
+                CHECK (estado IN ('vigente','terminado','incumplido')),
+  is_active    BOOLEAN NOT NULL DEFAULT true,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE convenios_pago ENABLE ROW LEVEL SECURITY;
+CREATE POLICY convenios_pago_empresa ON convenios_pago
+  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE));
+
+-- ─── 5. CUOTAS DE CONVENIO ────────────────────────────────────
+CREATE TABLE IF NOT EXISTS convenio_cuotas (
+  id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  convenio_id        UUID NOT NULL REFERENCES convenios_pago(id) ON DELETE CASCADE,
+  empresa_id         UUID NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+  numero             INTEGER NOT NULL,
+  fecha_vencimiento  DATE NOT NULL,
+  monto              NUMERIC(15,2) NOT NULL DEFAULT 0,
+  estado             TEXT NOT NULL DEFAULT 'pendiente'
+                      CHECK (estado IN ('pendiente','pagada','vencida')),
+  fecha_pago         DATE,
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE convenio_cuotas ENABLE ROW LEVEL SECURITY;
+CREATE POLICY convenio_cuotas_empresa ON convenio_cuotas
+  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE));
+
+CREATE INDEX IF NOT EXISTS idx_convenio_cuotas_convenio ON convenio_cuotas(convenio_id);
+CREATE INDEX IF NOT EXISTS idx_convenio_cuotas_empresa ON convenio_cuotas(empresa_id, estado);
+
+-- ─── Trigger updated_at ───────────────────────────────────────
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DO $$
+DECLARE
+  tbl TEXT;
+BEGIN
+  FOREACH tbl IN ARRAY ARRAY['gastos_lir','registros_empresa_sii','devolucion_iva_exportador','convenios_pago']
+  LOOP
+    EXECUTE format(
+      'DROP TRIGGER IF EXISTS trg_%1$s_updated_at ON %1$s;
+       CREATE TRIGGER trg_%1$s_updated_at
+         BEFORE UPDATE ON %1$s
+         FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();',
+      tbl
+    );
+  END LOOP;
+END $$;
+
+
+-- ====== 018_rrhh_ampliado.sql ======
+-- ============================================================
+-- 018_rrhh_ampliado.sql
+-- Módulos RRHH completos: mutualidades, asistencia, banco horas,
+-- pactos horas extra, vacaciones/ausencias, terminaciones contrato.
+-- ALTER de tablas existentes para nuevos campos.
+-- ============================================================
+
+-- ─── MUTUALIDADES ────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS mutualidades (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nombre       TEXT NOT NULL,                -- ACHS, IST, Mutual de Seguridad, ISL
+  tasa_base    NUMERIC(5,2) NOT NULL DEFAULT 0.93,  -- tasa mínima Ley 16.744 (0.93%)
+  is_active    BOOLEAN NOT NULL DEFAULT true,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Catálogo inicial mutualidades Chile
+INSERT INTO mutualidades (nombre, tasa_base) VALUES
+  ('ACHS (Asociación Chilena de Seguridad)',  0.93),
+  ('IST (Instituto de Seguridad del Trabajo)', 0.93),
+  ('Mutual de Seguridad CChC',                0.93),
+  ('ISL (Instituto de Seguridad Laboral)',     0.93)
+ON CONFLICT DO NOTHING;
+
+-- ─── ALTER: afp → agregar comisión y SIS ─────────────────────
+ALTER TABLE afp
+  ADD COLUMN IF NOT EXISTS tasa_afp  NUMERIC(5,2) NOT NULL DEFAULT 10.0,
+  ADD COLUMN IF NOT EXISTS comision  NUMERIC(5,2) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS sis       NUMERIC(5,2) NOT NULL DEFAULT 1.49;
+
+-- Actualizar valores aproximados AFP Chile 2025
+UPDATE afp SET tasa_afp = 10.0, comision = 0.58, sis = 1.49 WHERE nombre ILIKE '%capital%';
+UPDATE afp SET tasa_afp = 10.0, comision = 0.44, sis = 1.49 WHERE nombre ILIKE '%cuprum%';
+UPDATE afp SET tasa_afp = 10.0, comision = 0.77, sis = 1.49 WHERE nombre ILIKE '%habitat%';
+UPDATE afp SET tasa_afp = 10.0, comision = 0.69, sis = 1.49 WHERE nombre ILIKE '%planvital%';
+UPDATE afp SET tasa_afp = 10.0, comision = 0.49, sis = 1.49 WHERE nombre ILIKE '%provida%';
+UPDATE afp SET tasa_afp = 10.0, comision = 0.57, sis = 1.49 WHERE nombre ILIKE '%modelo%';
+
+-- ─── ALTER: trabajadores → mutualidad_id ─────────────────────
+ALTER TABLE trabajadores
+  ADD COLUMN IF NOT EXISTS mutualidad_id UUID REFERENCES mutualidades(id);
+
+-- ─── ALTER: contratos → lugar_prestacion, departamento ───────
+ALTER TABLE contratos
+  ADD COLUMN IF NOT EXISTS lugar_prestacion TEXT,
+  ADD COLUMN IF NOT EXISTS departamento     TEXT;
+
+-- ─── ALTER: liquidaciones → afp_comision, afp_sis ────────────
+ALTER TABLE liquidaciones
+  ADD COLUMN IF NOT EXISTS afp_comision NUMERIC(12,0) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS afp_sis      NUMERIC(12,0) NOT NULL DEFAULT 0;
+
+-- ─── REGISTRO ASISTENCIA ─────────────────────────────────────
+CREATE TABLE IF NOT EXISTS registro_asistencia (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  empresa_id        UUID NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+  trabajador_id     UUID NOT NULL REFERENCES trabajadores(id) ON DELETE CASCADE,
+  fecha             DATE NOT NULL,
+  hora_entrada      TIME,
+  hora_salida       TIME,
+  horas_ordinarias  NUMERIC(5,2) NOT NULL DEFAULT 0,
+  horas_extra       NUMERIC(5,2) NOT NULL DEFAULT 0,
+  tipo              TEXT NOT NULL DEFAULT 'entrada'
+                    CHECK (tipo IN ('entrada','salida','hora_extra','ausencia')),
+  observacion       TEXT,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_asistencia_empresa_fecha
+  ON registro_asistencia (empresa_id, fecha DESC);
+
+CREATE INDEX IF NOT EXISTS idx_asistencia_trabajador
+  ON registro_asistencia (trabajador_id, fecha DESC);
+
+-- ─── PACTO HORAS EXTRA ───────────────────────────────────────
+CREATE TABLE IF NOT EXISTS pactos_horas_extra (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  empresa_id    UUID NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+  trabajador_id UUID NOT NULL REFERENCES trabajadores(id) ON DELETE CASCADE,
+  fecha_inicio  DATE NOT NULL,
+  fecha_termino DATE,
+  horas_semana  NUMERIC(4,1) NOT NULL DEFAULT 0,
+  monto_hora    NUMERIC(12,0) NOT NULL DEFAULT 0,
+  is_active     BOOLEAN NOT NULL DEFAULT true,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_pactos_horas_empresa
+  ON pactos_horas_extra (empresa_id, trabajador_id);
+
+-- ─── BANCO DE HORAS ──────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS banco_horas (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  empresa_id    UUID NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+  trabajador_id UUID NOT NULL REFERENCES trabajadores(id) ON DELETE CASCADE,
+  periodo_mes   INT NOT NULL CHECK (periodo_mes BETWEEN 1 AND 12),
+  periodo_anio  INT NOT NULL,
+  horas_extra   NUMERIC(6,2) NOT NULL DEFAULT 0,
+  horas_usadas  NUMERIC(6,2) NOT NULL DEFAULT 0,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ─── AUSENCIAS (vacaciones y licencias) ─────────────────────
+CREATE TABLE IF NOT EXISTS ausencias (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  empresa_id      UUID NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+  trabajador_id   UUID NOT NULL REFERENCES trabajadores(id) ON DELETE CASCADE,
+  tipo            TEXT NOT NULL
+                  CHECK (tipo IN (
+                    'vacaciones','permiso_goce','permiso_sin_goce',
+                    'licencia_medica','licencia_maternal','licencia_paternal',
+                    'sala_cuna','fuero_maternal','otro'
+                  )),
+  fecha_inicio    DATE NOT NULL,
+  fecha_fin       DATE NOT NULL,
+  dias_habiles    INT NOT NULL DEFAULT 0,
+  dias_corridos   INT NOT NULL DEFAULT 0,
+  estado          TEXT NOT NULL DEFAULT 'pendiente'
+                  CHECK (estado IN ('pendiente','aprobada','rechazada','anulada')),
+  motivo          TEXT,
+  numero_licencia TEXT,
+  documento_url   TEXT,
+  aprobado_por    UUID REFERENCES auth.users(id),
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ausencias_empresa
+  ON ausencias (empresa_id, trabajador_id, fecha_inicio DESC);
+
+-- ─── TERMINACIONES DE CONTRATO ───────────────────────────────
+CREATE TABLE IF NOT EXISTS terminaciones_contrato (
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  empresa_id            UUID NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+  trabajador_id         UUID NOT NULL REFERENCES trabajadores(id),
+  contrato_id           UUID NOT NULL REFERENCES contratos(id),
+  fecha_termino         DATE NOT NULL,
+  causal                TEXT NOT NULL
+                        CHECK (causal IN (
+                          '159_1','159_2','159_3','159_4','159_5','159_6',
+                          '160_1','160_2','160_3','160_4','160_5','160_6','160_7','160_8',
+                          '161'
+                        )),
+  descripcion           TEXT,
+  preaviso_dias         INT NOT NULL DEFAULT 30,
+  indemnizacion_anios   INT NOT NULL DEFAULT 0,
+  indemnizacion_monto   NUMERIC(14,0) NOT NULL DEFAULT 0,
+  vacaciones_pendientes INT NOT NULL DEFAULT 0,
+  monto_total_finiquito NUMERIC(14,0) NOT NULL DEFAULT 0,
+  ministro_de_fe        TEXT,
+  firmado               BOOLEAN NOT NULL DEFAULT false,
+  fecha_firma           DATE,
+  created_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_terminaciones_empresa
+  ON terminaciones_contrato (empresa_id, fecha_termino DESC);
+
+-- ─── RLS ────────────────────────────────────────────────────
+ALTER TABLE mutualidades          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE registro_asistencia   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pactos_horas_extra    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE banco_horas           ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ausencias             ENABLE ROW LEVEL SECURITY;
+ALTER TABLE terminaciones_contrato ENABLE ROW LEVEL SECURITY;
+
+-- Políticas: acceso por empresa_id vía perfil
+CREATE POLICY "mutualidades_public_read" ON mutualidades
+  FOR SELECT USING (true);
+
+CREATE POLICY "asistencia_empresa" ON registro_asistencia
+  FOR ALL USING (
+    empresa_id IN (
+      SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE
+    )
+  );
+
+CREATE POLICY "pactos_empresa" ON pactos_horas_extra
+  FOR ALL USING (
+    empresa_id IN (
+      SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE
+    )
+  );
+
+CREATE POLICY "banco_horas_empresa" ON banco_horas
+  FOR ALL USING (
+    empresa_id IN (
+      SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE
+    )
+  );
+
+CREATE POLICY "ausencias_empresa" ON ausencias
+  FOR ALL USING (
+    empresa_id IN (
+      SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE
+    )
+  );
+
+CREATE POLICY "terminaciones_empresa" ON terminaciones_contrato
+  FOR ALL USING (
+    empresa_id IN (
+      SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE
+    )
+  );
+
+

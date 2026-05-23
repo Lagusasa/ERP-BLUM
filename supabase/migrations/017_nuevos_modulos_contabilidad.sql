@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS gastos_lir (
 
 ALTER TABLE gastos_lir ENABLE ROW LEVEL SECURITY;
 CREATE POLICY gastos_lir_empresa ON gastos_lir
-  USING (empresa_id IN (SELECT empresa_id FROM usuario_empresas WHERE user_id = auth.uid()));
+  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE));
 
 CREATE INDEX IF NOT EXISTS idx_gastos_lir_empresa_anio ON gastos_lir(empresa_id, anio);
 
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS registros_empresa_sii (
 
 ALTER TABLE registros_empresa_sii ENABLE ROW LEVEL SECURITY;
 CREATE POLICY registros_empresa_sii_empresa ON registros_empresa_sii
-  USING (empresa_id IN (SELECT empresa_id FROM usuario_empresas WHERE user_id = auth.uid()));
+  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE));
 
 CREATE INDEX IF NOT EXISTS idx_registros_sii_empresa_tipo ON registros_empresa_sii(empresa_id, tipo, anio);
 
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS devolucion_iva_exportador (
 
 ALTER TABLE devolucion_iva_exportador ENABLE ROW LEVEL SECURITY;
 CREATE POLICY devolucion_iva_empresa ON devolucion_iva_exportador
-  USING (empresa_id IN (SELECT empresa_id FROM usuario_empresas WHERE user_id = auth.uid()));
+  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE));
 
 -- ─── 4. CONVENIOS DE PAGO ─────────────────────────────────────
 CREATE TABLE IF NOT EXISTS convenios_pago (
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS convenios_pago (
 
 ALTER TABLE convenios_pago ENABLE ROW LEVEL SECURITY;
 CREATE POLICY convenios_pago_empresa ON convenios_pago
-  USING (empresa_id IN (SELECT empresa_id FROM usuario_empresas WHERE user_id = auth.uid()));
+  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE));
 
 -- ─── 5. CUOTAS DE CONVENIO ────────────────────────────────────
 CREATE TABLE IF NOT EXISTS convenio_cuotas (
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS convenio_cuotas (
 
 ALTER TABLE convenio_cuotas ENABLE ROW LEVEL SECURITY;
 CREATE POLICY convenio_cuotas_empresa ON convenio_cuotas
-  USING (empresa_id IN (SELECT empresa_id FROM usuario_empresas WHERE user_id = auth.uid()));
+  USING (empresa_id IN (SELECT empresa_id FROM empresa_usuarios WHERE user_id = auth.uid() AND is_active = TRUE));
 
 CREATE INDEX IF NOT EXISTS idx_convenio_cuotas_convenio ON convenio_cuotas(convenio_id);
 CREATE INDEX IF NOT EXISTS idx_convenio_cuotas_empresa ON convenio_cuotas(empresa_id, estado);
