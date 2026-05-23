@@ -89,6 +89,32 @@ export default async function SiiPage() {
           <p className="text-xs text-slate-400 mt-2">{dtes.length} documentos registrados</p>
         </Link>
 
+        <Link href="/sii/boleta"
+          className="bg-white border border-slate-200 rounded-xl p-5 hover:border-sky-300 hover:shadow-sm transition-all group">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-9 h-9 bg-sky-100 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a3 3 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
+              </svg>
+            </div>
+            <p className="font-semibold text-slate-800 group-hover:text-sky-700">Boleta Electrónica</p>
+          </div>
+          <p className="text-sm text-slate-500">Emisión de boletas tipo 39 para consumidores finales.</p>
+        </Link>
+
+        <Link href="/sii/notas"
+          className="bg-white border border-slate-200 rounded-xl p-5 hover:border-orange-300 hover:shadow-sm transition-all group">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" />
+              </svg>
+            </div>
+            <p className="font-semibold text-slate-800 group-hover:text-orange-700">Notas Cred./Déb.</p>
+          </div>
+          <p className="text-sm text-slate-500">Nota de Crédito (tipo 61) y Nota de Débito (tipo 56).</p>
+        </Link>
+
         <Link href="/sii/honorarios"
           className="bg-white border border-slate-200 rounded-xl p-5 hover:border-green-300 hover:shadow-sm transition-all group">
           <div className="flex items-center gap-3 mb-3">

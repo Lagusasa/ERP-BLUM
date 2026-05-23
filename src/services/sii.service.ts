@@ -32,6 +32,10 @@ export async function crearDte(
   return data as DteDocumento
 }
 
+export async function getDteByTipo(empresa_id: string, tipo_dte: string): Promise<DteDocumento[]> {
+  return getDteDocumentos(empresa_id, tipo_dte)
+}
+
 export async function actualizarEstadoDte(id: string, estado: DteDocumento['estado'], track_id?: string): Promise<void> {
   const supabase = await createClient()
   const { error } = await supabase

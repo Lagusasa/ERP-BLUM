@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { getEmpresaActiva } from '@/lib/empresa'
-import { getAFPs, getIsapres } from '@/services/remuneraciones.service'
+import { getAFPs, getIsapres, getMutualidades } from '@/services/remuneraciones.service'
 import TrabajadorForm from '@/components/remuneraciones/TrabajadorForm'
 
 export const metadata: Metadata = { title: 'Nuevo Trabajador' }
@@ -9,7 +9,7 @@ export default async function NuevoTrabajadorPage() {
   const empresa = await getEmpresaActiva()
   if (!empresa) return null
 
-  const [afps, isapres] = await Promise.allSettled([getAFPs(), getIsapres()])
+  const [afps, isapres, mutualidades] = await Promise.allSettled([getAFPs(), getIsapres(), getMutualidades()])
 
   return (
     <div className="space-y-4">
@@ -21,6 +21,7 @@ export default async function NuevoTrabajadorPage() {
         empresa_id={empresa.id}
         afps={afps.status === 'fulfilled' ? afps.value : []}
         isapres={isapres.status === 'fulfilled' ? isapres.value : []}
+        mutualidades={mutualidades.status === 'fulfilled' ? mutualidades.value : []}
       />
     </div>
   )

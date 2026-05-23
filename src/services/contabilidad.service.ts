@@ -796,6 +796,9 @@ export async function registrarDepreciacionMes(
 
     if (activo.metodo === 'lineal') {
       monto = base / activo.vida_util_meses
+    } else if (activo.metodo === 'instantanea') {
+      // 100% en el primer período (art. 31 N°5 bis LIR)
+      monto = mesesDep === 0 ? base : 0
     } else {
       const restantes = activo.vida_util_meses - mesesDep
       const sumaDigitos = (activo.vida_util_meses * (activo.vida_util_meses + 1)) / 2

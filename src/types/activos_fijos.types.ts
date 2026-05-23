@@ -1,4 +1,4 @@
-export type MetodoDepreciacion = 'lineal' | 'acelerada'
+export type MetodoDepreciacion = 'lineal' | 'acelerada' | 'instantanea'
 export type EstadoActivo = 'activo' | 'dado_baja' | 'vendido'
 export type CategoriaActivo =
   | 'edificios'

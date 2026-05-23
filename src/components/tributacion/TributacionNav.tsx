@@ -5,10 +5,14 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const TABS = [
-  { label: 'Resumen',         href: '/tributacion' },
-  { label: 'Libro IVA Compras', href: '/tributacion/libro-compras' },
-  { label: 'Libro IVA Ventas',  href: '/tributacion/libro-ventas' },
-  { label: 'Declaración F29',   href: '/tributacion/f29' },
+  { label: 'Resumen',              href: '/tributacion' },
+  { label: 'Libro IVA Compras',    href: '/tributacion/libro-compras' },
+  { label: 'Libro IVA Ventas',     href: '/tributacion/libro-ventas' },
+  { label: 'Declaración F29',      href: '/tributacion/f29' },
+  { label: 'Decl. Juradas',        href: '/tributacion/declaraciones-juradas' },
+  { label: 'Dev. IVA Export.',     href: '/tributacion/devolucion-iva' },
+  { label: 'Registros SII',        href: '/tributacion/registros-empresa' },
+  { label: 'RLI',                  href: '/tributacion/rli' },
 ]
 
 export default function TributacionNav() {

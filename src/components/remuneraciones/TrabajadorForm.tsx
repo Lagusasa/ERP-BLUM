@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import type { AFP, Isapre } from '@/types/remuneraciones.types'
+import type { AFP, Isapre, Mutualidad } from '@/types/remuneraciones.types'
 import { TIPO_CONTRATO_LABELS } from '@/types/remuneraciones.types'
 import { formatCurrency } from '@/lib/utils'
 import { calcularLiquidacion, SUELDO_MINIMO } from '@/lib/remuneraciones-calc'
@@ -12,9 +12,10 @@ interface Props {
   empresa_id: string
   afps: AFP[]
   isapres: Isapre[]
+  mutualidades: Mutualidad[]
 }
 
-export default function TrabajadorForm({ empresa_id, afps, isapres }: Props) {
+export default function TrabajadorForm({ empresa_id, afps, isapres, mutualidades }: Props) {
   const router = useRouter()
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -28,10 +29,13 @@ export default function TrabajadorForm({ empresa_id, afps, isapres }: Props) {
   const [telefono, setTelefono] = useState('')
   const [afpId, setAfpId] = useState('')
   const [isapredId, setIsapreId] = useState('')
+  const [mutualidadId, setMutualidadId] = useState('')
 
   // Contrato
   const [tipoContrato, setTipoContrato] = useState('indefinido')
   const [cargo, setCargo] = useState('')
+  const [departamento, setDepartamento] = useState('')
+  const [lugarPrestacion, setLugarPrestacion] = useState('')
   const [fechaInicio, setFechaInicio] = useState(new Date().toISOString().split('T')[0])
   const [sueldoBase, setSueldoBase] = useState(String(SUELDO_MINIMO))
   const [gratificacionTipo, setGratificacionTipo] = useState('legal')
@@ -73,6 +77,7 @@ export default function TrabajadorForm({ empresa_id, afps, isapres }: Props) {
           telefono: telefono.trim() || null,
           afp_id: afpId || null,
           isapre_id: isapredId || null,
+          mutualidad_id: mutualidadId || null,
           tipo_afiliacion: afpId ? 'afp' : 'ninguno',
           is_active: true,
         })
@@ -88,6 +93,8 @@ export default function TrabajadorForm({ empresa_id, afps, isapres }: Props) {
           trabajador_id: trabajador.id,
           tipo_contrato: tipoContrato,
           cargo: cargo.trim() || null,
+          departamento: departamento.trim() || null,
+          lugar_prestacion: lugarPrestacion.trim() || null,
           fecha_inicio: fechaInicio,
           sueldo_base: sueldoNum,
           gratificacion_tipo: gratificacionTipo,
@@ -170,6 +177,16 @@ export default function TrabajadorForm({ empresa_id, afps, isapres }: Props) {
                   ))}
                 </select>
               </div>
+              <div className="md:col-span-2">
+                <label className="block text-xs font-medium text-slate-600 mb-1">Mutualidad (Ley 16.744)</label>
+                <select value={mutualidadId} onChange={(e) => setMutualidadId(e.target.value)}
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                  <option value="">— Sin mutualidad —</option>
+                  {mutualidades.map((m) => (
+                    <option key={m.id} value={m.id}>{m.nombre} (tasa base {m.tasa_base}%)</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
@@ -189,6 +206,18 @@ export default function TrabajadorForm({ empresa_id, afps, isapres }: Props) {
                 <label className="block text-xs font-medium text-slate-600 mb-1">Cargo</label>
                 <input type="text" value={cargo} onChange={(e) => setCargo(e.target.value)}
                   placeholder="Ej: Contador, Vendedor..."
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Departamento</label>
+                <input type="text" value={departamento} onChange={(e) => setDepartamento(e.target.value)}
+                  placeholder="Ej: Administración, Ventas..."
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-xs font-medium text-slate-600 mb-1">Lugar de Prestación de Servicios</label>
+                <input type="text" value={lugarPrestacion} onChange={(e) => setLugarPrestacion(e.target.value)}
+                  placeholder="Ej: Oficina central, Obra San Pedro, Teletrabajo..."
                   className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>

@@ -7,16 +7,21 @@ import { cn } from '@/lib/utils'
 const TABS = [
   { label: 'Resumen',         href: '/remuneraciones' },
   { label: 'Trabajadores',    href: '/remuneraciones/trabajadores' },
+  { label: 'Asistencia',      href: '/remuneraciones/asistencia' },
+  { label: 'Vacaciones',      href: '/remuneraciones/vacaciones' },
   { label: 'Liquidaciones',   href: '/remuneraciones/liquidaciones' },
+  { label: 'Cotizaciones',    href: '/remuneraciones/cotizaciones' },
   { label: 'Libro de Rem.',   href: '/remuneraciones/libro' },
   { label: 'Honorarios',      href: '/remuneraciones/honorarios' },
+  { label: 'Terminaciones',   href: '/remuneraciones/terminaciones' },
   { label: 'Indicadores',     href: '/remuneraciones/indicadores' },
+  { label: 'Certificados',    href: '/remuneraciones/certificados' },
 ]
 
 export default function RemuneracionesNav() {
   const pathname = usePathname()
   return (
-    <nav className="flex gap-1 border-b border-slate-200">
+    <nav className="flex gap-1 border-b border-slate-200 overflow-x-auto">
       {TABS.map((tab) => {
         const active = tab.href === '/remuneraciones'
           ? pathname === '/remuneraciones'

@@ -95,6 +95,20 @@ export default async function FinanzasPage() {
         </div>
       )}
 
+      {/* Accesos rápidos */}
+      <div className="grid grid-cols-2 gap-4">
+        <Link href="/finanzas/conciliacion"
+          className="bg-white border border-slate-200 rounded-xl p-4 hover:border-emerald-300 hover:shadow-sm transition-all">
+          <p className="text-sm font-semibold text-slate-800">Conciliación Bancaria</p>
+          <p className="text-xs text-slate-400 mt-1">Reconciliar movimientos con cartola bancaria.</p>
+        </Link>
+        <Link href="/finanzas/convenios"
+          className="bg-white border border-slate-200 rounded-xl p-4 hover:border-amber-300 hover:shadow-sm transition-all">
+          <p className="text-sm font-semibold text-slate-800">Convenios de Pago</p>
+          <p className="text-xs text-slate-400 mt-1">Control de deudas reestructuradas y cuotas pendientes.</p>
+        </Link>
+      </div>
+
       {/* Últimos movimientos */}
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">

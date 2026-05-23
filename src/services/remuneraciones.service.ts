@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
-import type { Trabajador, Contrato, Liquidacion, AFP, Isapre } from '@/types/remuneraciones.types'
+import type { Trabajador, Contrato, Liquidacion, AFP, Isapre, Mutualidad } from '@/types/remuneraciones.types'
+export type { IndicadoresPrevisionales } from '@/types/indicadores.types'
+export { INDICADORES_DEFAULT } from '@/types/indicadores.types'
 
 export async function getTrabajadores(empresa_id: string): Promise<Trabajador[]> {
   const supabase = await createClient()
@@ -167,6 +169,12 @@ export async function getIsapres(): Promise<Isapre[]> {
   return (data ?? []) as Isapre[]
 }
 
+export async function getMutualidades(): Promise<Mutualidad[]> {
+  const supabase = await createClient()
+  const { data } = await supabase.from('mutualidades').select('*').eq('is_active', true).order('nombre')
+  return (data ?? []) as Mutualidad[]
+}
+
 export async function getResumenRemuneraciones(
   empresa_id: string,
   mes: number,
@@ -284,34 +292,8 @@ export async function updateEstadoHonorario(id: string, estado: 'pagado' | 'anul
 }
 
 // ── INDICADORES PREVISIONALES ────────────────────────────────
-export interface IndicadoresPrevisionales {
-  id?: string
-  empresa_id: string
-  anio: number
-  sueldo_minimo: number
-  uf_referencia: number | null
-  utm: number | null
-  tope_imponible_uf: number
-  retencion_honorarios_pct: number
-  tasa_seg_ces_trab: number
-  tasa_seg_ces_emp_indef: number
-  tasa_seg_ces_emp_plazo: number
-  tasa_scs: number
-  tasa_mutualidad: number
-}
-
-export const INDICADORES_DEFAULT: Omit<IndicadoresPrevisionales, 'id' | 'empresa_id' | 'anio'> = {
-  sueldo_minimo: 500000,
-  uf_referencia: 37000,
-  utm: 66081,
-  tope_imponible_uf: 81.6,
-  retencion_honorarios_pct: 0.1375,
-  tasa_seg_ces_trab: 0.006,
-  tasa_seg_ces_emp_indef: 0.024,
-  tasa_seg_ces_emp_plazo: 0.030,
-  tasa_scs: 0.010,
-  tasa_mutualidad: 0.0093,
-}
+import type { IndicadoresPrevisionales } from '@/types/indicadores.types'
+import { INDICADORES_DEFAULT } from '@/types/indicadores.types'
 
 export async function getIndicadores(
   empresa_id: string,

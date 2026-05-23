@@ -35,6 +35,9 @@ export default function NuevaLiquidacionForm({ empresa_id, trabajadores, mes, an
         sueldoBase: contrato.sueldo_base,
         horasExtra: parseInt(horasExtra) || 0,
         afpTasa: trabajador.afp.tasa,
+        afpTasaBase: trabajador.afp.tasa_afp,
+        afpComision: trabajador.afp.comision,
+        afpSis: trabajador.afp.sis,
         isapreMonto: trabajador.isapre ? Math.round(contrato.sueldo_base * 0.07) : 0,
         asigMovilizacion: parseInt(asigMovilizacion) || 0,
         asigColacion: parseInt(asigColacion) || 0,
@@ -76,6 +79,8 @@ export default function NuevaLiquidacionForm({ empresa_id, trabajadores, mes, an
         total_no_imponible: resultado.totalNoImponible,
         afp_tasa: resultado.afpTasa,
         afp_monto: resultado.afpMonto,
+        afp_comision: resultado.afpComision,
+        afp_sis: resultado.afpSis,
         isapre_monto: resultado.isapreMonto,
         seguro_cesantia: resultado.seguroCesantia,
         impuesto_2da_cat: resultado.impuesto2daCat,
@@ -176,6 +181,8 @@ export default function NuevaLiquidacionForm({ empresa_id, trabajadores, mes, an
 
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-3 mb-2">Descuentos</p>
               <div className="flex justify-between text-red-600"><span>AFP ({resultado.afpTasa}%)</span><span className="tabular-nums">-{formatCurrency(resultado.afpMonto)}</span></div>
+              {resultado.afpComision > 0 && <div className="flex justify-between text-red-400 pl-2 text-xs"><span>↳ Comisión AFP</span><span className="tabular-nums">-{formatCurrency(resultado.afpComision)}</span></div>}
+              {resultado.afpSis > 0 && <div className="flex justify-between text-red-400 pl-2 text-xs"><span>↳ Prima SIS</span><span className="tabular-nums">-{formatCurrency(resultado.afpSis)}</span></div>}
               <div className="flex justify-between text-red-600"><span>Salud (7%)</span><span className="tabular-nums">-{formatCurrency(resultado.isapreMonto)}</span></div>
               <div className="flex justify-between text-red-600"><span>Seg. Cesantía (0.6%)</span><span className="tabular-nums">-{formatCurrency(resultado.seguroCesantia)}</span></div>
               {resultado.impuesto2daCat > 0 && <div className="flex justify-between text-red-600"><span>Imp. 2da Categoría</span><span className="tabular-nums">-{formatCurrency(resultado.impuesto2daCat)}</span></div>}

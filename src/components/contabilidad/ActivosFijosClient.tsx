@@ -214,8 +214,9 @@ export default function ActivosFijosClient({ activos, cuentas }: Props) {
               <label className="text-xs text-slate-500">Método depreciación</label>
               <select value={form.metodo} onChange={(e) => setForm((f) => ({ ...f, metodo: e.target.value as MetodoDepreciacion }))}
                 className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                <option value="lineal">Lineal</option>
-                <option value="acelerada">Acelerada (dígitos)</option>
+                <option value="lineal">Lineal (art. 31 N°5)</option>
+                <option value="acelerada">Acelerada — suma de dígitos</option>
+                <option value="instantanea">Instantánea (art. 31 N°5 bis)</option>
               </select>
             </div>
             {editando && (

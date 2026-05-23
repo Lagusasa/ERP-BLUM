@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { IndicadoresPrevisionales } from '@/services/remuneraciones.service'
-import { INDICADORES_DEFAULT } from '@/services/remuneraciones.service'
+import type { IndicadoresPrevisionales } from '@/types/indicadores.types'
+import { INDICADORES_DEFAULT } from '@/types/indicadores.types'
 import type { AFP } from '@/types/remuneraciones.types'
 
 interface Props {

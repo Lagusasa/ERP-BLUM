@@ -356,6 +356,7 @@ export type Database = {
           ciudad: string | null
           afp_id: string | null
           isapre_id: string | null
+          mutualidad_id: string | null
           tipo_afiliacion: string
           is_active: boolean
           created_at: string
@@ -371,10 +372,25 @@ export type Database = {
           id: string
           nombre: string
           tasa: number
+          tasa_afp: number
+          comision: number
+          sis: number
           is_active: boolean
         }
         Insert: Omit<Database['public']['Tables']['afp']['Row'], 'id'>
         Update: Partial<Database['public']['Tables']['afp']['Insert']>
+        Relationships: []
+      }
+      mutualidades: {
+        Row: {
+          id: string
+          nombre: string
+          tasa_base: number
+          is_active: boolean
+          created_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['mutualidades']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Database['public']['Tables']['mutualidades']['Insert']>
         Relationships: []
       }
       isapres: {
@@ -395,6 +411,7 @@ export type Database = {
           tipo_contrato: string
           cargo: string | null
           departamento: string | null
+          lugar_prestacion: string | null
           fecha_inicio: string
           fecha_termino: string | null
           sueldo_base: number
@@ -431,6 +448,8 @@ export type Database = {
           total_no_imponible: number
           afp_tasa: number
           afp_monto: number
+          afp_comision: number
+          afp_sis: number
           isapre_monto: number
           seguro_cesantia: number
           impuesto_2da_cat: number
@@ -727,6 +746,115 @@ export type Database = {
         }
         Insert: MakeNullOptional<Omit<Database['public']['Tables']['sii_config']['Row'], 'id' | 'created_at'>>
         Update: Partial<Database['public']['Tables']['sii_config']['Insert']>
+        Relationships: []
+      }
+      gastos_lir: {
+        Row: {
+          id: string; empresa_id: string; cuenta_id: string | null; fecha: string; anio: number
+          concepto: string; monto: number; articulo: string; tipo_gasto: string | null
+          rut_beneficiario: string | null; nombre_beneficiario: string | null
+          is_active: boolean; created_at: string; updated_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['gastos_lir']['Row'], 'id' | 'created_at' | 'updated_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['gastos_lir']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      registros_empresa_sii: {
+        Row: {
+          id: string; empresa_id: string; tipo: string; anio: number
+          concepto: string; monto: number; descripcion: string | null
+          is_active: boolean; created_at: string; updated_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['registros_empresa_sii']['Row'], 'id' | 'created_at' | 'updated_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['registros_empresa_sii']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      devolucion_iva_exportador: {
+        Row: {
+          id: string; empresa_id: string; periodo: string
+          monto_iva_exportaciones: number; monto_solicitado: number
+          numero_solicitud: string | null; estado: string
+          observacion: string | null; is_active: boolean
+          created_at: string; updated_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['devolucion_iva_exportador']['Row'], 'id' | 'created_at' | 'updated_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['devolucion_iva_exportador']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      convenios_pago: {
+        Row: {
+          id: string; empresa_id: string; acreedor: string; tipo: string
+          monto_total: number; n_cuotas: number; monto_cuota: number
+          fecha_inicio: string; tasa_interes: number; descripcion: string | null
+          estado: string; is_active: boolean; created_at: string; updated_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['convenios_pago']['Row'], 'id' | 'created_at' | 'updated_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['convenios_pago']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      convenio_cuotas: {
+        Row: {
+          id: string; convenio_id: string; empresa_id: string; numero: number
+          fecha_vencimiento: string; monto: number; estado: string
+          fecha_pago: string | null; created_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['convenio_cuotas']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['convenio_cuotas']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      registro_asistencia: {
+        Row: {
+          id: string; empresa_id: string; trabajador_id: string; fecha: string
+          hora_entrada: string | null; hora_salida: string | null
+          horas_ordinarias: number; horas_extra: number; tipo: string
+          observacion: string | null; created_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['registro_asistencia']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['registro_asistencia']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      pactos_horas_extra: {
+        Row: {
+          id: string; empresa_id: string; trabajador_id: string
+          fecha_inicio: string; fecha_termino: string | null
+          horas_semana: number; monto_hora: number; is_active: boolean; created_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['pactos_horas_extra']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['pactos_horas_extra']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      banco_horas: {
+        Row: {
+          id: string; empresa_id: string; trabajador_id: string
+          periodo_mes: number; periodo_anio: number
+          horas_extra: number; horas_usadas: number; created_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['banco_horas']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['banco_horas']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      ausencias: {
+        Row: {
+          id: string; empresa_id: string; trabajador_id: string; tipo: string
+          fecha_inicio: string; fecha_fin: string; dias_habiles: number; dias_corridos: number
+          estado: string; motivo: string | null; numero_licencia: string | null
+          documento_url: string | null; aprobado_por: string | null; created_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['ausencias']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['ausencias']['Row'], 'id' | 'created_at'>>
+        Relationships: []
+      }
+      terminaciones_contrato: {
+        Row: {
+          id: string; empresa_id: string; trabajador_id: string; contrato_id: string
+          fecha_termino: string; causal: string; descripcion: string | null
+          preaviso_dias: number; indemnizacion_anios: number; indemnizacion_monto: number
+          vacaciones_pendientes: number; monto_total_finiquito: number
+          ministro_de_fe: string | null; firmado: boolean; fecha_firma: string | null
+          created_at: string
+        }
+        Insert: MakeNullOptional<Omit<Database['public']['Tables']['terminaciones_contrato']['Row'], 'id' | 'created_at'>>
+        Update: Partial<Omit<Database['public']['Tables']['terminaciones_contrato']['Row'], 'id' | 'created_at'>>
         Relationships: []
       }
     }

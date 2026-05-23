@@ -46,7 +46,10 @@ export function calcularGratificacionLegal(sueldoBase: number): number {
 export interface InputLiquidacion {
   sueldoBase: number
   horasExtra?: number
-  afpTasa: number        // ej: 10.44 (porcentaje)
+  afpTasa: number        // tasa total AFP (ej: 10.44 = tasa_afp + comision + sis)
+  afpTasaBase?: number   // cotización obligatoria pura (10%)
+  afpComision?: number   // comisión AFP (ej: 0.44%)
+  afpSis?: number        // prima SIS (ej: 1.49%)
   isapreMonto: number    // cotización fija isapre o 7% fonasa
   asigMovilizacion?: number
   asigColacion?: number
@@ -73,6 +76,8 @@ export interface ResultadoLiquidacion {
   totalNoImponible: number
   afpTasa: number
   afpMonto: number
+  afpComision: number   // monto comisión AFP
+  afpSis: number        // monto prima SIS
   isapreMonto: number
   seguroCesantia: number
   impuesto2daCat: number
@@ -88,6 +93,9 @@ export function calcularLiquidacion(input: InputLiquidacion): ResultadoLiquidaci
     sueldoBase,
     horasExtra = 0,
     afpTasa,
+    afpTasaBase,
+    afpComision: afpComisionPct = 0,
+    afpSis: afpSisPct = 0,
     isapreMonto,
     asigMovilizacion = 0,
     asigColacion = 0,
@@ -120,6 +128,10 @@ export function calcularLiquidacion(input: InputLiquidacion): ResultadoLiquidaci
   const topeImponibleAFP = TOPE_IMPONIBLE_UF * UF_VALOR
   const baseAFP = Math.min(totalImponible, topeImponibleAFP)
   const afpMonto = Math.round(baseAFP * afpTasa / 100)
+  // Desglose AFP: si se entregaron tasas separadas, calcular montos individuales
+  const afpComisionMonto = afpComisionPct > 0 ? Math.round(baseAFP * afpComisionPct / 100) : 0
+  const afpSisMonto = afpSisPct > 0 ? Math.round(baseAFP * afpSisPct / 100) : 0
+  void afpTasaBase // solo informativo
 
   // Salud: cotización fija isapre o 7% fonasa
   const isapre = isapreMonto
@@ -154,6 +166,8 @@ export function calcularLiquidacion(input: InputLiquidacion): ResultadoLiquidaci
     totalNoImponible,
     afpTasa,
     afpMonto,
+    afpComision: afpComisionMonto,
+    afpSis: afpSisMonto,
     isapreMonto: isapre,
     seguroCesantia,
     impuesto2daCat,
