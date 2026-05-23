@@ -7,6 +7,9 @@ export async function GET(req: NextRequest) {
   if (!empresa_id) return NextResponse.json({ error: 'empresa_id requerido' }, { status: 400 })
 
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
   const { data, error } = await supabase
     .from('terminaciones_contrato')
     .select('*, trabajador:trabajadores(nombre, apellido_paterno, rut)')
@@ -31,6 +34,8 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
   const { data: terminacion, error: e1 } = await supabase
     .from('terminaciones_contrato')
@@ -54,17 +59,8 @@ export async function POST(req: NextRequest) {
 
   if (e1 || !terminacion) return NextResponse.json({ error: e1?.message ?? 'Error al crear' }, { status: 500 })
 
-  // Desactivar contrato
-  await supabase
-    .from('contratos')
-    .update({ es_activo: false, fecha_termino })
-    .eq('id', contrato_id)
-
-  // Desactivar trabajador
-  await supabase
-    .from('trabajadores')
-    .update({ is_active: false })
-    .eq('id', trabajador_id)
+  await supabase.from('contratos').update({ es_activo: false, fecha_termino }).eq('id', contrato_id)
+  await supabase.from('trabajadores').update({ is_active: false }).eq('id', trabajador_id)
 
   return NextResponse.json(terminacion)
 }
@@ -75,6 +71,9 @@ export async function PATCH(req: NextRequest) {
   if (!id) return NextResponse.json({ error: 'id requerido' }, { status: 400 })
 
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
   const { data, error } = await supabase
     .from('terminaciones_contrato')
     .update({ firmado, fecha_firma, ministro_de_fe })

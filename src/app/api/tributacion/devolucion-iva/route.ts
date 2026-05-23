@@ -8,6 +8,9 @@ export async function GET(req: Request) {
     if (!empresa_id) return NextResponse.json({ ok: false, error: 'empresa_id requerido' }, { status: 400 })
 
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
     const { data, error } = await supabase
       .from('devolucion_iva_exportador')
       .select('*')
@@ -28,7 +31,11 @@ export async function POST(req: Request) {
     if (!empresa_id || !periodo || !monto_solicitado) {
       return NextResponse.json({ ok: false, error: 'Campos requeridos incompletos' }, { status: 400 })
     }
+
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
     const { data, error } = await supabase
       .from('devolucion_iva_exportador')
       .insert({
@@ -49,7 +56,11 @@ export async function PATCH(req: Request) {
   try {
     const { id, estado, observacion } = await req.json()
     if (!id) return NextResponse.json({ ok: false, error: 'id requerido' }, { status: 400 })
+
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
     const { data, error } = await supabase
       .from('devolucion_iva_exportador')
       .update({ estado, observacion })

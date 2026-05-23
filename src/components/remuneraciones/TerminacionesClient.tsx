@@ -55,6 +55,10 @@ export default function TerminacionesClient({ empresa_id, trabajadores }: Props)
     setError(null)
     if (!fTrabajador || !fFechaTermino) { setError('Trabajador y fecha de término son requeridos'); return }
     if (!contrato) { setError('El trabajador no tiene contrato activo'); return }
+    if (contrato.fecha_inicio && fFechaTermino < contrato.fecha_inicio) {
+      setError('La fecha de término no puede ser anterior al inicio del contrato')
+      return
+    }
     setGuardando(true)
     try {
       const res = await fetch('/api/remuneraciones/terminaciones', {

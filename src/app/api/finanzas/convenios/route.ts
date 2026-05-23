@@ -8,6 +8,9 @@ export async function GET(req: Request) {
     if (!empresa_id) return NextResponse.json({ ok: false, error: 'empresa_id requerido' }, { status: 400 })
 
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
     const { data, error } = await supabase
       .from('convenios_pago')
       .select('*, cuotas:convenio_cuotas(*)')
@@ -28,15 +31,26 @@ export async function POST(req: Request) {
     if (!empresa_id || !acreedor || !monto_total || !n_cuotas || !fecha_inicio) {
       return NextResponse.json({ ok: false, error: 'Campos requeridos incompletos' }, { status: 400 })
     }
+    const nCuotasNum = Number(n_cuotas)
+    if (!Number.isInteger(nCuotasNum) || nCuotasNum < 1 || nCuotasNum > 360) {
+      return NextResponse.json({ ok: false, error: 'n_cuotas debe ser un entero entre 1 y 360' }, { status: 400 })
+    }
+    const montoTotalNum = Number(monto_total)
+    if (isNaN(montoTotalNum) || montoTotalNum <= 0) {
+      return NextResponse.json({ ok: false, error: 'monto_total debe ser mayor a 0' }, { status: 400 })
+    }
 
     const supabase = await createClient()
-    const montoCuota = Math.round(Number(monto_total) / Number(n_cuotas))
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
+    const montoCuota = Math.round(montoTotalNum / nCuotasNum)
 
     const { data: convenio, error } = await supabase
       .from('convenios_pago')
       .insert({
         empresa_id, acreedor, tipo: tipo || 'proveedor',
-        monto_total: Number(monto_total), n_cuotas: Number(n_cuotas),
+        monto_total: montoTotalNum, n_cuotas: nCuotasNum,
         monto_cuota: montoCuota, fecha_inicio,
         tasa_interes: Number(tasa_interes || 0), descripcion: descripcion || null,
         estado: 'vigente', is_active: true,
@@ -46,7 +60,7 @@ export async function POST(req: Request) {
     if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
 
     // Generar cuotas automáticamente
-    const cuotas = Array.from({ length: Number(n_cuotas) }, (_, i) => {
+    const cuotas = Array.from({ length: nCuotasNum }, (_, i) => {
       const fecha = new Date(fecha_inicio)
       fecha.setMonth(fecha.getMonth() + i)
       return {
@@ -71,6 +85,9 @@ export async function PATCH(req: Request) {
   try {
     const { id, cuota_id, accion } = await req.json()
     const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
 
     if (cuota_id && accion === 'pagar') {
       const { error } = await supabase

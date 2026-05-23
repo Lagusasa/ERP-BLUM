@@ -9,6 +9,9 @@ export async function GET(req: Request) {
     if (!empresa_id) return NextResponse.json({ ok: false, error: 'empresa_id requerido' }, { status: 400 })
 
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
     let query = supabase
       .from('gastos_lir')
       .select('*')
@@ -34,6 +37,9 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
     const anio = new Date(fecha).getFullYear()
 
     const { data, error } = await supabase
@@ -68,6 +74,9 @@ export async function DELETE(req: Request) {
     if (!id) return NextResponse.json({ ok: false, error: 'id requerido' }, { status: 400 })
 
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
     const { error } = await supabase.from('gastos_lir').update({ is_active: false }).eq('id', id)
     if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
     return NextResponse.json({ ok: true })

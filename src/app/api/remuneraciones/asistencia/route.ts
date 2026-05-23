@@ -11,6 +11,9 @@ export async function GET(req: NextRequest) {
   if (!empresa_id) return NextResponse.json({ error: 'empresa_id requerido' }, { status: 400 })
 
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
   let query = supabase
     .from('registro_asistencia')
     .select('*, trabajador:trabajadores(nombre, apellido_paterno, rut)')
@@ -36,8 +39,9 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
-  // Calcular horas ordinarias si hay entrada y salida
   let horas_ordinarias = 0
   if (hora_entrada && hora_salida) {
     const [hE, mE] = hora_entrada.split(':').map(Number)
@@ -72,6 +76,9 @@ export async function DELETE(req: NextRequest) {
   if (!id) return NextResponse.json({ error: 'id requerido' }, { status: 400 })
 
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
   const { error } = await supabase.from('registro_asistencia').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })

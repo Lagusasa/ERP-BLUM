@@ -83,6 +83,10 @@ export default function VacacionesClient({ empresa_id, trabajadores }: Props) {
       setError('Trabajador, fecha inicio y fecha fin son requeridos')
       return
     }
+    if (fFechaFin < fFechaInicio) {
+      setError('La fecha de fin no puede ser anterior a la fecha de inicio')
+      return
+    }
     setGuardando(true)
     try {
       const res = await fetch('/api/remuneraciones/ausencias', {

@@ -31,6 +31,9 @@ export async function POST(req: NextRequest) {
   if (!empresa_id || !trabajador_id || !tipo || !fecha_inicio || !fecha_fin) {
     return NextResponse.json({ error: 'Campos requeridos faltantes' }, { status: 400 })
   }
+  if (fecha_fin < fecha_inicio) {
+    return NextResponse.json({ error: 'fecha_fin no puede ser anterior a fecha_inicio' }, { status: 400 })
+  }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

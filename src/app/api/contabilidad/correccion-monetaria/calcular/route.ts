@@ -9,6 +9,9 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
     const factor = uf_fin / uf_inicio
 
     // Saldos al inicio del año (01/01/anio) desde el libro mayor

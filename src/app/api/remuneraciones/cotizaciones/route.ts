@@ -12,6 +12,8 @@ export async function GET(req: NextRequest) {
   }
 
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
   const { data: liquidaciones, error } = await supabase
     .from('liquidaciones')
@@ -35,7 +37,6 @@ export async function GET(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Totales consolidados
   const items = (liquidaciones ?? []).map((l: Record<string, unknown>) => ({
     ...l,
     cotizacion_afp_base: Math.round(((l.afp_monto as number) ?? 0) - ((l.afp_comision as number) ?? 0) - ((l.afp_sis as number) ?? 0)),

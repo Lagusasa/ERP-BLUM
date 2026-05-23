@@ -10,6 +10,9 @@ export async function GET(req: Request) {
     if (!empresa_id) return NextResponse.json({ ok: false, error: 'empresa_id requerido' }, { status: 400 })
 
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
     let query = supabase
       .from('registros_empresa_sii')
       .select('*')
@@ -37,6 +40,9 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
     const { data, error } = await supabase
       .from('registros_empresa_sii')
       .insert({ empresa_id, tipo, anio: Number(anio), concepto, monto: Number(monto), descripcion: descripcion || null, is_active: true })
@@ -55,7 +61,11 @@ export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url)
     const id = searchParams.get('id')
     if (!id) return NextResponse.json({ ok: false, error: 'id requerido' }, { status: 400 })
+
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
     const { error } = await supabase.from('registros_empresa_sii').update({ is_active: false }).eq('id', id)
     if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
     return NextResponse.json({ ok: true })

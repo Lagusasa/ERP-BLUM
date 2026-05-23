@@ -30,6 +30,8 @@ function AfpRow({ afp, onGuardar, guardando }: {
           <input
             type="number"
             step="0.0001"
+            min="0"
+            max="30"
             value={tasaLocal}
             onChange={(e) => setTasaLocal(e.target.value)}
             className="w-full text-sm border border-slate-300 rounded-lg px-3 py-1.5 pr-7 text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -136,6 +138,8 @@ export default function IndicadoresClient({ indicadores: init, afps: initAfps, e
           <input
             type="number"
             step={tipo === 'pct' ? '0.0001' : '1'}
+            min="0"
+            max={tipo === 'pct' ? '100' : undefined}
             value={display}
             onChange={(e) => {
               const v = tipo === 'pct' ? fromPct(e.target.value) : parseFloat(e.target.value)
