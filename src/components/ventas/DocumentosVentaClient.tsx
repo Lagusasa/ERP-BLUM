@@ -11,6 +11,24 @@ interface Props {
   empresa_id: string
 }
 
+function diasVencimiento(fechaVenc: string | null, estado: string): number | null {
+  if (!fechaVenc || estado === 'cobrado' || estado === 'anulado') return null
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0)
+  const venc = new Date(fechaVenc); venc.setHours(0, 0, 0, 0)
+  return Math.round((hoy.getTime() - venc.getTime()) / (1000 * 60 * 60 * 24))
+}
+
+function VencimientoBadge({ dias }: { dias: number | null }) {
+  if (dias === null) return null
+  if (dias < 0) {
+    const faltan = -dias
+    const color = faltan <= 7 ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-slate-500 bg-slate-50 border-slate-200'
+    return <span className={`inline-block text-xs px-1.5 py-0.5 rounded border ${color}`}>vence en {faltan}d</span>
+  }
+  if (dias === 0) return <span className="inline-block text-xs px-1.5 py-0.5 rounded border text-amber-700 bg-amber-50 border-amber-200">vence hoy</span>
+  return <span className="inline-block text-xs px-1.5 py-0.5 rounded border text-red-700 bg-red-50 border-red-200">{dias}d vencido</span>
+}
+
 export default function DocumentosVentaClient({ documentos, empresa_id }: Props) {
   const router = useRouter()
   const [busqueda, setBusqueda] = useState('')
@@ -31,13 +49,12 @@ export default function DocumentosVentaClient({ documentos, empresa_id }: Props)
     })
   }, [documentos, busqueda, filtroEstado])
 
-  const totalNeto = filtrados.reduce((s, d) => s + d.neto, 0)
-  const totalIVA = filtrados.reduce((s, d) => s + d.iva, 0)
+  const totalNeto  = filtrados.reduce((s, d) => s + d.neto, 0)
+  const totalIVA   = filtrados.reduce((s, d) => s + d.iva, 0)
   const totalBruto = filtrados.reduce((s, d) => s + d.total, 0)
 
   async function contabilizar(doc_id: string) {
-    setProcesando(doc_id)
-    setError(null)
+    setProcesando(doc_id); setError(null)
     try {
       const res = await fetch('/api/centralizacion/venta', {
         method: 'POST',
@@ -47,11 +64,22 @@ export default function DocumentosVentaClient({ documentos, empresa_id }: Props)
       const json = await res.json()
       if (!json.ok) { setError(json.error ?? 'Error al contabilizar'); return }
       router.refresh()
-    } catch {
-      setError('Error de conexión')
-    } finally {
-      setProcesando(null)
-    }
+    } catch { setError('Error de conexión') } finally { setProcesando(null) }
+  }
+
+  async function marcarCobrado(doc_id: string) {
+    if (!confirm('¿Confirmar cobro de este documento?')) return
+    setProcesando(doc_id); setError(null)
+    try {
+      const res = await fetch('/api/ventas/documentos', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: doc_id, accion: 'cobrado' }),
+      })
+      const json = await res.json()
+      if (!json.ok) { setError(json.error ?? 'Error'); return }
+      router.refresh()
+    } catch { setError('Error de conexión') } finally { setProcesando(null) }
   }
 
   return (
@@ -89,7 +117,7 @@ export default function DocumentosVentaClient({ documentos, empresa_id }: Props)
               <tr>
                 <th className="text-left px-5 py-2.5 text-xs font-medium text-slate-500">Cliente</th>
                 <th className="text-left px-4 py-2.5 text-xs font-medium text-slate-500">Documento</th>
-                <th className="text-left px-4 py-2.5 text-xs font-medium text-slate-500">Fecha</th>
+                <th className="text-left px-4 py-2.5 text-xs font-medium text-slate-500">Emisión / Vencimiento</th>
                 <th className="text-right px-4 py-2.5 text-xs font-medium text-slate-500">Neto</th>
                 <th className="text-right px-4 py-2.5 text-xs font-medium text-slate-500">IVA</th>
                 <th className="text-right px-4 py-2.5 text-xs font-medium text-slate-500">Total</th>
@@ -101,42 +129,60 @@ export default function DocumentosVentaClient({ documentos, empresa_id }: Props)
               {filtrados.length === 0 ? (
                 <tr><td colSpan={8} className="text-center py-8 text-slate-400">No hay documentos que coincidan.</td></tr>
               ) : (
-                filtrados.map((d) => (
-                  <tr key={d.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-5 py-2.5">
-                      <p className="font-medium text-slate-800">{d.cliente?.razon_social ?? '—'}</p>
-                      <p className="text-xs text-slate-400">{d.cliente?.rut}</p>
-                    </td>
-                    <td className="px-4 py-2.5 text-xs text-slate-600">
-                      <p className="font-medium">{d.tipo_documento?.abreviatura} N° {d.numero_documento}</p>
-                    </td>
-                    <td className="px-4 py-2.5 text-xs text-slate-600">{formatDate(d.fecha_emision)}</td>
-                    <td className="px-4 py-2.5 text-right text-xs tabular-nums">{formatCurrency(d.neto)}</td>
-                    <td className="px-4 py-2.5 text-right text-xs tabular-nums">{formatCurrency(d.iva)}</td>
-                    <td className="px-4 py-2.5 text-right text-xs font-medium tabular-nums">{formatCurrency(d.total)}</td>
-                    <td className="px-4 py-2.5 text-center">
-                      <span className={cn('inline-block px-2 py-0.5 rounded-full text-xs font-medium', {
-                        'bg-emerald-100 text-emerald-800':    d.estado === 'emitido',
-                        'bg-purple-100 text-purple-700': d.estado === 'contabilizado',
-                        'bg-green-100 text-green-700':  d.estado === 'cobrado',
-                        'bg-red-100 text-red-700':      d.estado === 'anulado',
-                      })}>
-                        {ESTADO_VENTA_LABELS[d.estado]}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2.5 text-right">
-                      {d.estado === 'emitido' && (
-                        <button
-                          onClick={() => contabilizar(d.id)}
-                          disabled={procesando === d.id}
-                          className="text-xs px-2.5 py-1 rounded-md bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium disabled:opacity-50 transition-colors whitespace-nowrap"
-                        >
-                          {procesando === d.id ? '...' : 'Centralizar'}
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))
+                filtrados.map((d) => {
+                  const dias = diasVencimiento(d.fecha_vencimiento, d.estado)
+                  return (
+                    <tr key={d.id} className={cn('hover:bg-slate-50 transition-colors', {
+                      'bg-red-50/30': dias !== null && dias > 0,
+                    })}>
+                      <td className="px-5 py-2.5">
+                        <p className="font-medium text-slate-800">{d.cliente?.razon_social ?? '—'}</p>
+                        <p className="text-xs text-slate-400">{d.cliente?.rut}</p>
+                      </td>
+                      <td className="px-4 py-2.5 text-xs text-slate-600">
+                        <p className="font-medium">{d.tipo_documento?.abreviatura} N° {d.numero_documento}</p>
+                      </td>
+                      <td className="px-4 py-2.5 text-xs text-slate-600">
+                        <p>{formatDate(d.fecha_emision)}</p>
+                        {d.fecha_vencimiento && (
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-slate-400">{formatDate(d.fecha_vencimiento)}</span>
+                            <VencimientoBadge dias={dias} />
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-2.5 text-right text-xs tabular-nums">{formatCurrency(d.neto)}</td>
+                      <td className="px-4 py-2.5 text-right text-xs tabular-nums">{formatCurrency(d.iva)}</td>
+                      <td className="px-4 py-2.5 text-right text-xs font-medium tabular-nums">{formatCurrency(d.total)}</td>
+                      <td className="px-4 py-2.5 text-center">
+                        <span className={cn('inline-block px-2 py-0.5 rounded-full text-xs font-medium', {
+                          'bg-emerald-100 text-emerald-800':  d.estado === 'emitido',
+                          'bg-indigo-100 text-indigo-700':    d.estado === 'contabilizado',
+                          'bg-green-100 text-green-700':      d.estado === 'cobrado',
+                          'bg-red-100 text-red-700':          d.estado === 'anulado',
+                        })}>
+                          {ESTADO_VENTA_LABELS[d.estado]}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {d.estado === 'emitido' && (
+                            <button onClick={() => contabilizar(d.id)} disabled={procesando === d.id}
+                              className="text-xs px-2.5 py-1 rounded-md bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium disabled:opacity-50 transition-colors whitespace-nowrap">
+                              {procesando === d.id ? '...' : 'Centralizar'}
+                            </button>
+                          )}
+                          {(d.estado === 'contabilizado' || d.estado === 'emitido') && (
+                            <button onClick={() => marcarCobrado(d.id)} disabled={procesando === d.id}
+                              className="text-xs px-2.5 py-1 rounded-md bg-green-50 hover:bg-green-100 text-green-700 font-medium disabled:opacity-50 transition-colors whitespace-nowrap">
+                              {procesando === d.id ? '...' : 'Cobrado'}
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
             {filtrados.length > 0 && (

@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 const SUBMENU = [
   { label: 'Resumen',      href: '/ventas' },
   { label: 'Documentos',   href: '/ventas/documentos' },
+  { label: 'CxC',          href: '/ventas/cxc' },
   { label: 'Clientes',     href: '/ventas/clientes' },
   { label: 'Libro Ventas', href: '/ventas/libro' },
 ]
