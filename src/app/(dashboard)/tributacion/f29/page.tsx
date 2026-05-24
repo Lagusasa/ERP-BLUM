@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { getEmpresaActiva } from '@/lib/empresa'
-import { getResumenIVA } from '@/services/tributacion.service'
+import { getResumenIVA, getDeclaracionesF29 } from '@/services/tributacion.service'
 import { formatCurrency } from '@/lib/utils'
 import PeriodoSelector from '@/components/tributacion/PeriodoSelector'
+import F29Client from '@/components/tributacion/F29Client'
 
 export const metadata: Metadata = { title: 'Declaración F29' }
 
@@ -31,15 +32,23 @@ export default async function F29Page({ searchParams }: PageProps) {
   const empresa = await getEmpresaActiva()
   if (!empresa) return null
 
-  const resumen = await getResumenIVA(empresa.id, mes, anio)
+  const [resumen, declaraciones] = await Promise.all([
+    getResumenIVA(empresa.id, mes, anio),
+    getDeclaracionesF29(empresa.id),
+  ])
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between print:hidden">
         <h2 className="text-sm font-semibold text-slate-700">Formulario 29 — Período</h2>
         <Suspense>
           <PeriodoSelector mes={mes} anio={anio} basePath="/tributacion/f29" />
         </Suspense>
+      </div>
+
+      <div className="hidden print:block mb-4">
+        <h2 className="text-lg font-bold text-slate-900">Formulario 29 — Pre-liquidación IVA</h2>
+        <p className="text-sm text-slate-600">{MESES[mes - 1]} {anio}</p>
       </div>
 
       <div className="max-w-2xl space-y-4">
@@ -90,6 +99,15 @@ export default async function F29Page({ searchParams }: PageProps) {
             Para presentar la declaración oficial, accede al portal del SII.
           </p>
         </div>
+
+        {/* Acciones + historial (client) */}
+        <F29Client
+          resumen={resumen}
+          empresa_id={empresa.id}
+          declaraciones={declaraciones}
+          mes={mes}
+          anio={anio}
+        />
       </div>
     </div>
   )
