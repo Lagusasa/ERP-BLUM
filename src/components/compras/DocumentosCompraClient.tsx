@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import * as XLSX from 'xlsx'
 import type { DocumentoCompra } from '@/types/compras.types'
 import { ESTADO_COMPRA_LABELS } from '@/types/compras.types'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
@@ -56,6 +57,31 @@ export default function DocumentosCompraClient({ documentos, empresa_id }: Props
   const totalNeto  = filtrados.reduce((s, d) => s + d.neto, 0)
   const totalIVA   = filtrados.reduce((s, d) => s + d.iva, 0)
   const totalBruto = filtrados.reduce((s, d) => s + d.total, 0)
+
+  const exportarExcel = useCallback(() => {
+    const rows = [
+      ['Proveedor', 'RUT', 'Tipo', 'N° Documento', 'Emisión', 'Vencimiento', 'Neto', 'IVA', 'Total', 'Estado'],
+      ...filtrados.map((d) => [
+        d.proveedor?.razon_social ?? '',
+        d.proveedor?.rut ?? '',
+        d.tipo_documento?.abreviatura ?? '',
+        d.numero_documento,
+        d.fecha_emision,
+        d.fecha_vencimiento ?? '',
+        d.neto,
+        d.iva,
+        d.total,
+        ESTADO_COMPRA_LABELS[d.estado] ?? d.estado,
+      ]),
+      [],
+      ['TOTAL', '', '', '', '', '', totalNeto, totalIVA, totalBruto, ''],
+    ]
+    const ws = XLSX.utils.aoa_to_sheet(rows)
+    ws['!cols'] = [{ wch: 28 }, { wch: 14 }, { wch: 8 }, { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 14 }]
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Documentos Compra')
+    XLSX.writeFile(wb, `compras_${new Date().toISOString().slice(0, 10)}.xlsx`)
+  }, [filtrados, totalNeto, totalIVA, totalBruto])
 
   async function contabilizar(doc_id: string) {
     setProcesando(doc_id); setError(null)
@@ -113,6 +139,13 @@ export default function DocumentosCompraClient({ documentos, empresa_id }: Props
               <option key={v} value={v}>{l}</option>
             ))}
           </select>
+          <button onClick={exportarExcel}
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium rounded-lg whitespace-nowrap">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Excel
+          </button>
         </div>
 
         <div className="overflow-x-auto">

@@ -1,5 +1,7 @@
 'use client'
 
+import { useCallback } from 'react'
+import * as XLSX from 'xlsx'
 import type { EstadoResultados, ResultadoItem } from '@/types/reportes.types'
 import { formatCurrency } from '@/lib/utils'
 
@@ -48,13 +50,51 @@ function ResultadoLinea({ label, monto, destacado }: { label: string; monto: num
 }
 
 export default function EstadoResultadosClient({ data }: Props) {
+  const exportarExcel = useCallback(() => {
+    const rows: (string | number)[][] = [
+      ['Estado de Resultados'],
+      [],
+      ['Código', 'Cuenta', 'Monto'],
+      ['INGRESOS'],
+      ...data.ingresos.map((i) => [i.codigo, i.nombre, i.monto]),
+      ['', 'TOTAL INGRESOS', data.total_ingresos],
+      [],
+      ['COSTOS'],
+      ...data.costos.map((i) => [i.codigo, i.nombre, i.monto]),
+      ['', 'TOTAL COSTOS', data.total_costos],
+      ['', 'RESULTADO BRUTO', data.resultado_bruto],
+      [],
+      ['GASTOS'],
+      ...data.gastos.map((i) => [i.codigo, i.nombre, i.monto]),
+      ['', 'TOTAL GASTOS', data.total_gastos],
+      [],
+      ['', 'RESULTADO DEL EJERCICIO', data.resultado_neto],
+    ]
+    const ws = XLSX.utils.aoa_to_sheet(rows)
+    ws['!cols'] = [{ wch: 10 }, { wch: 35 }, { wch: 18 }]
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Estado de Resultados')
+    XLSX.writeFile(wb, `estado_resultados_${new Date().toISOString().slice(0, 10)}.xlsx`)
+  }, [data])
+
   return (
-    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-      <Grupo titulo="Ingresos" items={data.ingresos} total={data.total_ingresos} positivo />
-      <Grupo titulo="Costos" items={data.costos} total={data.total_costos} positivo={false} />
-      <ResultadoLinea label="Resultado Bruto" monto={data.resultado_bruto} />
-      <Grupo titulo="Gastos" items={data.gastos} total={data.total_gastos} positivo={false} />
-      <ResultadoLinea label="Resultado del Ejercicio" monto={data.resultado_neto} destacado />
+    <div className="space-y-3">
+      <div className="flex justify-end print:hidden">
+        <button onClick={exportarExcel}
+          className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium rounded-lg">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Excel
+        </button>
+      </div>
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+        <Grupo titulo="Ingresos" items={data.ingresos} total={data.total_ingresos} positivo />
+        <Grupo titulo="Costos" items={data.costos} total={data.total_costos} positivo={false} />
+        <ResultadoLinea label="Resultado Bruto" monto={data.resultado_bruto} />
+        <Grupo titulo="Gastos" items={data.gastos} total={data.total_gastos} positivo={false} />
+        <ResultadoLinea label="Resultado del Ejercicio" monto={data.resultado_neto} destacado />
+      </div>
     </div>
   )
 }

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
+import * as XLSX from 'xlsx'
 import type { Liquidacion } from '@/types/remuneraciones.types'
 import { ESTADO_LIQUIDACION_LABELS } from '@/types/remuneraciones.types'
 import { formatCurrency, formatRut, cn } from '@/lib/utils'
@@ -32,20 +33,52 @@ export default function LiquidacionesClient({ liquidaciones, mes, anio }: Props)
   const totalImponible = filtradas.reduce((s, l) => s + l.total_imponible, 0)
   const totalDescuentos = filtradas.reduce((s, l) => s + l.total_descuentos, 0)
 
+  const exportarExcel = useCallback(() => {
+    const rows = [
+      [`Liquidaciones ${MESES[mes - 1]} ${anio}`],
+      [],
+      ['Trabajador', 'RUT', 'Total Imponible', 'Descuentos', 'Sueldo Líquido', 'Estado'],
+      ...filtradas.map((l) => [
+        `${l.trabajador?.nombre ?? ''} ${l.trabajador?.apellido_paterno ?? ''}`.trim(),
+        l.trabajador?.rut ?? '',
+        l.total_imponible,
+        l.total_descuentos,
+        l.sueldo_liquido,
+        ESTADO_LIQUIDACION_LABELS[l.estado] ?? l.estado,
+      ]),
+      [],
+      ['TOTAL', '', totalImponible, totalDescuentos, totalLiquido, ''],
+    ]
+    const ws = XLSX.utils.aoa_to_sheet(rows)
+    ws['!cols'] = [{ wch: 28 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 16 }, { wch: 12 }]
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, `Liquidaciones ${mes}-${anio}`)
+    XLSX.writeFile(wb, `liquidaciones_${anio}_${String(mes).padStart(2, '0')}.xlsx`)
+  }, [filtradas, mes, anio, totalImponible, totalDescuentos, totalLiquido])
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-600">
           Período: <span className="font-medium">{MESES[mes - 1]} {anio}</span>
         </p>
-        <Link
-          href={`/remuneraciones/liquidaciones/nueva?mes=${mes}&anio=${anio}`}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-colors">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          Nueva liquidación
-        </Link>
+        <div className="flex gap-2">
+          <button onClick={exportarExcel}
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium rounded-lg">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Excel
+          </button>
+          <Link
+            href={`/remuneraciones/liquidaciones/nueva?mes=${mes}&anio=${anio}`}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Nueva liquidación
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">

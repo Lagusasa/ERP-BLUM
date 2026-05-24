@@ -1,5 +1,7 @@
 'use client'
 
+import { useCallback } from 'react'
+import * as XLSX from 'xlsx'
 import type { BalanceComprobacionLinea } from '@/types/reportes.types'
 import { formatCurrency } from '@/lib/utils'
 
@@ -21,6 +23,18 @@ function Total({ v }: { v: number }) {
 }
 
 export default function BalanceComprobacionClient({ lineas }: Props) {
+  const exportarExcel = useCallback(() => {
+    const rows = [
+      ['Código', 'Cuenta', 'Clase', 'Debe Total', 'Haber Total', 'Saldo Deudor', 'Saldo Acreedor', 'Balance Debe', 'Balance Haber', 'Resultado Debe', 'Resultado Haber'],
+      ...lineas.map((l) => [l.codigo, l.nombre, l.clase, l.total_debe, l.total_haber, l.saldo_deudor, l.saldo_acreedor, l.balance_debe, l.balance_haber, l.resultado_debe, l.resultado_haber]),
+    ]
+    const ws = XLSX.utils.aoa_to_sheet(rows)
+    ws['!cols'] = [{ wch: 8 }, { wch: 30 }, { wch: 10 }, ...Array(8).fill({ wch: 16 })]
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Balance Comprobación')
+    XLSX.writeFile(wb, `balance_comprobacion_${new Date().toISOString().slice(0, 10)}.xlsx`)
+  }, [lineas])
+
   if (lineas.length === 0) {
     return (
       <div className="bg-white border border-slate-200 rounded-xl px-6 py-12 text-center text-slate-400">
@@ -46,6 +60,16 @@ export default function BalanceComprobacionClient({ lineas }: Props) {
   const thCol     = 'px-2 py-1.5 text-right text-xs font-medium text-slate-500'
 
   return (
+    <div className="space-y-3">
+    <div className="flex justify-end print:hidden">
+      <button onClick={exportarExcel}
+        className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium rounded-lg">
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        Excel
+      </button>
+    </div>
     <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm" style={{ minWidth: '1100px' }}>
@@ -117,6 +141,7 @@ export default function BalanceComprobacionClient({ lineas }: Props) {
           </tfoot>
         </table>
       </div>
+    </div>
     </div>
   )
 }
