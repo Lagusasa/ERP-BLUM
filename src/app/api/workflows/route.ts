@@ -3,6 +3,24 @@ import { createClient } from '@/lib/supabase/server'
 import { createWorkflowConfig, registrarDecision } from '@/services/workflows.service'
 import type { ModuloWorkflow } from '@/types/workflows.types'
 
+export async function DELETE(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
+  const { id, empresa_id } = await req.json()
+  if (!id || !empresa_id) return NextResponse.json({ ok: false, error: 'Parámetros inválidos' }, { status: 400 })
+
+  const { error } = await supabase
+    .from('workflow_configs')
+    .update({ is_active: false })
+    .eq('id', id)
+    .eq('empresa_id', empresa_id)
+
+  if (error) return NextResponse.json({ ok: false, error: error.message })
+  return NextResponse.json({ ok: true })
+}
+
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

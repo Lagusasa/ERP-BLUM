@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createDocumento, deleteDocumento, archivarDocumento } from '@/services/gestion-documental.service'
+import { createDocumento, deleteDocumento, archivarDocumento, getStorageUrl } from '@/services/gestion-documental.service'
 import type { DocumentoGestion } from '@/types/gestion-documental.types'
 
 export async function POST(req: NextRequest) {
@@ -24,6 +24,34 @@ export async function POST(req: NextRequest) {
       referencia_tabla: null, referencia_id: null,
     } as Omit<DocumentoGestion, 'id' | 'empresa_id' | 'created_at' | 'created_by' | 'estado'>)
     return NextResponse.json({ ok: true, doc })
+  } catch (e) {
+    return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : 'Error' })
+  }
+}
+
+export async function GET(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
+  const path = req.nextUrl.searchParams.get('path')
+  if (!path) return NextResponse.json({ ok: false, error: 'path requerido' }, { status: 400 })
+
+  const url = await getStorageUrl(path)
+  return NextResponse.json({ ok: true, url })
+}
+
+export async function PATCH(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ ok: false, error: 'No autenticado' }, { status: 401 })
+
+  const { id, empresa_id } = await req.json()
+  if (!id || !empresa_id) return NextResponse.json({ ok: false, error: 'Parámetros inválidos' }, { status: 400 })
+
+  try {
+    await archivarDocumento(id, empresa_id)
+    return NextResponse.json({ ok: true })
   } catch (e) {
     return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : 'Error' })
   }

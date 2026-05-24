@@ -17,6 +17,8 @@ const TIPOS: Array<{ value: TipoDocumento | 'todos'; label: string }> = [
   ...Object.entries(TIPO_DOC_LABELS).map(([v, l]) => ({ value: v as TipoDocumento, label: l })),
 ]
 
+type Orden = 'fecha_desc' | 'fecha_asc' | 'nombre_asc'
+
 function formatBytes(bytes: number | null): string {
   if (!bytes) return ''
   if (bytes < 1024) return `${bytes} B`
@@ -28,20 +30,55 @@ export default function DocumentosClient({ documentos, empresa_id }: Props) {
   const router = useRouter()
   const [filtroTipo, setFiltroTipo] = useState<string>('todos')
   const [busqueda, setBusqueda] = useState('')
+  const [orden, setOrden] = useState<Orden>('fecha_desc')
   const [error, setError] = useState<string | null>(null)
   const [eliminando, setEliminando] = useState<string | null>(null)
+  const [archivando, setArchivando] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [loadingUrl, setLoadingUrl] = useState<string | null>(null)
 
   const filtrados = useMemo(() => {
     const term = busqueda.toLowerCase()
-    return documentos.filter((d) => {
+    const base = documentos.filter((d) => {
       const tipoOk = filtroTipo === 'todos' || d.tipo === filtroTipo
       const matchOk = !term || d.nombre.toLowerCase().includes(term) || (d.descripcion ?? '').toLowerCase().includes(term)
       return tipoOk && matchOk
     })
-  }, [documentos, filtroTipo, busqueda])
+    if (orden === 'fecha_asc') return [...base].sort((a, b) => a.created_at.localeCompare(b.created_at))
+    if (orden === 'nombre_asc') return [...base].sort((a, b) => a.nombre.localeCompare(b.nombre))
+    return [...base].sort((a, b) => b.created_at.localeCompare(a.created_at))
+  }, [documentos, filtroTipo, busqueda, orden])
+
+  async function handleVerStorage(doc: DocumentoGestion) {
+    if (!doc.storage_path) return
+    setLoadingUrl(doc.id)
+    try {
+      const res = await fetch(`/api/gestion-documental?path=${encodeURIComponent(doc.storage_path)}`)
+      const json = await res.json()
+      if (json.ok && json.url) window.open(json.url, '_blank')
+      else setError('No se pudo generar el enlace de descarga')
+    } catch { setError('Error de conexión') }
+    finally { setLoadingUrl(null) }
+  }
+
+  async function handleArchivar(id: string) {
+    if (!confirm('¿Archivar este documento? Seguirá disponible en el historial.')) return
+    setArchivando(id)
+    try {
+      const res = await fetch('/api/gestion-documental', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, empresa_id }),
+      })
+      const json = await res.json()
+      if (!json.ok) setError(json.error ?? 'Error al archivar')
+      else router.refresh()
+    } catch { setError('Error de conexión') }
+    finally { setArchivando(null) }
+  }
 
   async function handleDelete(id: string) {
+    if (!confirm('¿Eliminar este documento? Esta acción no se puede deshacer.')) return
     setEliminando(id)
     try {
       const res = await fetch('/api/gestion-documental', {
@@ -86,8 +123,14 @@ export default function DocumentosClient({ documentos, empresa_id }: Props) {
               className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
           <select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}
-            className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
             {TIPOS.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+          </select>
+          <select value={orden} onChange={(e) => setOrden(e.target.value as Orden)}
+            className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+            <option value="fecha_desc">Más recientes</option>
+            <option value="fecha_asc">Más antiguos</option>
+            <option value="nombre_asc">Nombre A→Z</option>
           </select>
           <button
             onClick={() => setShowForm((s) => !s)}
@@ -127,9 +170,9 @@ export default function DocumentosClient({ documentos, empresa_id }: Props) {
                   {doc.descripcion && <p className="text-xs text-slate-400 truncate mt-0.5">{doc.descripcion}</p>}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  {(doc.url_externo || doc.storage_path) && (
+                  {doc.url_externo && (
                     <a
-                      href={doc.url_externo ?? '#'}
+                      href={doc.url_externo}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs px-2.5 py-1 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-medium transition-colors"
@@ -137,6 +180,22 @@ export default function DocumentosClient({ documentos, empresa_id }: Props) {
                       Ver
                     </a>
                   )}
+                  {doc.storage_path && !doc.url_externo && (
+                    <button
+                      onClick={() => handleVerStorage(doc)}
+                      disabled={loadingUrl === doc.id}
+                      className="text-xs px-2.5 py-1 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-medium transition-colors disabled:opacity-50"
+                    >
+                      {loadingUrl === doc.id ? '…' : 'Descargar'}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleArchivar(doc.id)}
+                    disabled={archivando === doc.id}
+                    className="text-xs px-2.5 py-1 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-500 font-medium transition-colors disabled:opacity-50"
+                  >
+                    {archivando === doc.id ? '…' : 'Archivar'}
+                  </button>
                   <button
                     onClick={() => handleDelete(doc.id)}
                     disabled={eliminando === doc.id}
@@ -289,11 +348,11 @@ function SubirDocumentoForm({ empresa_id, onSuccess, onCancel, onError }: FormPr
           <div className="flex items-center gap-4 mb-2">
             <label className="text-xs text-slate-500">Adjunto:</label>
             <label className="flex items-center gap-1 cursor-pointer">
-              <input type="radio" checked={modo === 'url'} onChange={() => setModo('url')} className="accent-blue-600" />
+              <input type="radio" checked={modo === 'url'} onChange={() => setModo('url')} className="accent-emerald-600" />
               <span className="text-xs text-slate-700">URL externa</span>
             </label>
             <label className="flex items-center gap-1 cursor-pointer">
-              <input type="radio" checked={modo === 'archivo'} onChange={() => setModo('archivo')} className="accent-blue-600" />
+              <input type="radio" checked={modo === 'archivo'} onChange={() => setModo('archivo')} className="accent-emerald-600" />
               <span className="text-xs text-slate-700">Subir archivo</span>
             </label>
           </div>
@@ -316,7 +375,7 @@ function SubirDocumentoForm({ empresa_id, onSuccess, onCancel, onError }: FormPr
             Cancelar
           </button>
           <button type="submit" disabled={uploading}
-            className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors">
+            className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors">
             {uploading ? 'Subiendo...' : 'Guardar'}
           </button>
         </div>

@@ -110,13 +110,13 @@ export default function NuevoWorkflowClient({ empresa_id }: Props) {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Monto mínimo (USD)</label>
+              <label className="block text-xs text-slate-500 mb-1">Monto mínimo (CLP)</label>
               <input type="number" value={montoMin} onChange={(e) => setMontoMin(e.target.value)}
                 placeholder="0 = siempre aplica" min="0" step="0.01"
                 className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Monto máximo (USD)</label>
+              <label className="block text-xs text-slate-500 mb-1">Monto máximo (CLP)</label>
               <input type="number" value={montoMax} onChange={(e) => setMontoMax(e.target.value)}
                 placeholder="Sin límite" min="0" step="0.01"
                 className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
