@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 const TABS = [
   { label: 'Empresas', href: '/admin/empresas' },
   { label: 'Usuarios', href: '/admin/usuarios' },
+  { label: 'Roles',    href: '/admin/roles' },
 ]
 
 export default function AdminNav() {

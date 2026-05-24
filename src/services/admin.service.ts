@@ -164,12 +164,20 @@ export async function getUsuariosEmpresa(empresa_id: string): Promise<UsuarioEmp
   return data as unknown as UsuarioEmpresa[]
 }
 
-export async function getRoles(): Promise<{ id: string; nombre: string; descripcion: string | null }[]> {
+export async function getRoles(empresa_id?: string): Promise<{ id: string; nombre: string; descripcion: string | null; es_sistema: boolean }[]> {
   const supabase = await createClient()
-  const { data, error } = await supabase
+  let query = supabase
     .from('roles')
-    .select('id, nombre, descripcion')
+    .select('id, nombre, descripcion, es_sistema')
+    .eq('is_active', true)
+    .order('es_sistema', { ascending: false })
     .order('nombre')
+
+  if (empresa_id) {
+    query = query.or(`empresa_id.eq.${empresa_id},empresa_id.is.null`)
+  }
+
+  const { data, error } = await query
   if (error || !data) return []
-  return data
+  return data as { id: string; nombre: string; descripcion: string | null; es_sistema: boolean }[]
 }
