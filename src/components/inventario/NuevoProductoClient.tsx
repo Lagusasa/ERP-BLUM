@@ -2,23 +2,31 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { CategoriaProducto, UnidadMedida, TipoProducto } from '@/types/inventario.types'
+import type { CategoriaProducto, Producto, TipoProducto, UnidadMedida } from '@/types/inventario.types'
 import { TIPO_PRODUCTO_LABELS } from '@/types/inventario.types'
 
 interface Props {
   empresa_id: string
   categorias: CategoriaProducto[]
   unidades: UnidadMedida[]
+  producto?: Producto
 }
 
-export default function NuevoProductoClient({ empresa_id, categorias, unidades }: Props) {
+export default function NuevoProductoClient({ empresa_id, categorias, unidades, producto }: Props) {
   const router = useRouter()
+  const editando = !!producto
+
   const [form, setForm] = useState({
-    sku: '', nombre: '', descripcion: '',
-    tipo: 'producto' as TipoProducto,
-    categoria_id: '', unidad_id: '',
-    precio_compra: '0', precio_venta: '0', stock_minimo: '0',
-    afecto_iva: true,
+    sku:         producto?.sku ?? '',
+    nombre:      producto?.nombre ?? '',
+    descripcion: producto?.descripcion ?? '',
+    tipo:        (producto?.tipo ?? 'producto') as TipoProducto,
+    categoria_id: producto?.categoria_id ?? '',
+    unidad_id:   producto?.unidad_id ?? '',
+    precio_compra: String(producto?.precio_compra ?? 0),
+    precio_venta:  String(producto?.precio_venta ?? 0),
+    stock_minimo:  String(producto?.stock_minimo ?? 0),
+    afecto_iva:    producto?.afecto_iva ?? true,
   })
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -32,23 +40,23 @@ export default function NuevoProductoClient({ empresa_id, categorias, unidades }
     setGuardando(true)
     setError(null)
     try {
+      const body = {
+        sku: form.sku.trim(),
+        nombre: form.nombre.trim(),
+        descripcion: form.descripcion.trim() || null,
+        tipo: form.tipo,
+        categoria_id: form.categoria_id || null,
+        unidad_id: form.unidad_id || null,
+        precio_compra: Number(form.precio_compra),
+        precio_venta: Number(form.precio_venta),
+        stock_minimo: Number(form.stock_minimo),
+        afecto_iva: form.afecto_iva,
+      }
+
       const res = await fetch('/api/inventario/productos', {
-        method: 'POST',
+        method: editando ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          empresa_id,
-          sku: form.sku.trim(),
-          nombre: form.nombre.trim(),
-          descripcion: form.descripcion.trim() || null,
-          tipo: form.tipo,
-          categoria_id: form.categoria_id || null,
-          unidad_id: form.unidad_id || null,
-          precio_compra: Number(form.precio_compra),
-          precio_venta: Number(form.precio_venta),
-          stock_minimo: Number(form.stock_minimo),
-          afecto_iva: form.afecto_iva,
-          is_active: true,
-        }),
+        body: JSON.stringify(editando ? { id: producto!.id, ...body } : { empresa_id, is_active: true, ...body }),
       })
       const json = await res.json()
       if (!json.ok) throw new Error(json.error ?? 'Error al guardar')
@@ -93,6 +101,11 @@ export default function NuevoProductoClient({ empresa_id, categorias, unidades }
             <input type="text" value={form.nombre} onChange={(e) => set('nombre', e.target.value)} required
               className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">Descripción</label>
+            <input type="text" value={form.descripcion} onChange={(e) => set('descripcion', e.target.value)}
+              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-slate-500 mb-1">Categoría</label>
@@ -121,13 +134,13 @@ export default function NuevoProductoClient({ empresa_id, categorias, unidades }
         <div className="px-5 py-4 space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Precio compra (USD)</label>
+              <label className="block text-xs text-slate-500 mb-1">Precio compra</label>
               <input type="number" value={form.precio_compra} onChange={(e) => set('precio_compra', e.target.value)}
                 min="0" step="0.01"
                 className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1">Precio venta (USD)</label>
+              <label className="block text-xs text-slate-500 mb-1">Precio venta</label>
               <input type="number" value={form.precio_venta} onChange={(e) => set('precio_venta', e.target.value)}
                 min="0" step="0.01"
                 className="w-full text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
@@ -153,8 +166,8 @@ export default function NuevoProductoClient({ empresa_id, categorias, unidades }
           Cancelar
         </button>
         <button type="submit" disabled={guardando}
-          className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-colors">
-          {guardando ? 'Guardando...' : 'Crear producto'}
+          className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors">
+          {guardando ? 'Guardando...' : editando ? 'Actualizar producto' : 'Crear producto'}
         </button>
       </div>
     </form>

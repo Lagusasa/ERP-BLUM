@@ -55,10 +55,12 @@ export default async function InventarioPage() {
           <p className="text-xs text-slate-500 uppercase tracking-wide">Bodegas</p>
           <p className="text-2xl font-bold text-slate-800 mt-1">{bodegas.length}</p>
         </div>
-        <div className={`border rounded-xl p-4 ${stockBajo > 0 ? 'bg-amber-50 border-amber-200' : 'bg-white border-slate-200'}`}>
+        <Link href="/inventario/alertas"
+          className={`border rounded-xl p-4 transition-all hover:shadow-sm ${stockBajo > 0 ? 'bg-amber-50 border-amber-200 hover:border-amber-400' : 'bg-white border-slate-200'}`}>
           <p className={`text-xs uppercase tracking-wide ${stockBajo > 0 ? 'text-amber-600' : 'text-slate-500'}`}>Stock bajo mínimo</p>
           <p className={`text-2xl font-bold mt-1 ${stockBajo > 0 ? 'text-amber-700' : 'text-slate-800'}`}>{stockBajo}</p>
-        </div>
+          {stockBajo > 0 && <p className="text-xs text-amber-500 mt-0.5">Ver alertas →</p>}
+        </Link>
         <div className="bg-white border border-slate-200 rounded-xl p-4">
           <p className="text-xs text-slate-500 uppercase tracking-wide">Valor inventario</p>
           <p className="text-xl font-bold text-slate-800 mt-1 tabular-nums">{formatCurrency(valorInventario)}</p>
@@ -66,11 +68,12 @@ export default async function InventarioPage() {
       </div>
 
       {/* Navegación rápida */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
           { href: '/inventario/productos', label: 'Productos', desc: 'Ver catálogo completo' },
           { href: '/inventario/kardex', label: 'Kardex / Movimientos', desc: 'Entradas, salidas y ajustes' },
           { href: '/inventario/bodegas', label: 'Bodegas', desc: 'Gestión de ubicaciones' },
+          { href: '/inventario/alertas', label: 'Alertas de Stock', desc: 'Productos bajo mínimo' },
         ].map((item) => (
           <Link key={item.href} href={item.href}
             className="bg-white border border-slate-200 rounded-xl p-4 hover:border-emerald-300 hover:shadow-sm transition-all">

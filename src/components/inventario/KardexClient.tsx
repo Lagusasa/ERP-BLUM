@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import * as XLSX from 'xlsx'
 import type { MovimientoInventario, Producto, Bodega } from '@/types/inventario.types'
 import { TIPO_MOVIMIENTO_LABELS } from '@/types/inventario.types'
 import { formatDate, cn } from '@/lib/utils'
@@ -23,6 +24,30 @@ export default function KardexClient({ movimientos, productos, bodegas, empresa_
     if (!filtroProducto) return movimientos
     return movimientos.filter((m) => m.producto_id === filtroProducto)
   }, [movimientos, filtroProducto])
+
+  const exportarExcel = useCallback(() => {
+    const rows = [
+      ['Kardex de Inventario'],
+      [],
+      ['Fecha', 'Producto', 'SKU', 'Bodega', 'Tipo', 'Cantidad', 'Stock Resultante', 'Costo Unit.', 'Glosa'],
+      ...filtrados.map((m) => [
+        m.created_at.split('T')[0],
+        m.producto?.nombre ?? '—',
+        m.producto?.sku ?? '—',
+        m.bodega?.nombre ?? '—',
+        TIPO_MOVIMIENTO_LABELS[m.tipo] ?? m.tipo,
+        m.tipo === 'salida' ? -m.cantidad : m.cantidad,
+        m.stock_resultante,
+        m.costo_unitario ?? 0,
+        m.glosa ?? '',
+      ]),
+    ]
+    const ws = XLSX.utils.aoa_to_sheet(rows)
+    ws['!cols'] = [{ wch: 12 }, { wch: 30 }, { wch: 12 }, { wch: 18 }, { wch: 10 }, { wch: 10 }, { wch: 16 }, { wch: 12 }, { wch: 35 }]
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Kardex')
+    XLSX.writeFile(wb, 'kardex_inventario.xlsx')
+  }, [filtrados])
 
   return (
     <div className="space-y-4">
@@ -51,6 +76,13 @@ export default function KardexClient({ movimientos, productos, bodegas, empresa_
             <option value="">Todos los productos</option>
             {productos.map((p) => <option key={p.id} value={p.id}>{p.sku} — {p.nombre}</option>)}
           </select>
+          <button onClick={exportarExcel}
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm rounded-lg whitespace-nowrap">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Excel
+          </button>
           <button onClick={() => setShowForm((s) => !s)}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-lg whitespace-nowrap">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
