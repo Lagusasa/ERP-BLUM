@@ -107,6 +107,16 @@ export default async function FinanzasPage() {
           <p className="text-sm font-semibold text-slate-800">Convenios de Pago</p>
           <p className="text-xs text-slate-400 mt-1">Control de deudas reestructuradas y cuotas pendientes.</p>
         </Link>
+        <Link href="/finanzas/proyecciones"
+          className="bg-white border border-slate-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition-all">
+          <p className="text-sm font-semibold text-slate-800">Flujo Proyectado</p>
+          <p className="text-xs text-slate-400 mt-1">Proyecciones de ingresos y egresos por mes.</p>
+        </Link>
+        <Link href="/finanzas/movimientos"
+          className="bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-300 hover:shadow-sm transition-all">
+          <p className="text-sm font-semibold text-slate-800">Todos los movimientos</p>
+          <p className="text-xs text-slate-400 mt-1">Historial completo con filtros y exportación Excel.</p>
+        </Link>
       </div>
 
       {/* Últimos movimientos */}
