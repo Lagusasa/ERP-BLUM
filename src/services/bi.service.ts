@@ -64,13 +64,24 @@ export async function getKpiEjecutivo(empresa_id: string): Promise<BiKpiEjecutiv
     supabase.from('cuentas_bancarias').select('saldo_actual').eq('empresa_id', empresa_id).eq('is_active', true),
     supabase.from('trabajadores').select('id').eq('empresa_id', empresa_id).eq('is_active', true),
     supabase.from('dte_documentos').select('id').eq('empresa_id', empresa_id).eq('estado', 'pendiente'),
-    supabase.from('productos').select('id').eq('empresa_id', empresa_id).eq('is_active', true),
+    supabase
+      .from('productos')
+      .select('id, stock_minimo, tipo, stock_bodega(cantidad)')
+      .eq('empresa_id', empresa_id)
+      .eq('is_active', true)
+      .neq('tipo', 'servicio'),
   ])
 
   const sumVentasMes  = (ventasMes  ?? []).reduce((s, d) => s + (d.total ?? 0), 0)
   const sumVentasAnt  = (ventasAnt  ?? []).reduce((s, d) => s + (d.total ?? 0), 0)
   const sumComprasMes = (comprasMes ?? []).reduce((s, d) => s + (d.total ?? 0), 0)
   const saldoCaja     = (cuentas    ?? []).reduce((s, c) => s + (c.saldo_actual ?? 0), 0)
+
+  const stockBajoCount = (stockBajo ?? []).filter((p) => {
+    const total = ((p as unknown as { stock_bodega: { cantidad: number }[] }).stock_bodega ?? [])
+      .reduce((s: number, sb: { cantidad: number }) => s + sb.cantidad, 0)
+    return total <= (p as unknown as { stock_minimo: number }).stock_minimo
+  }).length
 
   return {
     ventas_mes:          sumVentasMes,
@@ -80,7 +91,7 @@ export async function getKpiEjecutivo(empresa_id: string): Promise<BiKpiEjecutiv
     saldo_caja:          saldoCaja,
     trabajadores_activos: (trabajadores ?? []).length,
     dtes_pendientes:     (dtePend     ?? []).length,
-    stock_bajo_minimo:   0,  // Calculado directamente en la tabla stock_bodega si es necesario
+    stock_bajo_minimo:   stockBajoCount,
   }
 }
 
