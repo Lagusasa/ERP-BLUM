@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import * as XLSX from 'xlsx'
 import type { BoletaHonorarios, TipoBoleta } from '@/types/sii.types'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import ImportCsvModal from '@/components/sii/ImportCsvModal'
@@ -86,6 +87,31 @@ export default function HonorariosClient({ empresa_id, boletas }: Props) {
   const totalBruto     = filtradas.reduce((s, b) => s + b.monto_bruto, 0)
   const totalRetencion = filtradas.reduce((s, b) => s + b.retencion_10, 0)
 
+  const exportarExcel = useCallback(() => {
+    const rows = [
+      ['Tipo', 'N°', 'RUT Prestador', 'Nombre Prestador', 'RUT Pagador', 'Nombre Pagador', 'Fecha', 'Bruto', 'Retención 10%', 'Líquido'],
+      ...filtradas.map((b) => [
+        b.tipo === 'emitida' ? 'Emitida' : 'Recibida',
+        b.numero,
+        b.rut_prestador,
+        b.nombre_prestador,
+        b.rut_pagador ?? '',
+        b.nombre_pagador ?? '',
+        b.fecha,
+        b.monto_bruto,
+        b.retencion_10,
+        b.monto_liquido,
+      ]),
+      [],
+      ['', '', '', '', '', '', 'TOTAL', totalBruto, totalRetencion, totalBruto - totalRetencion],
+    ]
+    const ws = XLSX.utils.aoa_to_sheet(rows)
+    ws['!cols'] = [{ wch: 10 }, { wch: 8 }, { wch: 16 }, { wch: 24 }, { wch: 16 }, { wch: 20 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 14 }]
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Honorarios')
+    XLSX.writeFile(wb, `honorarios_${new Date().toISOString().slice(0, 10)}.xlsx`)
+  }, [filtradas, totalBruto, totalRetencion])
+
   return (
     <div className="space-y-4">
       {showImport && (
@@ -110,6 +136,13 @@ export default function HonorariosClient({ empresa_id, boletas }: Props) {
           <span>Bruto: <strong className="text-slate-700">{formatCurrency(totalBruto)}</strong></span>
           <span>Retención 10%: <strong className="text-orange-600">{formatCurrency(totalRetencion)}</strong></span>
         </div>
+        <button onClick={exportarExcel}
+          className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium rounded-lg">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Excel
+        </button>
         <button onClick={() => setShowImport(true)}
           className="flex items-center gap-1.5 px-4 py-1.5 border border-emerald-300 text-emerald-700 hover:bg-emerald-50 text-sm font-medium rounded-lg">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

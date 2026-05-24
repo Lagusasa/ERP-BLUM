@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import * as XLSX from 'xlsx'
 import type { DteDocumento } from '@/types/sii.types'
 import { TIPO_DTE_LABELS, ESTADO_DTE_LABELS } from '@/types/sii.types'
 import { formatCurrency, formatDate } from '@/lib/utils'
@@ -41,7 +42,6 @@ const TIPO_DTE_MAP: Record<string, string> = {
 function normTipoDte(s: string): string {
   const n = normText(s)
   if (TIPO_DTE_MAP[n]) return TIPO_DTE_MAP[n]
-  // Try as numeric code
   const num = s.replace(/\D/g, '')
   if (['33','34','39','41','52','61','56'].includes(num)) return num
   return ''
@@ -56,7 +56,6 @@ function normEstadoDte(s: string): string {
 }
 
 function parseDteRow(raw: Record<string, string>): ParseResult<DteImportRow> {
-  // Tipo DTE
   const tipoRaw = col(raw,
     'TIPO DTE','Tipo DTE','TIPO','Tipo','TipoDTE','tipo_dte','CODIGO DTE','Codigo DTE',
     'TIPO DOCUMENTO','Tipo Documento'
@@ -64,25 +63,21 @@ function parseDteRow(raw: Record<string, string>): ParseResult<DteImportRow> {
   const tipo_dte = normTipoDte(tipoRaw)
   if (!tipo_dte) return { ok: false, error: `Tipo DTE inválido: "${tipoRaw}"` }
 
-  // Folio
   const folioRaw = col(raw, 'FOLIO','Folio','folio','N° DOCUMENTO','N DOCUMENTO','NUMERO','Numero')
   const folio = parseInt(folioRaw.replace(/\D/g, ''))
   if (!folio || isNaN(folio)) return { ok: false, error: `Folio inválido: "${folioRaw}"` }
 
-  // RUT
   const rut_contraparte = col(raw,
     'RUT','RUT RECEPTOR','RUT EMISOR','Rut Receptor','Rut Emisor','rut_contraparte',
     'RUT CONTRAPARTE','RUT CLIENTE','RUT PROVEEDOR'
   )
   if (!rut_contraparte) return { ok: false, error: 'RUT contraparte no encontrado' }
 
-  // Razón Social
   const razon_social = col(raw,
     'RAZON SOCIAL','RAZON SOCIAL RECEPTOR','RAZON SOCIAL EMISOR','Razon Social',
     'Razón Social','NOMBRE','razon_social'
   )
 
-  // Fecha
   const fechaRaw = col(raw,
     'FECHA EMISION DOCUMENTO','FECHA EMISION','FECHA','Fecha Emisión','Fecha','fecha_emision',
     'FECHA EMISION DOC','FECHA DOCUMENTO'
@@ -90,13 +85,11 @@ function parseDteRow(raw: Record<string, string>): ParseResult<DteImportRow> {
   const fecha_emision = parseDate(fechaRaw)
   if (!fecha_emision) return { ok: false, error: `Fecha inválida: "${fechaRaw}"` }
 
-  // Montos — the SII RCV export has Neto + IVA + Total
   const monto_neto  = parseNum(col(raw, 'MONTO NETO','Monto Neto','NETO','Neto','monto_neto','MONTO AFECTO','Monto Afecto'))
   const monto_iva   = parseNum(col(raw, 'IVA RECUPERABLE','IVA','Iva','monto_iva','IVA 19%','MONTO IVA'))
   let   monto_total = parseNum(col(raw, 'MONTO TOTAL','Monto Total','TOTAL','Total','monto_total'))
   if (monto_total === 0) monto_total = monto_neto + monto_iva
 
-  // Estado
   const estadoRaw = col(raw, 'ESTADO','Estado','estado','ESTADO OPERACION','Estado Operacion','ACCION')
   const estado = normEstadoDte(estadoRaw || 'pendiente')
 
@@ -135,13 +128,67 @@ interface Props {
   dtes: DteDocumento[]
 }
 
+type EstadoFiltro = 'todos' | 'pendiente' | 'aceptado' | 'rechazado' | 'anulado'
+
 export default function DteListClient({ empresa_id, dtes }: Props) {
   const router = useRouter()
   const [showImport, setShowImport] = useState(false)
+  const [busqueda, setBusqueda] = useState('')
+  const [filtroTipo, setFiltroTipo] = useState('')
+  const [filtroEstado, setFiltroEstado] = useState<EstadoFiltro>('todos')
+  const [anulando, setAnulando] = useState<string | null>(null)
 
-  const totalNeto  = dtes.reduce((s, d) => s + d.monto_neto,  0)
-  const totalIva   = dtes.reduce((s, d) => s + d.monto_iva,   0)
-  const totalTotal = dtes.reduce((s, d) => s + d.monto_total, 0)
+  const filtrados = useMemo(() => {
+    const q = busqueda.toLowerCase()
+    return dtes.filter((d) => {
+      if (q && !d.razon_social?.toLowerCase().includes(q) && !d.rut_contraparte?.toLowerCase().includes(q) && !String(d.folio).includes(q)) return false
+      if (filtroTipo && d.tipo_dte !== filtroTipo) return false
+      if (filtroEstado !== 'todos' && d.estado !== filtroEstado) return false
+      return true
+    })
+  }, [dtes, busqueda, filtroTipo, filtroEstado])
+
+  const totalNeto  = filtrados.reduce((s, d) => s + d.monto_neto,  0)
+  const totalIva   = filtrados.reduce((s, d) => s + d.monto_iva,   0)
+  const totalTotal = filtrados.reduce((s, d) => s + d.monto_total, 0)
+
+  const exportarExcel = useCallback(() => {
+    const rows = [
+      ['Tipo', 'Folio', 'RUT Contraparte', 'Razón Social', 'Fecha Emisión', 'Estado', 'Neto', 'IVA', 'Total'],
+      ...filtrados.map((d) => [
+        (TIPO_DTE_LABELS as Record<string, string>)[d.tipo_dte] ?? d.tipo_dte,
+        d.folio,
+        d.rut_contraparte,
+        d.razon_social ?? '',
+        d.fecha_emision,
+        (ESTADO_DTE_LABELS as Record<string, string>)[d.estado] ?? d.estado,
+        d.monto_neto,
+        d.monto_iva,
+        d.monto_total,
+      ]),
+      [],
+      ['', '', '', '', '', 'TOTALES', totalNeto, totalIva, totalTotal],
+    ]
+    const ws = XLSX.utils.aoa_to_sheet(rows)
+    ws['!cols'] = [{ wch: 20 }, { wch: 8 }, { wch: 16 }, { wch: 28 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 14 }]
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'DTEs')
+    XLSX.writeFile(wb, `dte_${new Date().toISOString().slice(0, 10)}.xlsx`)
+  }, [filtrados, totalNeto, totalIva, totalTotal])
+
+  async function anularDte(id: string) {
+    if (!confirm('¿Anular este DTE? No se puede deshacer.')) return
+    setAnulando(id)
+    const res = await fetch('/api/sii/dte', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, estado: 'anulado' }),
+    })
+    setAnulando(null)
+    if (res.ok) router.refresh()
+  }
+
+  const tiposPresentes = Array.from(new Set(dtes.map((d) => d.tipo_dte))).sort()
 
   return (
     <>
@@ -160,6 +207,13 @@ export default function DteListClient({ empresa_id, dtes }: Props) {
             <p className="text-sm text-slate-500 mt-0.5">Registro de DTEs emitidos y recibidos.</p>
           </div>
           <div className="flex gap-2">
+            <button onClick={exportarExcel}
+              className="flex items-center gap-1.5 px-3 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium rounded-lg">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Excel
+            </button>
             <button onClick={() => setShowImport(true)}
               className="flex items-center gap-1.5 px-4 py-2 border border-emerald-300 text-emerald-700 hover:bg-emerald-50 text-sm font-medium rounded-lg">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -177,10 +231,12 @@ export default function DteListClient({ empresa_id, dtes }: Props) {
           </div>
         </div>
 
+        {/* KPIs */}
         <div className="grid grid-cols-3 gap-4">
           <div className="bg-white border border-slate-200 rounded-xl p-4">
             <p className="text-xs text-slate-500 uppercase tracking-wide">Neto total</p>
             <p className="text-2xl font-bold text-slate-800 mt-1 tabular-nums">{formatCurrency(totalNeto)}</p>
+            {filtrados.length < dtes.length && <p className="text-xs text-slate-400 mt-0.5">{filtrados.length} de {dtes.length} docs</p>}
           </div>
           <div className="bg-white border border-slate-200 rounded-xl p-4">
             <p className="text-xs text-slate-500 uppercase tracking-wide">IVA total</p>
@@ -192,19 +248,49 @@ export default function DteListClient({ empresa_id, dtes }: Props) {
           </div>
         </div>
 
+        {/* Filtros */}
+        <div className="flex flex-wrap gap-2 items-center">
+          <input
+            type="text"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="Buscar por RUT, razón social o folio…"
+            className="flex-1 min-w-48 border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          />
+          <select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}
+            className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-slate-700">
+            <option value="">Todos los tipos</option>
+            {tiposPresentes.map((t) => (
+              <option key={t} value={t}>{(TIPO_DTE_LABELS as Record<string, string>)[t] ?? t}</option>
+            ))}
+          </select>
+          {(['todos', 'pendiente', 'aceptado', 'rechazado', 'anulado'] as EstadoFiltro[]).map((e) => (
+            <button key={e} onClick={() => setFiltroEstado(e)}
+              className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
+                filtroEstado === e ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+              }`}>
+              {e === 'todos' ? 'Todos' : (ESTADO_DTE_LABELS as Record<string, string>)[e] ?? e}
+            </button>
+          ))}
+        </div>
+
         <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-          {dtes.length === 0 ? (
+          {filtrados.length === 0 ? (
             <div className="py-12 text-center">
-              <p className="text-slate-400 text-sm">Sin documentos registrados.</p>
-              <div className="mt-3 flex justify-center gap-3">
-                <button onClick={() => setShowImport(true)} className="text-sm text-emerald-700 hover:underline">
-                  Importar CSV del SII →
-                </button>
-                <span className="text-slate-300">|</span>
-                <Link href="/sii/dte/nuevo" className="text-sm text-emerald-700 hover:underline">
-                  Registrar manualmente →
-                </Link>
-              </div>
+              <p className="text-slate-400 text-sm">
+                {dtes.length === 0 ? 'Sin documentos registrados.' : 'Sin resultados para los filtros aplicados.'}
+              </p>
+              {dtes.length === 0 && (
+                <div className="mt-3 flex justify-center gap-3">
+                  <button onClick={() => setShowImport(true)} className="text-sm text-emerald-700 hover:underline">
+                    Importar CSV del SII →
+                  </button>
+                  <span className="text-slate-300">|</span>
+                  <Link href="/sii/dte/nuevo" className="text-sm text-emerald-700 hover:underline">
+                    Registrar manualmente →
+                  </Link>
+                </div>
+              )}
             </div>
           ) : (
             <table className="w-full text-sm">
@@ -218,11 +304,12 @@ export default function DteListClient({ empresa_id, dtes }: Props) {
                   <th className="text-right px-4 py-2.5 text-xs font-medium text-slate-500">Neto</th>
                   <th className="text-right px-4 py-2.5 text-xs font-medium text-slate-500">IVA</th>
                   <th className="text-right px-5 py-2.5 text-xs font-medium text-slate-500">Total</th>
+                  <th className="px-4 py-2.5" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {dtes.map((d) => (
-                  <tr key={d.id} className="hover:bg-slate-50">
+                {filtrados.map((d) => (
+                  <tr key={d.id} className={`hover:bg-slate-50 ${d.estado === 'anulado' ? 'opacity-50' : ''}`}>
                     <td className="px-5 py-2.5 text-xs font-medium text-slate-700">{TIPO_DTE_LABELS[d.tipo_dte] ?? d.tipo_dte}</td>
                     <td className="px-4 py-2.5 text-slate-600">#{d.folio}</td>
                     <td className="px-4 py-2.5">
@@ -241,6 +328,17 @@ export default function DteListClient({ empresa_id, dtes }: Props) {
                     <td className="px-4 py-2.5 text-right tabular-nums text-slate-600 text-xs">{formatCurrency(d.monto_neto)}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-slate-600 text-xs">{formatCurrency(d.monto_iva)}</td>
                     <td className="px-5 py-2.5 text-right tabular-nums font-medium text-slate-800">{formatCurrency(d.monto_total)}</td>
+                    <td className="px-4 py-2.5 text-right">
+                      {d.estado !== 'anulado' && (
+                        <button
+                          onClick={() => anularDte(d.id)}
+                          disabled={anulando === d.id}
+                          className="text-xs px-2 py-1 rounded border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-40 transition-colors"
+                        >
+                          {anulando === d.id ? '…' : 'Anular'}
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
