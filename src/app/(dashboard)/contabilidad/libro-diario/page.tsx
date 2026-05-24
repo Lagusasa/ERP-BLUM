@@ -6,14 +6,20 @@ import LibroDiarioClient from '@/components/contabilidad/LibroDiarioClient'
 
 export const metadata: Metadata = { title: 'Libro Diario' }
 
-export default async function LibroDiarioPage() {
+interface Props {
+  searchParams: Promise<{ anio?: string }>
+}
+
+export default async function LibroDiarioPage({ searchParams }: Props) {
   const empresa = await getEmpresaActiva()
   if (!empresa) return null
 
-  const ahora = new Date()
+  const params = await searchParams
+  const anio = params.anio ? parseInt(params.anio, 10) : new Date().getFullYear()
+
   const comprobantes = await getComprobantes({
     empresa_id: empresa.id,
-    anio: ahora.getFullYear(),
+    anio,
   }).catch(() => [])
 
   return (
@@ -22,7 +28,7 @@ export default async function LibroDiarioPage() {
         <div>
           <h1 className="text-xl font-bold text-slate-900">Libro Diario</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            {comprobantes.length} comprobantes — {ahora.getFullYear()}
+            {comprobantes.length} comprobantes — {anio}
           </p>
         </div>
         <Link
@@ -36,7 +42,7 @@ export default async function LibroDiarioPage() {
         </Link>
       </div>
 
-      <LibroDiarioClient comprobantes={comprobantes} empresa_id={empresa.id} />
+      <LibroDiarioClient comprobantes={comprobantes} empresa_id={empresa.id} anio={anio} />
     </div>
   )
 }

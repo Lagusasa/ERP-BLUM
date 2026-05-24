@@ -51,6 +51,23 @@ export default function ComprobanteDetalleClient({ comprobante_id, empresa_id, e
     }
   }
 
+  async function crearReverso() {
+    if (!confirm(`¿Crear un comprobante de reverso del N°${numero}? Se generará un nuevo comprobante con las partidas invertidas.`)) return
+    setProcesando(true)
+    try {
+      const res = await fetch('/api/contabilidad/comprobantes/reverso', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comprobante_id, empresa_id }),
+      })
+      const d = await res.json()
+      if (!d.ok) { alert(d.error ?? 'Error al crear reverso'); return }
+      router.push(`/contabilidad/libro-diario/${d.id}`)
+    } finally {
+      setProcesando(false)
+    }
+  }
+
   function imprimir() {
     window.print()
   }
@@ -86,6 +103,19 @@ export default function ComprobanteDetalleClient({ comprobante_id, empresa_id, e
           </svg>
           Imprimir
         </button>
+
+        {estado === 'aprobado' && (
+          <button
+            onClick={crearReverso}
+            disabled={procesando}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-amber-300 text-amber-700 hover:bg-amber-50 rounded-lg transition-colors disabled:opacity-50"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+            </svg>
+            {procesando ? 'Creando…' : 'Crear Reverso'}
+          </button>
+        )}
 
         {estado === 'borrador' && (
           <button

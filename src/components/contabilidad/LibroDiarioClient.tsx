@@ -1,25 +1,35 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
+import * as XLSX from 'xlsx'
 import type { Comprobante } from '@/types/contabilidad.types'
 import { TIPO_COMPROBANTE_LABELS, ESTADO_COMPROBANTE_LABELS } from '@/types/contabilidad.types'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
 
 interface Props {
   comprobantes: Comprobante[]
   empresa_id: string
+  anio: number
 }
 
-export default function LibroDiarioClient({ comprobantes, empresa_id }: Props) {
+export default function LibroDiarioClient({ comprobantes, empresa_id, anio }: Props) {
   const [busqueda, setBusqueda] = useState('')
   const [filtroEstado, setFiltroEstado] = useState<string>('todos')
   const [filtroTipo, setFiltroTipo] = useState<string>('todos')
   const [procesando, setProcesando] = useState<string | null>(null)
   const router = useRouter()
+  const pathname = usePathname()
+
+  const anioActual = new Date().getFullYear()
+  const anios = Array.from({ length: 5 }, (_, i) => anioActual - 2 + i)
+
+  function cambiarAnio(nuevoAnio: string) {
+    router.push(`${pathname}?anio=${nuevoAnio}`)
+  }
 
   const filtrados = useMemo(() => {
     return comprobantes.filter((c) => {
@@ -38,6 +48,35 @@ export default function LibroDiarioClient({ comprobantes, empresa_id }: Props) {
 
   const totalDebe = filtrados.reduce((s, c) => s + c.total_debe, 0)
   const totalHaber = filtrados.reduce((s, c) => s + c.total_haber, 0)
+
+  const exportarExcel = useCallback(() => {
+    const wb = XLSX.utils.book_new()
+    const rows: (string | number)[][] = []
+
+    rows.push(['LIBRO DIARIO', `Año ${anio}`])
+    rows.push([])
+    rows.push(['N°', 'Fecha', 'Tipo', 'Glosa', 'Debe', 'Haber', 'Estado'])
+
+    for (const c of filtrados) {
+      rows.push([
+        c.numero,
+        c.fecha,
+        TIPO_COMPROBANTE_LABELS[c.tipo] ?? c.tipo,
+        c.glosa ?? '',
+        c.total_debe,
+        c.total_haber,
+        ESTADO_COMPROBANTE_LABELS[c.estado as keyof typeof ESTADO_COMPROBANTE_LABELS] ?? c.estado,
+      ])
+    }
+
+    rows.push([])
+    rows.push(['', '', '', 'Totales:', totalDebe, totalHaber, ''])
+
+    const ws = XLSX.utils.aoa_to_sheet(rows)
+    ws['!cols'] = [{ wch: 6 }, { wch: 12 }, { wch: 16 }, { wch: 40 }, { wch: 14 }, { wch: 14 }, { wch: 12 }]
+    XLSX.utils.book_append_sheet(wb, ws, `Libro Diario ${anio}`)
+    XLSX.writeFile(wb, `libro-diario-${anio}.xlsx`)
+  }, [filtrados, totalDebe, totalHaber, anio])
 
   async function aprobar(id: string) {
     setProcesando(id)
@@ -106,6 +145,25 @@ export default function LibroDiarioClient({ comprobantes, empresa_id }: Props) {
             <option key={v} value={v}>{l}</option>
           ))}
         </select>
+
+        <select
+          value={anio}
+          onChange={(e) => cambiarAnio(e.target.value)}
+          className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        >
+          {anios.map((y) => <option key={y} value={y}>{y}</option>)}
+        </select>
+
+        <button
+          onClick={exportarExcel}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+          title="Exportar a Excel"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+          Excel
+        </button>
       </div>
 
       {/* Tabla */}
